@@ -10,8 +10,9 @@ public:
 	* We will need some Smart Pointers to get use up and running and to manage memory
 	* As we will be using olcPGEX, our memony will be managed and cleaned up automatically see olcPGEX_Template.h for details
 	*/
-	std::unique_ptr<olc::MainMenu> pMainMenu;			// Main Menu Smart pointer
-	std::unique_ptr<olc::BackgroundObject> pBackGround;	// Background smart pointer
+	std::unique_ptr<olc::MainMenu> pMainMenu;					// Main Menu Smart pointer
+	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
+	std::unique_ptr<olc::MessageController> pMessageController;
 
 
 

@@ -138,6 +138,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="olcPGEX_MessageController.h" />
     <ClInclude Include="olcPGEX_Background.h" />
     <ClInclude Include="olcPGEX_MainMenu.h" />
     <ClInclude Include="olcPGEX_Template.h" />
@@ -149,6 +150,7 @@
     <Image Include="assets\images\background.png" />
     <Image Include="assets\images\holytoilet.png" />
     <Image Include="assets\images\interfacePack_sheet.png" />
+    <Image Include="assets\images\LettersSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
     <Image Include="assets\images\toiletmainmenu.png" />
@@ -157,11 +159,12 @@
     <None Include="assets\maps\example1.city" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="assets\images\interfacePack_sheet.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3" />
     <Media Include="assets\sounds\ItalianMom.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="assets\maps\interfacePack_sheet.xml" />
+    <Xml Include="assets\maps\LettersSpriteSheet.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

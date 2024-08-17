@@ -1,6 +1,6 @@
 #pragma once
 /*
-* Setup our engine and tell it to use Geomertry2D Vec2D over PGE 2.0 Vec
+* Setup our engine and tell it to use Geomertry2D Vec2D over PGE 2.0 Vec2D
 */
 #define OLC_PGE_APPLICATION
 #include "olcUTIL_Geometry2D.h"
@@ -16,3 +16,6 @@
 
 #define OLC_PGEX_BACKGROUND_OBJECT	// Manages the Background Image
 #include "olcPGEX_Background.h"
+
+#define OLC_PGEX_MESSAGE_CONTROLLER	// Manages the messages displayed to the screen
+#include "olcPGEX_MessageController.h"
