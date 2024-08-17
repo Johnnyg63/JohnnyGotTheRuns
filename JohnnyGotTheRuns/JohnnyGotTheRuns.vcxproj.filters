@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="assets">
+      <UniqueIdentifier>{10fbe92e-6df2-4254-ae46-1173c24424d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\images">
+      <UniqueIdentifier>{ca77392f-958b-4f79-a9a5-7331c35133c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\sounds">
+      <UniqueIdentifier>{7a07ce5b-ba65-4658-81f7-9a0cb544a5cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\maps">
+      <UniqueIdentifier>{daccc7e6-d020-46fe-8196-a828f1577e88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="assets\objectfiles">
+      <UniqueIdentifier>{5bb25e67-d1d9-4c85-ba59-bc511be08910}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="olcPixelGameEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\images\background.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\olcpgemobilelogo.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\oip.jpg">
+      <Filter>assets\images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\maps\example1.city">
+      <Filter>assets\maps</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="assets\maps\spritesheet.xml">
+      <Filter>assets\maps</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\sounds\engineCircular_001.mp3">
+      <Filter>assets\sounds</Filter>
+    </Media>
+    <Media Include="assets\sounds\ItalianMom.mp3">
+      <Filter>assets\sounds</Filter>
+    </Media>
+  </ItemGroup>
+</Project>
