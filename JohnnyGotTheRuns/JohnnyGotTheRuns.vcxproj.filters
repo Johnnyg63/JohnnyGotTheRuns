@@ -28,6 +28,12 @@
     <Filter Include="assets\objectfiles">
       <UniqueIdentifier>{5bb25e67-d1d9-4c85-ba59-bc511be08910}</UniqueIdentifier>
     </Filter>
+    <Filter Include="olcUTILS">
+      <UniqueIdentifier>{00d38e93-5e9b-4b9c-9335-1507c17d8555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="olcPGEX">
+      <UniqueIdentifier>{abe08fb2-23c8-4617-aeb9-3da29ed99359}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -37,6 +43,18 @@
   <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="olcPGEX_Template.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
+    <ClInclude Include="olcUTIL_Geometry2D.h">
+      <Filter>olcUTILS</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="olcPGEX_MainMenu.h">
+      <Filter>olcPGEX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,6 +67,9 @@
     <Image Include="assets\images\oip.jpg">
       <Filter>assets\images</Filter>
     </Image>
+    <Image Include="assets\images\interfacePack_sheet.png">
+      <Filter>assets\images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\maps\example1.city">
@@ -56,7 +77,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="assets\maps\spritesheet.xml">
+    <Xml Include="assets\images\interfacePack_sheet.xml">
       <Filter>assets\maps</Filter>
     </Xml>
   </ItemGroup>
