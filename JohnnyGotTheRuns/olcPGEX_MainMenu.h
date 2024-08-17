@@ -18,7 +18,14 @@ namespace olc
 	{
 
 	public:
+		// Standard Constructor
 		MainMenu(); 
+
+		/*
+		* Constructor
+		* strSpriteSheetPath: Sprite Sheet Path i.e. "assets/images/SprintSheet.png"
+		*/
+		MainMenu(std::string strSpriteSheetPath);
 		virtual ~MainMenu();
 
 		// Fires just before the main OnUserCreate
@@ -36,10 +43,12 @@ namespace olc
 		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created decal
 		void DrawDecal();
 
-		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created sprite
-		void DrawSprite();
 
 		// Add your own public methods here
+
+	private:
+		
+		void DrawBanner();
 
 
 	public:
@@ -66,7 +75,6 @@ namespace olc
 			std::string strName = "GameObject"; // Object name. Default "GameObject"
 			int8_t nObjectNumber = 0;	        // Object number, Default 0 i.e. Player 1 , Player 2 etc
 
-			uint32_t nLives = 3;				// Lives, Default 3
 			uint32_t nMaxFrames = 3;			// Max number of frames, Default 0, this means we are not anitmating this object
 			uint32_t nCurrentFrame = 0;			// Stores the number of the last frame displayed
 			uint32_t nCurrentFPS = 0;			// Stores the current Engine FPS
@@ -83,17 +91,10 @@ namespace olc
 			olc::vi2d viPosition = { 0,0 };	        // Player current POS {x,y} (Int32_t), Default {0,0}
 			olc::vf2d vfPosition = { 0.0f,0.0f };	// Player current POS {x,y} (float), Default {0.0f,0.0f}, recommended for decals
 
-			std::string strSpritePath = "";     // Sprite path, i.e. "images/mysprite.png", Default: ""
-			olc::Sprite* sprImage = nullptr;	// Player Sprite image, Default nullptr
-			olc::Decal* decImage = nullptr;	    // Player Decal Image, Defalut nullptr
 			ImageInfo sprImageInfo;             // Stores the Source and Size of the sprImage
 
-
 			std::string strSpriteSheetPath = "";     // SpriteSheetPath path, i.e. "images/mysprite.png", Default: ""
-			olc::Sprite* sprSpriteSheet = nullptr;	// Player Sprite Sheet image, Default nullptr
-			olc::Decal* decSpriteSheet = nullptr;	// Plaer Decal Sheet Image, Defalut nullptr
 
-			olc::Renderable renImage;      // Keeps the sprImage and decImage in the one location
 			olc::Renderable renSpriteSheet;  // Keeps the sprSpriteSheet and decSpriteSheet in the one location
 			/*
 			*
@@ -109,6 +110,9 @@ namespace olc
 		};
 
 		ObjectProperites Properties;
+
+		private:
+			olc::Renderable renBGImage;
 
 
 	};
@@ -129,34 +133,44 @@ namespace olc
 	{
 		// Set up default Properties
 		Properties.bIsActive = 0;
+
+		// TODO: Create default empty sprite for when this constructor is useds
+	}
+
+	MainMenu::MainMenu(std::string sprSpriteSheetPath) : PGEX(true)
+	{
+		// Set up default Properties
+		Properties.bIsActive = 0;
+		
+#if defined (_MSC_VER)
+		// Windows stuff
+
+		if (sprSpriteSheetPath.rfind("./", 0) != 0) {
+			Properties.strSpriteSheetPath = "./" + sprSpriteSheetPath;
+		}
+#else
+		if (sprSpriteSheetPath.rfind("./", 0) == 0) {
+			Properties.strSpriteSheetPath = sprSpriteSheetPath.substr(2);
+	}
+#endif
+
+
 	}
 
 	// See Step 3: Rename to your Class name
 	MainMenu::~MainMenu()
 	{
 
-		if (Properties.decImage != nullptr)
+		if (Properties.renSpriteSheet.Decal() != nullptr)
 		{
-			// Only delete if it exists in memory
-			delete Properties.decImage;
+			Properties.renSpriteSheet.Decal()->~Decal();
+
 		}
 
-		if (Properties.sprImage != nullptr)
+		if (Properties.renSpriteSheet.Sprite() != nullptr)
 		{
-			// Only delete if it exists in memory
-			delete Properties.sprImage;
-		}
+			Properties.renSpriteSheet.Sprite()->~Sprite();
 
-		if (Properties.decSpriteSheet != nullptr)
-		{
-			// Only delete if it exists in memory
-			delete Properties.decSpriteSheet;
-		}
-
-		if (Properties.sprSpriteSheet != nullptr)
-		{
-			// Only delete if it exists in memory
-			delete Properties.sprSpriteSheet;
 		}
 
 		Properties.vecPartialImages.clear();
@@ -170,6 +184,12 @@ namespace olc
 	{
 		// Fires just before the main OnUserCreate
 
+		// Gets load our renender
+		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
+		Properties.sprImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
+		Properties.sprImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
+
+		
 	}
 
 	// See Step 3: Rename to your Class name
@@ -199,15 +219,49 @@ namespace olc
 	// See Step 3: Rename to your Class name
 	void MainMenu::DrawDecal()
 	{
-
+		// 1: lets get the background
+		DrawBanner();
 	}
 
-	// See Step 3: Rename to your Class name
-	void MainMenu::DrawSprite()
+	void MainMenu::DrawBanner()
 	{
+		 // 1: Our banner is store here in the sprite sheet (interfacePack_sheet.xml)
+		// <SubTexture name="bannerModern.png" x="0" y="59" width="264" height="50"/> TODO: Create XML Reader for images
 
+		// 2: We now need to scale it to our screen, we know our base sceen size is 640/480, 1, 1, so will work to this
+
+		// Get the current vScale of our screen
+		 olc::vf2d vfBaseScale = { 640, 480 };
+		 olc::vf2d vfScaler = { 1.0f, 1.0f };
+		 olc::vf2d vfScreenSize = pge->GetScreenSize();
+		 vfScaler.x = vfScreenSize.x / vfBaseScale.x;
+		 vfScaler.y = vfScreenSize.y / vfBaseScale.y;
+
+		//3: Get the current center pos and 20% from top
+		 olc::vf2d vfCenTopPos;
+		 vfCenTopPos.x = vfScreenSize.x / 2.0f;
+		 vfCenTopPos.y = (vfScreenSize.y / 100) * 10;
+
+		 //4: Ok now we need our start pos for our banner
+		 olc::vf2d vfStartPos;
+		 vfStartPos.x = vfCenTopPos.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		 vfStartPos.y = vfCenTopPos.y;
+
+		 //5: done
+		 pge->DrawPartialDecal(
+			 vfStartPos,
+			 Properties.renSpriteSheet.Decal(),
+			 { 0.0f, 59.0f },
+			 { 264.0f, 50.0f },
+			 vfScaler);
+		 vfStartPos.x += 2.0f;
+		 vfStartPos.y += 12.0f;
+
+		 pge->DrawStringDecal(vfStartPos + 3, " Johnny Got The Runs... ", olc::GREY, {1.35f, 1.5f});
+
+		 pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });
+		 
 	}
-
 
 
 } // olc

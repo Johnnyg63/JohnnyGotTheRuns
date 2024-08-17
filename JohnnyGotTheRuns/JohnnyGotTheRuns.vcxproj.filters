@@ -56,6 +56,9 @@
     <ClInclude Include="olcPGEX_MainMenu.h">
       <Filter>olcPGEX</Filter>
     </ClInclude>
+    <ClInclude Include="olcPGEX_Background.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">
@@ -68,6 +71,12 @@
       <Filter>assets\images</Filter>
     </Image>
     <Image Include="assets\images\interfacePack_sheet.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\holytoilet.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\toiletmainmenu.png">
       <Filter>assets\images</Filter>
     </Image>
   </ItemGroup>

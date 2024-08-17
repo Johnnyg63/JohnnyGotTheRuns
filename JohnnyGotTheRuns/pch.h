@@ -13,3 +13,6 @@
 
 #define OLC_PGEX_MAINMENU			// Manages the Main Menu
 #include "olcPGEX_MainMenu.h"
+
+#define OLC_PGEX_BACKGROUND_OBJECT	// Manages the Background Image
+#include "olcPGEX_Background.h"

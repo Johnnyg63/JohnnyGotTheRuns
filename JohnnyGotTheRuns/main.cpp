@@ -10,7 +10,8 @@ public:
 	* We will need some Smart Pointers to get use up and running and to manage memory
 	* As we will be using olcPGEX, our memony will be managed and cleaned up automatically see olcPGEX_Template.h for details
 	*/
-	std::unique_ptr<olc::MainMenu> pMainMenu;	// Main Menu Smart pointer
+	std::unique_ptr<olc::MainMenu> pMainMenu;			// Main Menu Smart pointer
+	std::unique_ptr<olc::BackgroundObject> pBackGround;	// Background smart pointer
 
 
 
@@ -20,7 +21,8 @@ public:
 		sAppName = "Johnny Got The Runs... OLC CodeJam 2024";
 
 		// Instantiate out smart pointer
-		pMainMenu = std::make_unique<olc::MainMenu>();	// Main Menu
+		pMainMenu	= std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
+		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);	// Background
 
 
 	}
@@ -38,7 +40,6 @@ public:
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
-		sprTemp = new olc::Sprite("./assets/images/oip.jpg");
 
 		return true;
 	}
@@ -47,12 +48,9 @@ public:
 	{
 		// Called once per frame, draws random coloured pixels
 		Clear(olc::BLACK);
-		DrawString({ 50, 100 }, "Johnny Got The Runs...");
-		DrawString({ 50, 150 }, "Can you get Johnny to the Throne in time...");
-
+		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
-
-		DrawSprite({ 100, 200 }, sprTemp);
+		
 		return true;
 	}
 };

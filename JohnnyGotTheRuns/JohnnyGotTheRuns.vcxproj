@@ -138,6 +138,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="olcPGEX_Background.h" />
     <ClInclude Include="olcPGEX_MainMenu.h" />
     <ClInclude Include="olcPGEX_Template.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
@@ -146,9 +147,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png" />
+    <Image Include="assets\images\holytoilet.png" />
     <Image Include="assets\images\interfacePack_sheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
+    <Image Include="assets\images\toiletmainmenu.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\maps\example1.city" />
