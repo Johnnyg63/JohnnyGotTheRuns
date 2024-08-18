@@ -108,11 +108,16 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.h</PrecompiledHeaderOutputFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>Copy $(ProjectDir)\dlls\*.* $(OutputPath)\*.*</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -126,23 +131,30 @@
       <PrecompiledHeader>Create</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.h</PrecompiledHeaderOutputFile>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PreBuildEvent>
+      <Command>Copy $(ProjectDir)\dlls\*.* $(OutputPath)\*.*</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\ft2build.h" />
     <ClInclude Include="olcPGEX_MessageController.h" />
     <ClInclude Include="olcPGEX_Background.h" />
     <ClInclude Include="olcPGEX_MainMenu.h" />
     <ClInclude Include="olcPGEX_SplashScreen.h" />
     <ClInclude Include="olcPGEX_Template.h" />
+    <ClInclude Include="olcPGEX_TTF.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="olcUTIL_Geometry2D.h" />
     <ClInclude Include="pch.h" />
@@ -158,6 +170,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\maps\example1.city" />
+    <None Include="dlls\freetype.dll" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3" />
@@ -166,6 +179,13 @@
   <ItemGroup>
     <Xml Include="assets\maps\interfacePack_sheet.xml" />
     <Xml Include="assets\maps\LettersSpriteSheet.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\kenney_bold.ttf" />
+    <Font Include="assets\fonts\kenney_thick.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\freetype.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

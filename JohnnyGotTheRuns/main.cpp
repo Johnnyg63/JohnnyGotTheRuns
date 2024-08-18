@@ -1,13 +1,25 @@
 #include "pch.h"
 //#include <memory>
 
-// Override base class with your custom functionality
+
+/*
+* IMPORTANT : This game is based on scaling, the base scale for this game is HD 1280x720 1X1 pixels
+* The engine will auto scale objects to ensure the same user experence across different screen size
+* If you change the screen ratio, the engine will still auto scale objects on the base of HD 1280x720 1X1
+* Play with the settings to see how it works... this will help you alot when developing games
+*/
+
+
+/*
+*  Main Game entry point
+*/
 class JGotTheRuns : public olc::PixelGameEngine
 {
 public:
 
 	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
-	olc::SplashScreen olcSplashScreen;
+	//olc::SplashScreen olcSplashScreen;
+
 
 	/*
 	* We will need some Smart Pointers to get use up and running and to manage memory
@@ -15,9 +27,10 @@ public:
 	*/
 	std::unique_ptr<olc::MainMenu> pMainMenu;					// Main Menu Smart pointer
 	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
-	std::unique_ptr<olc::MessageController> pMessageController;
+	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer, 
 
-	
+	// Font 
+	olc::Font font;
 
 
 	JGotTheRuns()
@@ -27,7 +40,8 @@ public:
 
 		// Instantiate out smart pointer
 		pMainMenu	= std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
-		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);	// Background
+		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
+		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
 		
 
 	}
@@ -45,6 +59,9 @@ public:
 	bool OnUserCreate() override
 	{
 		// Called once at the start, so create things here
+		olc::Font::init();
+		font = olc::Font{ "./assets/fonts/kenney_bold.ttf", 16 };
+		font.AddFallbackFont("./assest/fonts/kenney_thick.ttf");
 
 		return true;
 	}
@@ -56,14 +73,30 @@ public:
 		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
 		
+		
+
+
+
 		return true;
 	}
 };
 
 int main()
 {
+
 	JGotTheRuns demo;
-	if (demo.Construct(640, 480, 1, 1))
+
+	/*
+	* IMPORTANT : This game is based on scaling, the base scale for this game is HD 1280x720 1X1 pixels
+	* The engine will auto scale objects to ensure the same user experence across different screen size
+	* If you change the screen ratio, the engine will still auto scale objects on the base of HD 1280x720 1X1
+	* Play with the settings to see how it works... this will help you alot when developing games
+	* 
+	* In short there should be no hard coded values for sprites, except in the case of where the sprite is located on spritesheet
+	*/
+
+	// Lets use HD!
+	if (demo.Construct(1280, 720, 1, 1))
 		demo.Start();
 	return 0;
 }

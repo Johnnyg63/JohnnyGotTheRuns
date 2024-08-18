@@ -34,6 +34,21 @@
     <Filter Include="olcPGEX">
       <UniqueIdentifier>{abe08fb2-23c8-4617-aeb9-3da29ed99359}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assets\fonts">
+      <UniqueIdentifier>{f5f7e652-8366-4a5b-a545-e28bd7a771a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{5b2afe7e-2657-42d9-8ffd-d560ba6d0f35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Header Files">
+      <UniqueIdentifier>{1e4037ae-12aa-4ae3-90ae-19a47fd4af77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\lib">
+      <UniqueIdentifier>{6dec3b1e-6a80-4ac3-82cf-58f3097b3861}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\dlls">
+      <UniqueIdentifier>{6242e703-f9b7-4383-863d-5f1b7f852190}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,6 +80,12 @@
     <ClInclude Include="olcPGEX_SplashScreen.h">
       <Filter>olcPGEX</Filter>
     </ClInclude>
+    <ClInclude Include="olcPGEX_TTF.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ft2build.h">
+      <Filter>External\Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">
@@ -93,6 +114,9 @@
     <None Include="assets\maps\example1.city">
       <Filter>assets\maps</Filter>
     </None>
+    <None Include="dlls\freetype.dll">
+      <Filter>External\dlls</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3">
@@ -109,5 +133,18 @@
     <Xml Include="assets\maps\LettersSpriteSheet.xml">
       <Filter>assets\maps</Filter>
     </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\fonts\kenney_bold.ttf">
+      <Filter>assets\fonts</Filter>
+    </Font>
+    <Font Include="assets\fonts\kenney_thick.ttf">
+      <Filter>assets\fonts</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\freetype.lib">
+      <Filter>External\lib</Filter>
+    </Library>
   </ItemGroup>
 </Project>

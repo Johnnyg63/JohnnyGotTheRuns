@@ -70,6 +70,9 @@
 
 namespace olc
 {
+	/*
+	* Manages GPL 3.0 Licence Requirements for One Lone Coder Pixel Game Engine
+	*/
 	class SplashScreen : public olc::PGEX
 	{
 	public:
@@ -211,7 +214,7 @@ namespace olc
 			}
 
 		olc::vi2d vSize = pge->GetTextSizeProp("Copyright OneLoneCoder.com 2024");
-		pge->DrawStringPropDecal(olc::vf2d(float(pge->ScreenWidth()/2) - vSize.x/2, float(pge->ScreenHeight()) - vSize.y * 3.0f), "Copyright OneLoneCoder.com 2023", olc::PixelF(1.0f, 1.0f, 1.0f, 0.5f), olc::vf2d(1.0, 2.0f));
+		pge->DrawStringPropDecal(olc::vf2d(float(pge->ScreenWidth()/2) - vSize.x/2, float(pge->ScreenHeight()) - vSize.y * 3.0f), "Copyright OneLoneCoder.com 2024", olc::PixelF(1.0f, 1.0f, 1.0f, 0.5f), olc::vf2d(1.0, 2.0f));
 		return true;
 	}
 

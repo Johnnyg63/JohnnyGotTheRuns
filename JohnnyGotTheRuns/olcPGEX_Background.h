@@ -13,6 +13,9 @@
 
 namespace olc
 {
+	/*
+	* Manages the Background Images 
+	*/
 	class BackgroundObject : public PGEX
 	{
 

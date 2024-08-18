@@ -12,7 +12,7 @@
 namespace olc
 {
 	/*
-	* See Step 3: Rename to your Class name
+	* Manages the Main Menu Screen
 	*/
 	class MainMenu : public PGEX
 	{
@@ -43,12 +43,12 @@ namespace olc
 		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created decal
 		void DrawDecal();
 
-
-		// Add your own public methods here
+		// Font 
+		olc::Font font;
 
 	private:
 		
-		void DrawBanner();
+		void DrawBanners();
 
 
 	public:
@@ -91,11 +91,14 @@ namespace olc
 			olc::vi2d viPosition = { 0,0 };	        // Player current POS {x,y} (Int32_t), Default {0,0}
 			olc::vf2d vfPosition = { 0.0f,0.0f };	// Player current POS {x,y} (float), Default {0.0f,0.0f}, recommended for decals
 
-			ImageInfo sprImageInfo;             // Stores the Source and Size of the sprImage
+			ImageInfo sprImageInfo;					// Stores the Source and Size of the sprImage
 
-			std::string strSpriteSheetPath = "";     // SpriteSheetPath path, i.e. "images/mysprite.png", Default: ""
+			std::string strSpriteSheetPath = "";    // SpriteSheetPath path, i.e. "images/mysprite.png", Default: ""
+			std::string strFontPath = "";			// Font path, i.e. "fonts/kenney_bold.ttf", Default: ""
+			std::string strFontBackupPath = "";		// Font path, i.e. "fonts/kenney_thick.ttf", Default: ""
+			int8_t nFontSize = 12;					// Font size, Default: 16
 
-			olc::Renderable renSpriteSheet;  // Keeps the sprSpriteSheet and decSpriteSheet in the one location
+			olc::Renderable renSpriteSheet;			// Keeps the sprSpriteSheet and decSpriteSheet in the one location
 			/*
 			*
 			* Stores the location of the partial image from the sprSpriteSheet
@@ -189,6 +192,20 @@ namespace olc
 		Properties.sprImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
 		Properties.sprImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
 
+		// Load our font
+#if defined (_MSC_VER)
+// Windows stuff
+
+		Properties.strFontPath = "./assets/fonts/kenney_bold.ttf";
+		Properties.strFontBackupPath = "./assets/fonts/kenney_thick.ttf";
+#else
+		Properties.strFontPath = "assets/fonts/kenney_bold.ttf";
+		Properties.strFontBackupPath = "assets/fonts/kenney_thick.ttf";
+#endif
+		
+		olc::Font::init();
+		font = olc::Font{ Properties.strFontPath, Properties.nFontSize };
+		font.AddFallbackFont( Properties.strFontBackupPath);
 		
 	}
 
@@ -220,18 +237,18 @@ namespace olc
 	void MainMenu::DrawDecal()
 	{
 		// 1: lets get the background
-		DrawBanner();
+		DrawBanners();
 	}
 
-	void MainMenu::DrawBanner()
+	void MainMenu::DrawBanners()
 	{
 		 // 1: Our banner is store here in the sprite sheet (interfacePack_sheet.xml)
 		// <SubTexture name="bannerModern.png" x="0" y="59" width="264" height="50"/> TODO: Create XML Reader for images
 
-		// 2: We now need to scale it to our screen, we know our base sceen size is 640/480, 1, 1, so will work to this
+		// 2: We now need to scale it to our screen, we know our base sceen size is 1280/720, 1, 1, so will work to this
 
 		// Get the current vScale of our screen
-		 olc::vf2d vfBaseScale = { 640, 480 };
+		 olc::vf2d vfBaseScale = { 1280, 720 };
 		 olc::vf2d vfScaler = { 1.0f, 1.0f };
 		 olc::vf2d vfScreenSize = pge->GetScreenSize();
 		 vfScaler.x = vfScreenSize.x / vfBaseScale.x;
@@ -257,10 +274,34 @@ namespace olc
 		 vfStartPos.x += 2.0f;
 		 vfStartPos.y += 12.0f;
 
-		 pge->DrawStringDecal(vfStartPos + 3, " Johnny Got The Runs... ", olc::GREY, {1.35f, 1.5f});
-
-		 pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });
 		 
+		 pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x /100.0f) * 2.5f),  vfStartPos.y + 6.0f}, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
+
+		 vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 12.5f;
+		 vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 90.0f;
+
+		 // We need to work out how much we want to scale in the x so the banner fills 80% of the screen
+		 // We know the width of the image therefore
+		 float newWidth = (pge->GetScreenSize().x / 100) * 80;	// New Width Size
+		 float percentDiff = (264.0f / newWidth) * 100;			// Gives us the %differance between the widths	
+		 float newScaleX = (100 / percentDiff);						// Tells us by what amount to scale x
+
+
+		 pge->DrawPartialDecal(
+			 vfStartPos,
+			 Properties.renSpriteSheet.Decal(),
+			 { 0.0f, 59.0f },
+			 { 264.0f, 50.0f },
+			 { newScaleX, vfScaler.y });
+
+
+		 vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 33.0f;
+		 vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 92.5f;
+
+		 pge->DrawDecal( vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
+		/* pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });*/
+		 
+
 	}
 
 

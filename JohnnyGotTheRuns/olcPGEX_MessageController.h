@@ -13,6 +13,9 @@
 
 namespace olc
 {
+	/*
+	* Manages the displaying of game message fonts 
+	*/
 	class MessageController : public PGEX
 	{
 
@@ -39,8 +42,8 @@ namespace olc
 		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created sprite
 		void DrawSprite();
 
-		// Add your own public methods here
-
+		// Draws a message at the location
+		void DrawMessage(std::string strMessage);
 
 	public:
 
@@ -86,9 +89,8 @@ namespace olc
 			char font;			// Letter or number we want
 			vi2d viLocation;	// Location in the sprite sheet
 			vi2d viSize;		// Size of the Font
-		};
+		} GameFont;
 
-		sFont GameFont;
 
 		std::vector<sFont> vecFonts;
 
@@ -121,7 +123,7 @@ namespace olc
 			Properties.strSpriteSheetPath = strSpriteSheetPath.substr(2);
 		}
 #endif
-
+		vecFonts.clear();
 		
 
 	}
@@ -141,6 +143,8 @@ namespace olc
 		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
 		Properties.sImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
 		Properties.sImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
+
+		LoadFonts();
 
 	}
 
@@ -175,13 +179,29 @@ namespace olc
 
 	}
 
+	void MessageController::DrawMessage(std::string strMessage)
+	{
+		// 1: Some defensive programming
+		if (strMessage == "") return;
+		
+
+	}
+
 	void MessageController::LoadFonts()
 	{
 		// Right this will be a long list...., TODO convert to XML
+
+		/*
+		* By Right you should use database (SQLLite) to manage this stuff
+		* or you should use a True Type Font File (*.ttf) 
+		* But where is the fun in that, with a good fontSpriteSheet.png, you can have great fun with the fonts
+		* Move them, scale them, changes colours, rotate etc. etc.
+		*/
 		
 		// Clear our vector
 		vecFonts.clear();
 		
+		// Letters
 		vecFonts.push_back({ 'A', {412, 835}, {61, 64}});
 		vecFonts.push_back({ 'B', {487, 1537}, {50, 66} });
 		vecFonts.push_back({ 'C', {460, 1613}, {52, 66} });
@@ -208,6 +228,19 @@ namespace olc
 		vecFonts.push_back({ 'X', {418, 1409}, {58, 64} });
 		vecFonts.push_back({ 'Y', {432, 1473}, {57, 64} });
 		vecFonts.push_back({ 'Z', {486, 1613}, {50, 64} });
+
+		// Numbers
+		vecFonts.push_back({ '0', {432, 1743}, {53, 78} });
+		vecFonts.push_back({ '1', {512, 1093}, {37, 76} });
+		vecFonts.push_back({ '2', {477, 1350}, {51, 77} });
+		vecFonts.push_back({ '3', {485, 1679}, {51, 78} });
+		vecFonts.push_back({ '4', {432, 1537}, {55, 76} });
+		vecFonts.push_back({ '5', {485, 1823}, {50, 76} });
+		vecFonts.push_back({ '6', {432, 1885}, {53, 77} });
+		vecFonts.push_back({ '7', {478, 1173}, {51, 76} });
+		vecFonts.push_back({ '8', {461, 899}, {51, 78} });
+		vecFonts.push_back({ '9', {458, 1962}, {53, 77} });
+
 
 	}
 
