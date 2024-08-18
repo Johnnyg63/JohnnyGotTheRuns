@@ -6,6 +6,9 @@ class JGotTheRuns : public olc::PixelGameEngine
 {
 public:
 
+	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
+	olc::SplashScreen olcSplashScreen;
+
 	/*
 	* We will need some Smart Pointers to get use up and running and to manage memory
 	* As we will be using olcPGEX, our memony will be managed and cleaned up automatically see olcPGEX_Template.h for details
@@ -14,6 +17,7 @@ public:
 	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
 	std::unique_ptr<olc::MessageController> pMessageController;
 
+	
 
 
 	JGotTheRuns()
@@ -24,7 +28,7 @@ public:
 		// Instantiate out smart pointer
 		pMainMenu	= std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);	// Background
-
+		
 
 	}
 

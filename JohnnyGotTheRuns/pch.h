@@ -11,6 +11,9 @@
 *  Setup our PGE Extensions, I use PGEX classes to manage the game objects, it makes life easier.... 
 */
 
+#define OLC_PGEX_SPLASHSCREEN		// Manages the GPL-3.0 Licence requirements 
+#include "olcPGEX_SplashScreen.h"
+
 #define OLC_PGEX_MAINMENU			// Manages the Main Menu
 #include "olcPGEX_MainMenu.h"
 

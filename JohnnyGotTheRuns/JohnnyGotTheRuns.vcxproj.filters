@@ -62,6 +62,9 @@
     <ClInclude Include="olcPGEX_MessageController.h">
       <Filter>olcPGEX</Filter>
     </ClInclude>
+    <ClInclude Include="olcPGEX_SplashScreen.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">
