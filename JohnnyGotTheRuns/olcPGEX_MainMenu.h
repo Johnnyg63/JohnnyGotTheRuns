@@ -347,6 +347,26 @@ namespace olc
 			{ vfScaler.x, newScaleY });
 
 
+		vfCenTopRight.x = (vfScreenSize.x / 100.0f) * 20.0f;
+		vfCenTopRight.y = (vfScreenSize.y / 100.0f) * 15.0f;
+
+		vfStartPos.x = vfCenTopRight.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		vfStartPos.y = vfCenTopRight.y;
+
+		newHeight = (pge->GetScreenSize().y / 100) * 33;	// New Height Size
+		percentDiff = (59.0f / newHeight) * 100;			// Gives us the %differance between the widths	
+		newScaleY = (100 / percentDiff);						// Tells us by what amount to scale x
+
+		//5: done
+		pge->DrawPartialDecal(
+			vfStartPos,
+			Properties.renSpriteSheet.Decal(),
+			{ 0.0f, 59.0f },
+			{ 264.0f, 50.0f },
+			{ vfScaler.x, newScaleY });
+
+
+
 	}
 
 
