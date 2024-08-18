@@ -52,6 +52,10 @@ namespace olc
 
 		void DrawOptionsMenu();
 
+		void DrawToilet();
+
+		
+
 
 	public:
 
@@ -119,6 +123,10 @@ namespace olc
 	private:
 		olc::Renderable renBGImage;
 
+		olc::Renderable renToilet;
+
+		std::string strToiletPath;
+
 
 	};
 
@@ -153,10 +161,12 @@ namespace olc
 		if (sprSpriteSheetPath.rfind("./", 0) != 0) {
 			Properties.strSpriteSheetPath = "./" + sprSpriteSheetPath;
 		}
+		strToiletPath = "./assets/images/toilet.png";
 #else
 		if (sprSpriteSheetPath.rfind("./", 0) == 0) {
 			Properties.strSpriteSheetPath = sprSpriteSheetPath.substr(2);
 		}
+		strToiletPath = "assets/images/toilet.png";
 #endif
 
 
@@ -193,6 +203,8 @@ namespace olc
 		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
 		Properties.sprImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
 		Properties.sprImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
+
+		renToilet.Load(strToiletPath);
 
 		// Load our font
 #if defined (_MSC_VER)
@@ -240,6 +252,7 @@ namespace olc
 	{
 		DrawBanners();
 		DrawOptionsMenu();
+		DrawToilet();
 	}
 
 	void MainMenu::DrawBanners()
@@ -366,6 +379,33 @@ namespace olc
 			{ vfScaler.x, newScaleY });
 
 
+
+	}
+
+	void MainMenu::DrawToilet()
+	{
+		// Get the current vScale of our screen
+		olc::vf2d vfBaseScale = { 1280, 720 };
+		olc::vf2d vfScaler = { 1.0f, 1.0f };
+		olc::vf2d vfScreenSize = pge->GetScreenSize();
+		vfScaler.x = vfScreenSize.x / vfBaseScale.x;
+		vfScaler.y = vfScreenSize.y / vfBaseScale.y;
+
+		//3: Get the current center pos and 20% from top
+		olc::vf2d vfCenTopPos;
+		vfCenTopPos.x = (vfScreenSize.x / 100) * 80;
+		vfCenTopPos.y = (vfScreenSize.y / 100) * 80;
+
+		//4: Ok now we need our start pos for our banner
+		olc::vf2d vfStartPos;
+		vfStartPos.x = vfCenTopPos.x;  // we know our base height is width="264" from the xml
+		vfStartPos.y = vfCenTopPos.y;
+
+		//5: done
+		pge->DrawDecal(
+			vfStartPos,
+			renToilet.Decal(),
+			{ vfScaler.x / 2, vfScaler.y / 2 });
 
 	}
 

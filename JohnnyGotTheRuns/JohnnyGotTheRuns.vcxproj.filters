@@ -49,6 +49,9 @@
     <Filter Include="External\dlls">
       <UniqueIdentifier>{6242e703-f9b7-4383-863d-5f1b7f852190}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{bd4bc1bc-c932-4339-8744-6ffc8767604b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -86,6 +89,9 @@
     <ClInclude Include="include\ft2build.h">
       <Filter>External\Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="olcPGEX_PlayerObject.h">
+      <Filter>Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">
@@ -107,6 +113,12 @@
       <Filter>assets\images</Filter>
     </Image>
     <Image Include="assets\images\LettersSpriteSheet.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\toilet.png">
+      <Filter>assets\images</Filter>
+    </Image>
+    <Image Include="assets\images\playerSpriteSheet.png">
       <Filter>assets\images</Filter>
     </Image>
   </ItemGroup>
@@ -131,6 +143,9 @@
       <Filter>assets\maps</Filter>
     </Xml>
     <Xml Include="assets\maps\LettersSpriteSheet.xml">
+      <Filter>assets\maps</Filter>
+    </Xml>
+    <Xml Include="assets\maps\playerSpriteSheet.xml">
       <Filter>assets\maps</Filter>
     </Xml>
   </ItemGroup>

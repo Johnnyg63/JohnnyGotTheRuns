@@ -152,6 +152,7 @@
     <ClInclude Include="olcPGEX_MessageController.h" />
     <ClInclude Include="olcPGEX_Background.h" />
     <ClInclude Include="olcPGEX_MainMenu.h" />
+    <ClInclude Include="olcPGEX_PlayerObject.h" />
     <ClInclude Include="olcPGEX_SplashScreen.h" />
     <ClInclude Include="olcPGEX_Template.h" />
     <ClInclude Include="olcPGEX_TTF.h" />
@@ -166,6 +167,8 @@
     <Image Include="assets\images\LettersSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
+    <Image Include="assets\images\playerSpriteSheet.png" />
+    <Image Include="assets\images\toilet.png" />
     <Image Include="assets\images\toiletmainmenu.png" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +182,7 @@
   <ItemGroup>
     <Xml Include="assets\maps\interfacePack_sheet.xml" />
     <Xml Include="assets\maps\LettersSpriteSheet.xml" />
+    <Xml Include="assets\maps\playerSpriteSheet.xml" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\fonts\kenney_bold.ttf" />

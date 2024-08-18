@@ -27,4 +27,6 @@
 #define OLC_PGEX_BACKGROUND_OBJECT	// Manages the Background Image
 #include "olcPGEX_Background.h"
 
+#define OLC_PGEX_PLAYER_OBJECT		// Manages the Player object
+#include "olcPGEX_PlayerObject.h"
 
