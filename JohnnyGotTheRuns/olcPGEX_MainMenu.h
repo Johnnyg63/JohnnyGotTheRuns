@@ -19,7 +19,7 @@ namespace olc
 
 	public:
 		// Standard Constructor
-		MainMenu(); 
+		MainMenu();
 
 		/*
 		* Constructor
@@ -47,8 +47,10 @@ namespace olc
 		olc::Font font;
 
 	private:
-		
+
 		void DrawBanners();
+
+		void DrawOptionsMenu();
 
 
 	public:
@@ -114,8 +116,8 @@ namespace olc
 
 		ObjectProperites Properties;
 
-		private:
-			olc::Renderable renBGImage;
+	private:
+		olc::Renderable renBGImage;
 
 
 	};
@@ -144,7 +146,7 @@ namespace olc
 	{
 		// Set up default Properties
 		Properties.bIsActive = 0;
-		
+
 #if defined (_MSC_VER)
 		// Windows stuff
 
@@ -154,7 +156,7 @@ namespace olc
 #else
 		if (sprSpriteSheetPath.rfind("./", 0) == 0) {
 			Properties.strSpriteSheetPath = sprSpriteSheetPath.substr(2);
-	}
+		}
 #endif
 
 
@@ -202,11 +204,11 @@ namespace olc
 		Properties.strFontPath = "assets/fonts/kenney_bold.ttf";
 		Properties.strFontBackupPath = "assets/fonts/kenney_thick.ttf";
 #endif
-		
+
 		olc::Font::init();
 		font = olc::Font{ Properties.strFontPath, Properties.nFontSize };
-		font.AddFallbackFont( Properties.strFontBackupPath);
-		
+		font.AddFallbackFont(Properties.strFontBackupPath);
+
 	}
 
 	// See Step 3: Rename to your Class name
@@ -220,7 +222,7 @@ namespace olc
 	{
 		// If we are not acivated then we just return, we have nothing to do
 		if (!Properties.bIsActive) return false;
-		
+
 		// Fires just before the main OnUserUpdate
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
 	}
@@ -236,71 +238,114 @@ namespace olc
 	// See Step 3: Rename to your Class name
 	void MainMenu::DrawDecal()
 	{
-		// 1: lets get the background
 		DrawBanners();
+		DrawOptionsMenu();
 	}
 
 	void MainMenu::DrawBanners()
 	{
-		 // 1: Our banner is store here in the sprite sheet (interfacePack_sheet.xml)
-		// <SubTexture name="bannerModern.png" x="0" y="59" width="264" height="50"/> TODO: Create XML Reader for images
+		// 1: Our banner is store here in the sprite sheet (interfacePack_sheet.xml)
+	   // <SubTexture name="bannerModern.png" x="0" y="59" width="264" height="50"/> TODO: Create XML Reader for images
 
-		// 2: We now need to scale it to our screen, we know our base sceen size is 1280/720, 1, 1, so will work to this
+	   // 2: We now need to scale it to our screen, we know our base sceen size is 1280/720, 1, 1, so will work to this
 
-		// Get the current vScale of our screen
-		 olc::vf2d vfBaseScale = { 1280, 720 };
-		 olc::vf2d vfScaler = { 1.0f, 1.0f };
-		 olc::vf2d vfScreenSize = pge->GetScreenSize();
-		 vfScaler.x = vfScreenSize.x / vfBaseScale.x;
-		 vfScaler.y = vfScreenSize.y / vfBaseScale.y;
+	   // Get the current vScale of our screen
+		olc::vf2d vfBaseScale = { 1280, 720 };
+		olc::vf2d vfScaler = { 1.0f, 1.0f };
+		olc::vf2d vfScreenSize = pge->GetScreenSize();
+		vfScaler.x = vfScreenSize.x / vfBaseScale.x;
+		vfScaler.y = vfScreenSize.y / vfBaseScale.y;
 
 		//3: Get the current center pos and 20% from top
-		 olc::vf2d vfCenTopPos;
-		 vfCenTopPos.x = vfScreenSize.x / 2.0f;
-		 vfCenTopPos.y = (vfScreenSize.y / 100) * 10;
+		olc::vf2d vfCenTopPos;
+		vfCenTopPos.x = vfScreenSize.x / 2.0f;
+		vfCenTopPos.y = (vfScreenSize.y / 100) * 10;
 
-		 //4: Ok now we need our start pos for our banner
-		 olc::vf2d vfStartPos;
-		 vfStartPos.x = vfCenTopPos.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
-		 vfStartPos.y = vfCenTopPos.y;
+		//4: Ok now we need our start pos for our banner
+		olc::vf2d vfStartPos;
+		vfStartPos.x = vfCenTopPos.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		vfStartPos.y = vfCenTopPos.y;
 
-		 //5: done
-		 pge->DrawPartialDecal(
-			 vfStartPos,
-			 Properties.renSpriteSheet.Decal(),
-			 { 0.0f, 59.0f },
-			 { 264.0f, 50.0f },
-			 vfScaler);
-		 vfStartPos.x += 2.0f;
-		 vfStartPos.y += 12.0f;
+		//5: done
+		pge->DrawPartialDecal(
+			vfStartPos,
+			Properties.renSpriteSheet.Decal(),
+			{ 0.0f, 59.0f },
+			{ 264.0f, 50.0f },
+			vfScaler);
 
-		 
-		 pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x /100.0f) * 2.5f),  vfStartPos.y + 6.0f}, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
-
-		 vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 12.5f;
-		 vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 90.0f;
-
-		 // We need to work out how much we want to scale in the x so the banner fills 80% of the screen
-		 // We know the width of the image therefore
-		 float newWidth = (pge->GetScreenSize().x / 100) * 80;	// New Width Size
-		 float percentDiff = (264.0f / newWidth) * 100;			// Gives us the %differance between the widths	
-		 float newScaleX = (100 / percentDiff);						// Tells us by what amount to scale x
+		vfStartPos.x += 2.0f;
+		vfStartPos.y += 12.0f;
 
 
-		 pge->DrawPartialDecal(
-			 vfStartPos,
-			 Properties.renSpriteSheet.Decal(),
-			 { 0.0f, 59.0f },
-			 { 264.0f, 50.0f },
-			 { newScaleX, vfScaler.y });
+		pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x / 100.0f) * 2.5f),  vfStartPos.y + 6.0f }, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
+
+		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 12.5f;
+		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 90.0f;
+
+		// We need to work out how much we want to scale in the x so the banner fills 80% of the screen
+		// We know the width of the image therefore
+		float newWidth = (pge->GetScreenSize().x / 100) * 80;	// New Width Size
+		float percentDiff = (264.0f / newWidth) * 100;			// Gives us the %differance between the widths	
+		float newScaleX = (100 / percentDiff);						// Tells us by what amount to scale x
 
 
-		 vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 33.0f;
-		 vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 92.5f;
+		pge->DrawPartialDecal(
+			vfStartPos,
+			Properties.renSpriteSheet.Decal(),
+			{ 0.0f, 59.0f },
+			{ 264.0f, 50.0f },
+			{ newScaleX, vfScaler.y });
 
-		 pge->DrawDecal( vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
+
+		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 33.0f;
+		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 92.5f;
+
+		pge->DrawDecal(vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
 		/* pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });*/
-		 
+
+
+	}
+
+	void MainMenu::DrawOptionsMenu()
+	{
+		// Right the options will be on the top right of the screen
+		// Option 1: Start Game
+		// Option 2: Settings (Shound etc)
+		// Option 3: Credits
+
+		// Ok first step lets redraw our banner to work
+		// <SubTexture name="bannerHanging.png" x="0" y="0" width="268" height="59"/>
+
+		// Get our scaler values
+		olc::vf2d vfBaseScale = { 1280, 720 };
+		olc::vf2d vfScaler = { 1.0f, 1.0f };
+		olc::vf2d vfScreenSize = pge->GetScreenSize();
+		vfScaler.x = vfScreenSize.x / vfBaseScale.x;
+		vfScaler.y = vfScreenSize.y / vfBaseScale.y;
+
+		//3: Get the current center pos and 20% from top and 75% from the left
+		olc::vf2d vfCenTopRight;
+		vfCenTopRight.x = (vfScreenSize.x / 100.0f) * 80.0f;
+		vfCenTopRight.y = (vfScreenSize.y / 100.0f) * 15.0f;
+
+		//4: Ok now we need our start pos for our banner
+		olc::vf2d vfStartPos;
+		vfStartPos.x = vfCenTopRight.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		vfStartPos.y = vfCenTopRight.y;
+
+		float newHeight = (pge->GetScreenSize().y / 100) * 33;	// New Height Size
+		float percentDiff = (59.0f / newHeight) * 100;			// Gives us the %differance between the widths	
+		float newScaleY = (100 / percentDiff);						// Tells us by what amount to scale x
+
+		//5: done
+		pge->DrawPartialDecal(
+			vfStartPos,
+			Properties.renSpriteSheet.Decal(),
+			{ 0.0f, 59.0f },
+			{ 264.0f, 50.0f },
+			{ vfScaler.x, newScaleY });
+
 
 	}
 
