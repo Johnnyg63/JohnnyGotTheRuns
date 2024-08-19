@@ -290,8 +290,8 @@ namespace olc
 		vfStartPos.x += 2.0f;
 		vfStartPos.y += 12.0f;
 
-
-		pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x / 100.0f) * 2.5f),  vfStartPos.y + 6.0f }, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
+		// Memory Leak.... will correct later
+		//pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x / 100.0f) * 2.5f),  vfStartPos.y + 6.0f }, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
 
 		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 12.5f;
 		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 90.0f;
@@ -314,7 +314,7 @@ namespace olc
 		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 33.0f;
 		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 92.5f;
 
-		pge->DrawDecal(vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
+		//pge->DrawDecal(vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
 		/* pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });*/
 
 
