@@ -123,14 +123,10 @@ namespace olc
 
 			olc::vf2d vfVelocity = { 0.0f, 0.0f };  // Velocity, vfsd {x, y}, Default: {0.0f, 0.0f}
 
-			olc::vi2d viStartPosition = { 0,0 };	// Start Position {x,y} (Int32_t), Default {0,0}
+			olc::vi2d vfStartPosition = { 0,0 };	// Start Position {x,y} (Int32_t), Default {0,0}
 
-			olc::vi2d viPosition = { 0,0 };	        // Player current POS {x,y} (Int32_t), Default {0,0}
 			olc::vf2d vfPosition = { 0.0f,0.0f };	// Player current POS {x,y} (float), Default {0.0f,0.0f}, recommended for decals
 
-			std::string strSpritePath = "";			// Sprite path, i.e. "images/mysprite.png", Default: ""
-			olc::Sprite* sprImage = nullptr;		// Player Sprite image, Default nullptr
-			olc::Decal* decImage = nullptr;			// Player Decal Image, Defalut nullptr
 			ImageInfo sprImageInfo;					// Stores the Source and Size of the sprImage
 
 			std::string strSpriteSheetPath = "";    // SpriteSheetPath path, i.e. "images/mysprite.png", Default: ""
@@ -178,7 +174,7 @@ namespace olc
 
 			float fFrameChangeRate = 0.0f;          // This value will auto calcuate the rate of change depending on the current FPS
 			float fFrameElapsedTime = 0.0f;         // Keeps track of the time pass since the last frame change
-			float fFramesPerSecound = 1.0f;         // Set the number of times the frame is to change per second, Default: 1.0f
+			float fFramesPerSecound = 10.0f;         // Set the number of times the frame is to change per second, Default: 1.0f
 
 			/*
 			* Stores the location of the partial image from the sprSpriteSheet
@@ -231,32 +227,9 @@ namespace olc
 
 	PlayerObject::~PlayerObject()
 	{
-
 		// lets clean up
-		vecActionFrames.clear();
-
-		if (Properties.decImage != nullptr)
-		{
-			delete Properties.decImage;
-		}
-
-		if (Properties.sprImage != nullptr)
-		{
-			delete Properties.sprImage;
-		}
-
-		if (Properties.decSpriteSheet != nullptr)
-		{
-			delete Properties.decSpriteSheet;
-		}
-
-		if (Properties.sprSpriteSheet != nullptr)
-		{
-			delete Properties.sprSpriteSheet;
-		}
-
 		
-
+		
 	}
 
 	void PlayerObject::OnBeforeUserCreate()
@@ -266,8 +239,6 @@ namespace olc
 		if (bIsEmptySprite)
 		{
 			Properties.renImage.Create(10, 10);
-			Properties.sprImage = Properties.renImage.Sprite();
-			Properties.decImage = Properties.renImage.Decal();
 			Properties.sprImageInfo.vSource = { 0.0f, 0.0f };
 			Properties.sprImageInfo.vSize = { 10.0f, 10.0f };
 			return;
@@ -278,30 +249,12 @@ namespace olc
 		// and now has updated the properites before this execution
 		// Therefore the below code checks and ensures these "new" properties are applied
 
-		if (bisSpriteSheet)
-		{
-			// lets create Sprite Sheet
-			Properties.strSpriteSheetPath = strImagePath;
-			Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
-			Properties.sprSpriteSheet = Properties.renSpriteSheet.Sprite();
-			Properties.decSpriteSheet = Properties.renSpriteSheet.Decal();
-			Properties.sprImageInfo.vSize = Properties.renSpriteSheet.Sprite()->Size();
-
-		}
-		else
-		{
-			// Lets create a sprite
-			Properties.strSpritePath = strImagePath;
-			Properties.renImage.Load(Properties.strSpritePath);
-			Properties.sprImage = Properties.renImage.Sprite();
-			Properties.decImage = Properties.renImage.Decal();
-			Properties.sprImageInfo.vSize = Properties.renImage.Sprite()->Size();
-
-		}
-
-
-		Properties.vfPosition = Properties.viStartPosition;
-		Properties.viPosition = Properties.vfPosition;
+		// lets create Sprite Sheet
+		Properties.strSpriteSheetPath = strImagePath;
+		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
+		Properties.sprSpriteSheet = Properties.renSpriteSheet.Sprite();
+		Properties.decSpriteSheet = Properties.renSpriteSheet.Decal();
+		Properties.sprImageInfo.vSize = Properties.renSpriteSheet.Sprite()->Size();
 
 		LoadActionFrames();
 
@@ -321,8 +274,8 @@ namespace olc
 		//Properties.vfPosition.y += Properties.vfVelocity.y * fElapsedTime;
 
 		// Have we hit the bottom?
-		if (Properties.vfPosition.y > (pge->ScreenHeight() - Properties.sprImageInfo.vSize.y))
-			Properties.vfPosition.y = pge->ScreenHeight() - Properties.sprImageInfo.vSize.y;
+		//if (Properties.vfPosition.y > (pge->ScreenHeight() - Properties.sprImageInfo.vSize.y))
+		//	Properties.vfPosition.y = pge->ScreenHeight() - Properties.sprImageInfo.vSize.y;
 
 		//if (pge->GetTouch().bReleased)
 		//{
@@ -331,11 +284,8 @@ namespace olc
 		//}
 
 		// Have we hit the top
-		if (Properties.vfPosition.y < 1.0f)
-			Properties.vfPosition.y = 1.0f;
-
-		// Decals uses vf2f (floats) while Sprites use vi2d (int32_t), let case vfPos to vnPos
-		Properties.viPosition = Properties.vfPosition;
+		//if (Properties.vfPosition.y < 1.0f)
+		//	Properties.vfPosition.y = 1.0f;
 
 		/* END Update our postion  */
 
@@ -407,13 +357,20 @@ namespace olc
 					actionFrame.fFrameElapsedTime = 0.0f;
 					actionFrame.nCurrentFrame++;
 				}
-				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size()) { actionFrame.nCurrentFPS = 0; }
+				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size()) 
+				{ 
+					actionFrame.nCurrentFrame = 0;
+				}
 
 				// 3: Update our Properties to tell dev what is happening
 				Properties.sprImageInfo.vSource = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSource;
 				Properties.sprImageInfo.vSize = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSize;
 
-				// 4: Draw the current decal frame
+
+				// 4: Apply our master scaler
+				Properties.sprImageInfo.vScale = Properties.vfMasterScaler;
+
+				// 5: Draw the current decal frame
 				if (Properties.bIsVisiable)
 				{
 					pge->DrawPartialDecal(
@@ -459,376 +416,440 @@ namespace olc
 		// For the moment we will manually add the info... just want to get it up and running folks
 
 		// IDLE
-		ActionFrame actFrame;
-		actFrame.nActionID = ACTION::IDLE;
-		actFrame.strActionName = "idle";
-		actFrame.nMaxFrames = 1;
-		ImageInfo sImageInfo;
-		sImageInfo.vSource = { 0.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		ActionFrame actFrame_IDLE;
+		ImageInfo sImageInfo_IDLE;
+		actFrame_IDLE.nActionID = ACTION::IDLE;
+		actFrame_IDLE.strActionName = "idle";
+		actFrame_IDLE.nMaxFrames = 1;
+
+		sImageInfo_IDLE.vSource = { 0.0f, 0.0f };
+		sImageInfo_IDLE.vSize = { 192.0f, 256.0f };
+		actFrame_IDLE.vecPartialImages.push_back(sImageInfo_IDLE);
+		vecActionFrames.push_back(actFrame_IDLE);
 
 		// JUMP
-		actFrame.nActionID = ACTION::JUMP;
-		actFrame.strActionName = "jump";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_JUMP;
+		ImageInfo sImageInfo_JUMP;
+		actFrame_JUMP.nActionID = ACTION::JUMP;
+		actFrame_JUMP.strActionName = "jump";
+		actFrame_JUMP.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 192.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_JUMP.vSource = { 192.0f, 0.0f };
+		sImageInfo_JUMP.vSize = { 192.0f, 256.0f };
+		actFrame_JUMP.vecPartialImages.push_back(sImageInfo_JUMP);
+		vecActionFrames.push_back(actFrame_JUMP);
 
 		// FALL
-		actFrame.nActionID = ACTION::FALL;
-		actFrame.strActionName = "fall";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_FALL;
+		ImageInfo sImageInfo_FALL;
+		actFrame_FALL.nActionID = ACTION::FALL;
+		actFrame_FALL.strActionName = "fall";
+		actFrame_FALL.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 384.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_FALL.vSource = { 384.0f, 0.0f };
+		sImageInfo_FALL.vSize = { 192.0f, 256.0f };
+		actFrame_FALL.vecPartialImages.push_back(sImageInfo_FALL);
+		vecActionFrames.push_back(actFrame_FALL);
 
 		// DUCK
-		actFrame.nActionID = ACTION::DUCK;
-		actFrame.strActionName = "duck";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_DUCK;
+		ImageInfo sImageInfo_DUCK;
+		actFrame_DUCK.nActionID = ACTION::DUCK;
+		actFrame_DUCK.strActionName = "duck";
+		actFrame_DUCK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 576.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_DUCK.vSource = { 576.0f, 0.0f };
+		sImageInfo_DUCK.vSize = { 192.0f, 256.0f };
+		actFrame_DUCK.vecPartialImages.push_back(sImageInfo_DUCK);
+		vecActionFrames.push_back(actFrame_DUCK);
 
 		// HIT
-		actFrame.nActionID = ACTION::HIT;
-		actFrame.strActionName = "hit";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_HIT;
+		ImageInfo sImageInfo_HIT;
+		actFrame_HIT.nActionID = ACTION::HIT;
+		actFrame_HIT.strActionName = "hit";
+		actFrame_HIT.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 768.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_HIT.vSource = { 768.0f, 0.0f };
+		sImageInfo_HIT.vSize = { 192.0f, 256.0f };
+		actFrame_HIT.vecPartialImages.push_back(sImageInfo_HIT);
+		vecActionFrames.push_back(actFrame_HIT);
 
 		// CLIMB
-		actFrame.nActionID = ACTION::CLIMB;
-		actFrame.strActionName = "climb";
-		actFrame.nMaxFrames = 2;
+		ActionFrame actFrame_CLIMB;
+		ImageInfo sImageInfo_CLIMB;
+		actFrame_CLIMB.nActionID = ACTION::CLIMB;
+		actFrame_CLIMB.strActionName = "climb";
+		actFrame_CLIMB.nMaxFrames = 2;
 
-		sImageInfo.vSource = { 960.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		sImageInfo.vSource = { 1152.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_CLIMB.vSource = { 960.0f, 0.0f };
+		sImageInfo_CLIMB.vSize = { 192.0f, 256.0f };
+		actFrame_CLIMB.vecPartialImages.push_back(sImageInfo_CLIMB);
+
+		sImageInfo_CLIMB.vSource = { 1152.0f, 0.0f };
+		sImageInfo_CLIMB.vSize = { 192.0f, 256.0f };
+		actFrame_CLIMB.vecPartialImages.push_back(sImageInfo_CLIMB);
+		vecActionFrames.push_back(actFrame_CLIMB);
 
 		// CHEER
-		actFrame.nActionID = ACTION::CHEER;
-		actFrame.strActionName = "cheer";
-		actFrame.nMaxFrames = 2;
+		ActionFrame actFrame_CHEER;
+		ImageInfo sImageInfo_CHEER;
+		actFrame_CHEER.nActionID = ACTION::CHEER;
+		actFrame_CHEER.strActionName = "cheer";
+		actFrame_CHEER.nMaxFrames = 2;
 
-		sImageInfo.vSource = { 1344.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		sImageInfo.vSource = { 1536.0f, 0.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_CHEER.vSource = { 1344.0f, 0.0f };
+		sImageInfo_CHEER.vSize = { 192.0f, 256.0f };
+		actFrame_CHEER.vecPartialImages.push_back(sImageInfo_CHEER);
+
+		sImageInfo_CHEER.vSource = { 1536.0f, 0.0f };
+		sImageInfo_CHEER.vSize = { 192.0f, 256.0f };
+		actFrame_CHEER.vecPartialImages.push_back(sImageInfo_CHEER);
+		vecActionFrames.push_back(actFrame_CHEER);
 
 		// BACK
-		actFrame.nActionID = ACTION::BACK;
-		actFrame.strActionName = "back";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_BACK;
+		ImageInfo sImageInfo_BACK;
+		actFrame_BACK.nActionID = ACTION::BACK;
+		actFrame_BACK.strActionName = "back";
+		actFrame_BACK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 0.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_BACK.vSource = { 0.0f, 256.0f };
+		sImageInfo_BACK.vSize = { 192.0f, 256.0f };
+		actFrame_BACK.vecPartialImages.push_back(sImageInfo_BACK);
+		vecActionFrames.push_back(actFrame_BACK);
 
 		// SLIDE
-		actFrame.nActionID = ACTION::SLIDE;
-		actFrame.strActionName = "slide";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_SLIDE;
+		ImageInfo sImageInfo_SLIDE;
+		actFrame_SLIDE.nActionID = ACTION::SLIDE;
+		actFrame_SLIDE.strActionName = "slide";
+		actFrame_SLIDE.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 192.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SLIDE.vSource = { 192.0f, 256.0f };
+		sImageInfo_SLIDE.vSize = { 192.0f, 256.0f };
+		actFrame_SLIDE.vecPartialImages.push_back(sImageInfo_SLIDE);
+		vecActionFrames.push_back(actFrame_SLIDE);
 
 		// INTERACT
-		actFrame.nActionID = ACTION::INTERACT;
-		actFrame.strActionName = "interact";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_INTERACT;
+		ImageInfo sImageInfo_INTERACT;
+		actFrame_INTERACT.nActionID = ACTION::INTERACT;
+		actFrame_INTERACT.strActionName = "interact";
+		actFrame_INTERACT.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 384.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_INTERACT.vSource = { 384.0f, 256.0f };
+		sImageInfo_INTERACT.vSize = { 192.0f, 256.0f };
+		actFrame_INTERACT.vecPartialImages.push_back(sImageInfo_INTERACT);
+		vecActionFrames.push_back(actFrame_INTERACT);
 
-		// SWiTCH
-		actFrame.nActionID = ACTION::SWITCH;
-		actFrame.strActionName = "switch";
-		actFrame.nMaxFrames = 2;
+		// SWITCH
+		ActionFrame actFrame_SWITCH;
+		ImageInfo sImageInfo_SWITCH;
+		actFrame_SWITCH.nActionID = ACTION::SWITCH;
+		actFrame_SWITCH.strActionName = "switch";
+		actFrame_SWITCH.nMaxFrames = 2;
 
-		sImageInfo.vSource = { 576.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		sImageInfo.vSource = { 768.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SWITCH.vSource = { 576.0f, 256.0f };
+		sImageInfo_SWITCH.vSize = { 192.0f, 256.0f };
+		actFrame_SWITCH.vecPartialImages.push_back(sImageInfo_SWITCH);
+
+		sImageInfo_SWITCH.vSource = { 768.0f, 256.0f };
+		sImageInfo_SWITCH.vSize = { 192.0f, 256.0f };
+		actFrame_SWITCH.vecPartialImages.push_back(sImageInfo_SWITCH);
+		vecActionFrames.push_back(actFrame_SWITCH);
 
 		// KICK
-		actFrame.nActionID = ACTION::KICK;
-		actFrame.strActionName = "kick";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_KICK;
+		ImageInfo sImageInfo_KICK;
+		actFrame_KICK.nActionID = ACTION::KICK;
+		actFrame_KICK.strActionName = "kick";
+		actFrame_KICK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 960.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_KICK.vSource = { 960.0f, 256.0f };
+		sImageInfo_KICK.vSize = { 192.0f, 256.0f };
+		actFrame_KICK.vecPartialImages.push_back(sImageInfo_KICK);
+		vecActionFrames.push_back(actFrame_KICK);
 
 		// SIDE
-		actFrame.nActionID = ACTION::SIDE;
-		actFrame.strActionName = "side";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_SIDE;
+		ImageInfo sImageInfo_SIDE;
+		actFrame_SIDE.nActionID = ACTION::SIDE;
+		actFrame_SIDE.strActionName = "side";
+		actFrame_SIDE.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1152.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SIDE.vSource = { 1152.0f, 256.0f };
+		sImageInfo_SIDE.vSize = { 192.0f, 256.0f };
+		actFrame_SIDE.vecPartialImages.push_back(sImageInfo_SIDE);
+		vecActionFrames.push_back(actFrame_SIDE);
 
 		// SHOVE
-		actFrame.nActionID = ACTION::SHOVE;
-		actFrame.strActionName = "shove";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_SHOVE;
+		ImageInfo sImageInfo_SHOVE;
+		actFrame_SHOVE.nActionID = ACTION::SHOVE;
+		actFrame_SHOVE.strActionName = "shove";
+		actFrame_SHOVE.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1344.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SHOVE.vSource = { 1344.0f, 256.0f };
+		sImageInfo_SHOVE.vSize = { 192.0f, 256.0f };
+		actFrame_SHOVE.vecPartialImages.push_back(sImageInfo_SHOVE);
+		vecActionFrames.push_back(actFrame_SHOVE);
 
 		// SHOVE_BACK
-		actFrame.nActionID = ACTION::SHOVE_BACK;
-		actFrame.strActionName = "shoveBack";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_SHOVE_BACK;
+		ImageInfo sImageInfo_SHOVE_BACK;
+		actFrame_SHOVE_BACK.nActionID = ACTION::SHOVE_BACK;
+		actFrame_SHOVE_BACK.strActionName = "shoveBack";
+		actFrame_SHOVE_BACK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1536.0f, 256.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SHOVE_BACK.vSource = { 1536.0f, 256.0f };
+		sImageInfo_SHOVE_BACK.vSize = { 192.0f, 256.0f };
+		actFrame_SHOVE_BACK.vecPartialImages.push_back(sImageInfo_SHOVE_BACK);
+		vecActionFrames.push_back(actFrame_SHOVE_BACK);
 
 		// TALK
-		actFrame.nActionID = ACTION::TALK;
-		actFrame.strActionName = "talk";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_TALK;
+		ImageInfo sImageInfo_TALK;
+		actFrame_TALK.nActionID = ACTION::TALK;
+		actFrame_TALK.strActionName = "talk";
+		actFrame_TALK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 0.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_TALK.vSource = { 0.0f, 512.0f };
+		sImageInfo_TALK.vSize = { 192.0f, 256.0f };
+		actFrame_TALK.vecPartialImages.push_back(sImageInfo_TALK);
+		vecActionFrames.push_back(actFrame_TALK);
 
 		// ATTACK_KICK
-		actFrame.nActionID = ACTION::ATTACK_KICK;
-		actFrame.strActionName = "attackKick";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_ATTACK_KICK;
+		ImageInfo sImageInfo_ATTACK_KICK;
+		actFrame_ATTACK_KICK.nActionID = ACTION::ATTACK_KICK;
+		actFrame_ATTACK_KICK.strActionName = "attackKick";
+		actFrame_ATTACK_KICK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 192.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_ATTACK_KICK.vSource = { 192.0f, 512.0f };
+		sImageInfo_ATTACK_KICK.vSize = { 192.0f, 256.0f };
+		actFrame_ATTACK_KICK.vecPartialImages.push_back(sImageInfo_ATTACK_KICK);
+		vecActionFrames.push_back(actFrame_ATTACK_KICK);
 
 		// HANG
-		actFrame.nActionID = ACTION::HANG;
-		actFrame.strActionName = "hang";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_HANG;
+		ImageInfo sImageInfo_HANG;
+		actFrame_HANG.nActionID = ACTION::HANG;
+		actFrame_HANG.strActionName = "hang";
+		actFrame_HANG.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 384.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_HANG.vSource = { 384.0f, 512.0f };
+		sImageInfo_HANG.vSize = { 192.0f, 256.0f };
+		actFrame_HANG.vecPartialImages.push_back(sImageInfo_HANG);
+		vecActionFrames.push_back(actFrame_HANG);
 
 		// HOLD
-		actFrame.nActionID = ACTION::HOLD;
-		actFrame.strActionName = "hold";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_HOLD;
+		ImageInfo sImageInfo_HOLD;
+		actFrame_HOLD.nActionID = ACTION::HOLD;
+		actFrame_HOLD.strActionName = "hold";
+		actFrame_HOLD.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 576.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_HOLD.vSource = { 576.0f, 512.0f };
+		sImageInfo_HOLD.vSize = { 192.0f, 256.0f };
+		actFrame_HOLD.vecPartialImages.push_back(sImageInfo_HOLD);
+		vecActionFrames.push_back(actFrame_HOLD);
 
 		// SHOW
-		actFrame.nActionID = ACTION::SHOW;
-		actFrame.strActionName = "show";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_SHOW;
+		ImageInfo sImageInfo_SHOW;
+		actFrame_SHOW.nActionID = ACTION::SHOW;
+		actFrame_SHOW.strActionName = "show";
+		actFrame_SHOW.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 768.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_SHOW.vSource = { 768.0f, 512.0f };
+		sImageInfo_SHOW.vSize = { 192.0f, 256.0f };
+		actFrame_SHOW.vecPartialImages.push_back(sImageInfo_SHOW);
+		vecActionFrames.push_back(actFrame_SHOW);
 
 		// BEHIND_BACK
-		actFrame.nActionID = ACTION::BEHIND_BACK;
-		actFrame.strActionName = "behindBack";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_BEHIND_BACK;
+		ImageInfo sImageInfo_BEHIND_BACK;
+		actFrame_BEHIND_BACK.nActionID = ACTION::BEHIND_BACK;
+		actFrame_BEHIND_BACK.strActionName = "behindBack";
+		actFrame_BEHIND_BACK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 960.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_BEHIND_BACK.vSource = { 960.0f, 512.0f };
+		sImageInfo_BEHIND_BACK.vSize = { 192.0f, 256.0f };
+		actFrame_BEHIND_BACK.vecPartialImages.push_back(sImageInfo_BEHIND_BACK);
+		vecActionFrames.push_back(actFrame_BEHIND_BACK);
 
 		// RUN
-		actFrame.nActionID = ACTION::RUN;
-		actFrame.strActionName = "run";
-		actFrame.nMaxFrames = 3;
+		ActionFrame actFrame_RUN;
+		ImageInfo sImageInfo_RUN;
+		actFrame_RUN.nActionID = ACTION::RUN;
+		actFrame_RUN.strActionName = "run";
+		actFrame_RUN.nMaxFrames = 3;
 
-		sImageInfo.vSource = { 1152.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_RUN.vSource = { 1152.0f, 512.0f };
+		sImageInfo_RUN.vSize = { 192.0f, 256.0f };
+		actFrame_RUN.vecPartialImages.push_back(sImageInfo_RUN);
 
-		sImageInfo.vSource = { 1344.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_RUN.vSource = { 1344.0f, 512.0f };
+		sImageInfo_RUN.vSize = { 192.0f, 256.0f };
+		actFrame_RUN.vecPartialImages.push_back(sImageInfo_RUN);
 
-		sImageInfo.vSource = { 1536.0f, 512.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_RUN.vSource = { 1536.0f, 512.0f };
+		sImageInfo_RUN.vSize = { 192.0f, 256.0f };
+		actFrame_RUN.vecPartialImages.push_back(sImageInfo_RUN);
+		vecActionFrames.push_back(actFrame_RUN);
 
 		// ATTACK
-		actFrame.nActionID = ACTION::ATTACK;
-		actFrame.strActionName = "attack";
-		actFrame.nMaxFrames = 3;
+		ActionFrame actFrame_ATTACK;
+		ImageInfo sImageInfo_ATTACK;
+		actFrame_ATTACK.nActionID = ACTION::ATTACK;
+		actFrame_ATTACK.strActionName = "attack";
+		actFrame_ATTACK.nMaxFrames = 3;
 
-		sImageInfo.vSource = { 0.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_ATTACK.vSource = { 0.0f, 768.0f };
+		sImageInfo_ATTACK.vSize = { 192.0f, 256.0f };
+		actFrame_ATTACK.vecPartialImages.push_back(sImageInfo_ATTACK);
 
-		sImageInfo.vSource = { 192.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_ATTACK.vSource = { 192.0f, 768.0f };
+		sImageInfo_ATTACK.vSize = { 192.0f, 256.0f };
+		actFrame_ATTACK.vecPartialImages.push_back(sImageInfo_ATTACK);
 
-		sImageInfo.vSource = { 384.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_ATTACK.vSource = { 384.0f, 768.0f };
+		sImageInfo_ATTACK.vSize = { 192.0f, 256.0f };
+		actFrame_ATTACK.vecPartialImages.push_back(sImageInfo_ATTACK);
+		vecActionFrames.push_back(actFrame_ATTACK);
 
 		// THINK
-		actFrame.nActionID = ACTION::THINK;
-		actFrame.strActionName = "think";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_THINK;
+		ImageInfo sImageInfo_THINK;
+		actFrame_THINK.nActionID = ACTION::THINK;
+		actFrame_THINK.strActionName = "think";
+		actFrame_THINK.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 576.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_THINK.vSource = { 576.0f, 768.0f };
+		sImageInfo_THINK.vSize = { 192.0f, 256.0f };
+		actFrame_THINK.vecPartialImages.push_back(sImageInfo_THINK);
+		vecActionFrames.push_back(actFrame_THINK);
 
 		// DOWN
-		actFrame.nActionID = ACTION::DOWN;
-		actFrame.strActionName = "down";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_DOWN;
+		ImageInfo sImageInfo_DOWN;
+		actFrame_DOWN.nActionID = ACTION::DOWN;
+		actFrame_DOWN.strActionName = "down";
+		actFrame_DOWN.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 768.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_DOWN.vSource = { 768.0f, 768.0f };
+		sImageInfo_DOWN.vSize = { 192.0f, 256.0f };
+		actFrame_DOWN.vecPartialImages.push_back(sImageInfo_DOWN);
+		vecActionFrames.push_back(actFrame_DOWN);
 
 		// DRAG
-		actFrame.nActionID = ACTION::DRAG;
-		actFrame.strActionName = "drag";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_DRAG;
+		ImageInfo sImageInfo_DRAG;
+		actFrame_DRAG.nActionID = ACTION::DRAG;
+		actFrame_DRAG.strActionName = "drag";
+		actFrame_DRAG.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 960.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_DRAG.vSource = { 960.0f, 768.0f };
+		sImageInfo_DRAG.vSize = { 192.0f, 256.0f };
+		actFrame_DRAG.vecPartialImages.push_back(sImageInfo_DRAG);
+		vecActionFrames.push_back(actFrame_DRAG);
 
 		// HURT
-		actFrame.nActionID = ACTION::HURT;
-		actFrame.strActionName = "hurt";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_HURT;
+		ImageInfo sImageInfo_HURT;
+		actFrame_HURT.nActionID = ACTION::HURT;
+		actFrame_HURT.strActionName = "hurt";
+		actFrame_HURT.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1152.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_HURT.vSource = { 1152.0f, 768.0f };
+		sImageInfo_HURT.vSize = { 192.0f, 256.0f };
+		actFrame_HURT.vecPartialImages.push_back(sImageInfo_HURT);
+		vecActionFrames.push_back(actFrame_HURT);
 
 		// WIDE
-		actFrame.nActionID = ACTION::WIDE;
-		actFrame.strActionName = "wide";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_WIDE;
+		ImageInfo sImageInfo_WIDE;
+		actFrame_WIDE.nActionID = ACTION::WIDE;
+		actFrame_WIDE.strActionName = "wide";
+		actFrame_WIDE.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1344.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_WIDE.vSource = { 1344.0f, 768.0f };
+		sImageInfo_WIDE.vSize = { 192.0f, 256.0f };
+		actFrame_WIDE.vecPartialImages.push_back(sImageInfo_WIDE);
+		vecActionFrames.push_back(actFrame_WIDE);
 
 		// ROPE
-		actFrame.nActionID = ACTION::ROPE;
-		actFrame.strActionName = "rope";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_ROPE;
+		ImageInfo sImageInfo_ROPE;
+		actFrame_ROPE.nActionID = ACTION::ROPE;
+		actFrame_ROPE.strActionName = "rope";
+		actFrame_ROPE.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1536.0f, 768.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_ROPE.vSource = { 1536.0f, 768.0f };
+		sImageInfo_ROPE.vSize = { 192.0f, 256.0f };
+		actFrame_ROPE.vecPartialImages.push_back(sImageInfo_ROPE);
+		vecActionFrames.push_back(actFrame_ROPE);
 
 		// WALK
-		actFrame.nActionID = ACTION::WALK;
-		actFrame.strActionName = "walk";
-		actFrame.nMaxFrames = 8;
+		ActionFrame actFrame_WALK;
+		ImageInfo sImageInfo_WALK;
+		actFrame_WALK.nActionID = ACTION::WALK;
+		actFrame_WALK.strActionName = "walk";
+		actFrame_WALK.nMaxFrames = 8;
 
 		// frame 0
-		sImageInfo.vSource = { 0.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 0.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 1
-		sImageInfo.vSource = { 192.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 192.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 2
-		sImageInfo.vSource = { 384.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 384.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 3
-		sImageInfo.vSource = { 576.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 576.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 4
-		sImageInfo.vSource = { 768.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 768.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 5
-		sImageInfo.vSource = { 960.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 960.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 6
-		sImageInfo.vSource = { 1152.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
+		sImageInfo_WALK.vSource = { 1152.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 7
-		sImageInfo.vSource = { 1344.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_WALK.vSource = { 1344.0f, 1024.0f };
+		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
+		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
+		vecActionFrames.push_back(actFrame_WALK);
 
 		// FALL_DOWN
-		actFrame.nActionID = ACTION::FALL_DOWN;
-		actFrame.strActionName = "fallDOWN";
-		actFrame.nMaxFrames = 1;
+		ActionFrame actFrame_FALL_DOWN;
+		ImageInfo sImageInfo_FALL_DOWN;
+		actFrame_FALL_DOWN.nActionID = ACTION::FALL_DOWN;
+		actFrame_FALL_DOWN.strActionName = "fallDOWN";
+		actFrame_FALL_DOWN.nMaxFrames = 1;
 
-		sImageInfo.vSource = { 1536.0f, 1024.0f };
-		sImageInfo.vSize = { 192.0f, 256.0f };
-		actFrame.vecPartialImages.push_back(sImageInfo);
-		vecActionFrames.push_back(actFrame);
+		sImageInfo_FALL_DOWN.vSource = { 1536.0f, 1024.0f };
+		sImageInfo_FALL_DOWN.vSize = { 192.0f, 256.0f };
+		actFrame_FALL_DOWN.vecPartialImages.push_back(sImageInfo_FALL_DOWN);
+		vecActionFrames.push_back(actFrame_FALL_DOWN);
 
 
 	}

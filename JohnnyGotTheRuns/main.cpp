@@ -55,11 +55,6 @@ public:
 		pPlayer->Properties.nLives = 3;
 		pPlayer->Properties.vfVelocity = { 10.0f, 10.0f };
 
-		// Move the player to half way down screen, and 5% in from the right
-		pPlayer->Properties.viStartPosition.x = (ScreenWidth() / 100) * 10;
-		pPlayer->Properties.viStartPosition.y = (ScreenHeight() / 2);
-		
-
 	}
 
 	~JGotTheRuns()
@@ -79,6 +74,11 @@ public:
 		font = olc::Font{ "./assets/fonts/kenney_bold.ttf", 16 };
 		font.AddFallbackFont("./assest/fonts/kenney_thick.ttf");
 
+		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 10.0f;
+		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 76.4f;
+		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
+		pPlayer->Properties.vfMasterScaler = { 0.40f, 0.40f }; // Out player is HD and Big, bring him down a little
+
 		return true;
 	}
 
@@ -89,7 +89,7 @@ public:
 		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
 		
-		pPlayer->UpdateAction(olc::PlayerObject::WALK);
+		pPlayer->UpdateAction(olc::PlayerObject::RUN);
 		pPlayer->UpdatePlayer(fElapsedTime);
 	
 		return true;
