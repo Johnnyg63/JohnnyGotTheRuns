@@ -114,6 +114,10 @@ namespace olc
 			*/
 			std::vector<ImageInfo> vecPartialImages;
 
+			olc::vf2d vfSettingRect = { 0.0f, 0.0f };
+			olc::vf2d vfButtonRect = { 0.0f, 0.0f };
+
+
 
 
 		};
@@ -377,6 +381,9 @@ namespace olc
 		}
 
 		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decSettingMessage, vfScaler);
+		
+		// Set our Top Right position for QuickGUI
+		Properties.vfSettingRect = { vfStartPos.x + 10, vfStartPos.y + 60 };
 
 		vfCenTopRight.x = (vfScreenSize.x / 100.0f) * 20.0f;
 		vfCenTopRight.y = (vfScreenSize.y / 100.0f) * 15.0f;
@@ -403,6 +410,7 @@ namespace olc
 
 		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decButtonsMessage, vfScaler);
 
+		Properties.vfButtonRect = { vfStartPos.x + 10, vfStartPos.y + 60 };
 	}
 
 	void MainMenu::DrawToilet()

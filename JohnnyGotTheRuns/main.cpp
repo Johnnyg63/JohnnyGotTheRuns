@@ -1,6 +1,4 @@
 #include "pch.h"
-//#include <memory>
-
 
 /*
 * IMPORTANT : This game is based on scaling, the base scale for this game is HD 1280x720 1X1 pixels
@@ -19,6 +17,35 @@ public:
 
 	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
 	//olc::SplashScreen olcSplashScreen;
+
+	/*
+	* GAME Menu
+	*/
+	enum GAME_MENU
+	{
+		MAIN_MENU = 0,
+		GAME_LEVEL,
+		CREDITS
+
+	};
+
+	GAME_MENU eGameMenu;
+
+	/*
+	* QuickGUI Stuff
+	*/
+public:
+	olc::QuickGUI::Manager guiManager;
+
+	olc::QuickGUI::Slider* guiSlider1 = nullptr;
+	olc::QuickGUI::Slider* guiSlider2 = nullptr;
+
+	olc::QuickGUI::Button* guiButton1 = nullptr;
+	olc::QuickGUI::Button* guiButton2 = nullptr;
+
+	olc::QuickGUI::Label* guiLabelMasterVolume = nullptr;
+	olc::QuickGUI::Label* guiLabelSoundVolume = nullptr;
+
 
 
 	/*
@@ -80,16 +107,78 @@ public:
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
 		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Out player is HD and Big, bring him down a little
 
+		/*
+		* Quick GUI Stuff
+		*/
+		guiSlider1 = new olc::QuickGUI::Slider(guiManager,
+			{ 30.0f, 10.0f }, { 246.0f, 10.0f }, 0, 100, 50);
+
+
+		// Diagonal Slider!
+		guiSlider2 = new olc::QuickGUI::Slider(guiManager,
+			{ 20.0f, 20.0f }, { 120.0f, 120.0f }, 0, 100, 50);
+		
+
+		// Labels for theme colour sliders
+		guiLabelMasterVolume = new olc::QuickGUI::Label(guiManager,
+			"Volume:", { 80.0f, 22.0f }, { 50.0f, 16.0f });
+		guiLabelSoundVolume = new olc::QuickGUI::Label(guiManager,
+			"SFX:", { 80.0f, 42.0f }, { 50.0f, 16.0f });
+
+		// Customize how the labels look
+		guiLabelSoundVolume->nAlign = olc::QuickGUI::Label::Alignment::Left;
+		guiLabelSoundVolume->bHasBorder = false;
+		guiLabelSoundVolume->bHasBackground = false;
+
+		guiLabelMasterVolume->nAlign = olc::QuickGUI::Label::Alignment::Left;
+		guiLabelMasterVolume->bHasBorder = false;
+		guiLabelMasterVolume->bHasBackground = false;
+
+		// Some Buttons,
+		guiButton1 = new olc::QuickGUI::Button(guiManager,
+			"Start", { 30.0f, 150.0f }, { 100.0f, 16.0f });
+		guiButton2 = new olc::QuickGUI::Button(guiManager,
+			"Credits", { 30.0f, 170.0f }, { 100.0f, 16.0f });
+
+		
+
 		return true;
 	}
 
 	bool OnUserUpdate(float fElapsedTime) override
 	{
 		// Called once per frame, draws random coloured pixels
+		bool bResult = false;
+
+		switch (eGameMenu)
+		{
+		case JGotTheRuns::MAIN_MENU:
+			bResult = DisplayMainMenu(fElapsedTime);
+			break;
+		case JGotTheRuns::GAME_LEVEL:
+			bResult = DisplayGameLevel(fElapsedTime);
+			break;
+		case JGotTheRuns::CREDITS:
+			bResult = DisplayCredits(fElapsedTime);
+			break;
+		default:
+			break;
+		}
+
+		return bResult;
+	}
+
+
+	bool DisplayMainMenu(float fElapsedTime)
+	{
+		bool bResult = false;
+		SetDrawTarget(nullptr);
 		Clear(olc::BLACK);
 		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
-		
+
+		bResult = DisplayQuickGUI(fElapsedTime);
+
 		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
 		if (GetKey(olc::Key::RIGHT).bHeld)
 		{
@@ -101,11 +190,81 @@ public:
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
 			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
 		}
-		
+
 		pPlayer->UpdatePlayer(fElapsedTime);
-	
+		return bResult;
+	}
+
+	bool DisplayQuickGUI(float fElapsedTime)
+	{
+		guiManager.Update(this);
+
+		guiLabelMasterVolume->vPos.x = pMainMenu->Properties.vfSettingRect.x;
+		guiLabelMasterVolume->vPos.y = pMainMenu->Properties.vfSettingRect.y + 10;
+		guiLabelMasterVolume->vSize = { 240.0f, 20.0f };
+		guiSlider1->vPosMin.x = pMainMenu->Properties.vfSettingRect.x;
+		guiSlider1->vPosMin.y = pMainMenu->Properties.vfSettingRect.y + 40.0f;
+		guiSlider1->vPosMax.x = pMainMenu->Properties.vfSettingRect.x + 240.f;
+		guiSlider1->vPosMax.y = pMainMenu->Properties.vfSettingRect.y + 40.0f;
+
+		guiLabelSoundVolume->vPos.x = pMainMenu->Properties.vfSettingRect.x;
+		guiLabelSoundVolume->vPos.y = pMainMenu->Properties.vfSettingRect.y + 50;
+		guiLabelSoundVolume->vSize = { 240.0f, 20.0f };
+		guiSlider2->vPosMin.x = pMainMenu->Properties.vfSettingRect.x;
+		guiSlider2->vPosMin.y = pMainMenu->Properties.vfSettingRect.y + 80.0f;
+		guiSlider2->vPosMax.x = pMainMenu->Properties.vfSettingRect.x + 240.0f;
+		guiSlider2->vPosMax.y = pMainMenu->Properties.vfSettingRect.y + 80.0f;
+
+		guiButton1->vPos.x = pMainMenu->Properties.vfButtonRect.x;
+		guiButton1->vPos.y = pMainMenu->Properties.vfButtonRect.y + 10.0f;
+		guiButton1->vSize = { 240.0f, 40.0f };
+
+		guiButton2->vPos.x = pMainMenu->Properties.vfButtonRect.x;
+		guiButton2->vPos.y = pMainMenu->Properties.vfButtonRect.y + 60.0f;
+		guiButton2->vSize = { 240.0f, 40.0f };
+
+
+		if (guiSlider1->bHeld)
+		{
+			guiLabelMasterVolume->sText = "Volume: " + std::to_string(guiSlider1->fValue);
+			
+		}
+		
+		if (guiSlider2->bHeld)
+		{
+			guiLabelSoundVolume->sText = "SFX: " + std::to_string(guiSlider2->fValue);
+
+		}
+
+		if (guiButton1->bPressed)
+		{
+			eGameMenu = GAME_MENU::GAME_LEVEL;
+		}
+
+		if (guiButton2->bPressed)
+		{
+			eGameMenu = GAME_MENU::CREDITS;
+		}
+
+		guiManager.DrawDecal(this);
+
 		return true;
 	}
+
+
+	bool DisplayGameLevel(float fElapsedTime)
+	{
+		return true;
+	}
+
+	bool DisplayCredits(float fElapsedTime)
+	{
+
+		return true;
+	}
+
+
+
 };
 
 int main()
