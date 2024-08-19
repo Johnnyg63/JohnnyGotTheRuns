@@ -156,7 +156,15 @@ namespace olc
 		float fGodModeTimer = 0.0f;         // Use to timeout GodMode when the timeout is reached
 		float fGodModeFlashTimer = 0.0f;    // Used to flash the Decal while in God mode
 
+		bool bWarpFrame = false;				// used to warp the decal 
 		
+		olc::vf2d vfLeft = { -1.0f, 1.0f };		// Left Direction vector 
+		olc::vf2d vfRight = { 1.0f, 1.0f };		// Right Direction vector 
+		olc::vf2d vfDirection = vfRight;		// Direction vector Default: vfRight
+		bool bDirectionChanged = false;			// Use to stop flashing when we change direction
+
+
+
 
 		// Action Map to link the Enum to a String
 		std::map<ACTION, std::string> mActionMap;
@@ -167,7 +175,7 @@ namespace olc
 			ACTION nActionID = IDLE;                // Action ID, Default: IDLE
 			bool bActive = false;					// Is Active, Default: false
 			std::string strActionName = "Unknown";  // Action name, i.e. "Walk", "Jump" etc. , Default "Unknown"
-			
+
 			uint32_t nMaxFrames = 0;                // Max number of frames, Default 0, this means we are not anitmating this object
 			uint32_t nCurrentFrame = 0;             // Stores the number of the last frame displayed
 			uint32_t nCurrentFPS = 0;               // Stores the current Engine FPS
@@ -191,7 +199,7 @@ namespace olc
 		void LoadActionFrames();
 
 		// Change the frame, depending on frames per second
-		void ChangeFrame(ActionFrame* pActionFrame, float fElapsedTime);
+		olc::vf2d WarpFrame(ACTION action);
 
 	public:
 
@@ -228,8 +236,8 @@ namespace olc
 	PlayerObject::~PlayerObject()
 	{
 		// lets clean up
-		
-		
+
+
 	}
 
 	void PlayerObject::OnBeforeUserCreate()
@@ -268,6 +276,10 @@ namespace olc
 	bool PlayerObject::OnBeforeUserUpdate(float& fElapsedTime)
 	{
 
+		// find our direction
+		// Work out direction
+		
+
 		/* Update our postion  */
 
 		// Ok we are falling....
@@ -275,7 +287,7 @@ namespace olc
 
 		// Have we hit the bottom?
 		//if (Properties.vfPosition.y > (pge->ScreenHeight() - Properties.sprImageInfo.vSize.y))
-		//	Properties.vfPosition.y = pge->ScreenHeight() - Properties.sprImageInfo.vSize.y;
+		//	Properties.vfPosition.y = pge->ScreenHeight() - Properties.sprImageInfo.vSize.y;//
 
 		//if (pge->GetTouch().bReleased)
 		//{
@@ -285,18 +297,10 @@ namespace olc
 
 		// Have we hit the top
 		//if (Properties.vfPosition.y < 1.0f)
-		//	Properties.vfPosition.y = 1.0f;
+		//		Properties.vfPosition.y = 1.0f;
 
-		/* END Update our postion  */
-
-
-		// Ok now for the fun part, 
-		// We need to update the output decal so the main engine knows what to draw
-		// To do this we use the public method to drawObject
-		/// DrawDecal and DrawSprite methods
-
-		/* End Update our frame  */
-
+		
+		
 		return false;
 	}
 
@@ -324,6 +328,9 @@ namespace olc
 			fGodModeFlashTimer = 0.0f;
 			fGodModeTimer = 0.0f;
 		}
+
+		
+
 	}
 
 	void PlayerObject::UpdateAction(ACTION action)
@@ -340,7 +347,6 @@ namespace olc
 
 	void PlayerObject::UpdatePlayer(float fElapsedTime)
 	{
-
 		for (auto& actionFrame : vecActionFrames)
 		{
 			if (actionFrame.bActive)
@@ -356,19 +362,38 @@ namespace olc
 				{
 					actionFrame.fFrameElapsedTime = 0.0f;
 					actionFrame.nCurrentFrame++;
+					
 				}
-				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size()) 
-				{ 
+				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size())
+				{
 					actionFrame.nCurrentFrame = 0;
 				}
 
-				// 3: Update our Properties to tell dev what is happening
 				Properties.sprImageInfo.vSource = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSource;
 				Properties.sprImageInfo.vSize = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSize;
+				Properties.sprImageInfo.vScale = WarpFrame(actionFrame.nActionID);
+				Properties.sprImageInfo.vScale *= vfDirection;
+				
+				if (pge->GetKey(olc::Key::RIGHT).bPressed)
+				{
+					if (vfDirection != vfRight)
+					{
+						Properties.vfPosition.x -= (Properties.sprImageInfo.vSize.x * Properties.vfMasterScaler.x);
+						bDirectionChanged = true;
+					}
+					vfDirection = vfRight;
+				}
 
-
-				// 4: Apply our master scaler
-				Properties.sprImageInfo.vScale = Properties.vfMasterScaler;
+				if (pge->GetKey(olc::Key::LEFT).bPressed)
+				{
+					if (vfDirection != vfLeft)
+					{
+						Properties.vfPosition.x += (Properties.sprImageInfo.vSize.x * Properties.vfMasterScaler.x);
+						bDirectionChanged = true;
+					}
+					vfDirection = vfLeft;
+				}
+				
 
 				// 5: Draw the current decal frame
 				if (Properties.bIsVisiable)
@@ -382,7 +407,7 @@ namespace olc
 						Properties.sprImageInfo.pxTint
 					);
 				}
-					
+
 			}
 		}
 
@@ -395,19 +420,14 @@ namespace olc
 		collCircle.vfCenterPos *= Properties.sprImageInfo.vScale;
 
 		// 2: Lets get the radius, we want the small circle that can fit within the decal
-		collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2) 
-								* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
+		collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2)
+			* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
 
 		pge->FillCircle(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
 
 	}
 
-	void PlayerObject::ChangeFrame(ActionFrame* pActionFrame, float fElapsedTime)
-	{
-		// Calculate the rate of change from frames
-		
 
-	}
 
 
 	void PlayerObject::LoadActionFrames()
@@ -854,7 +874,92 @@ namespace olc
 
 	}
 
-	
+	olc::vf2d PlayerObject::WarpFrame(ACTION action)
+	{
+		bWarpFrame = !bWarpFrame;
+		if (!bWarpFrame) return olc::vf2d(Properties.vfMasterScaler);
+
+		olc::vf2d vfWarp = { 0.0f, 0.0f };
+
+		switch (action)
+		{
+		case olc::PlayerObject::IDLE:
+			break;
+		case olc::PlayerObject::JUMP:
+			break;
+		case olc::PlayerObject::FALL:
+			break;
+		case olc::PlayerObject::DUCK:
+			break;
+		case olc::PlayerObject::HIT:
+			break;
+		case olc::PlayerObject::CLIMB:
+			break;
+		case olc::PlayerObject::CHEER:
+			break;
+		case olc::PlayerObject::BACK:
+			break;
+		case olc::PlayerObject::SLIDE:
+			break;
+		case olc::PlayerObject::INTERACT:
+			break;
+		case olc::PlayerObject::SWITCH:
+			break;
+		case olc::PlayerObject::KICK:
+			break;
+		case olc::PlayerObject::SIDE:
+			break;
+		case olc::PlayerObject::SHOVE:
+			break;
+		case olc::PlayerObject::SHOVE_BACK:
+			break;
+		case olc::PlayerObject::TALK:
+			break;
+		case olc::PlayerObject::ATTACK_KICK:
+			break;
+		case olc::PlayerObject::HANG:
+			break;
+		case olc::PlayerObject::HOLD:
+			break;
+		case olc::PlayerObject::SHOW:
+			break;
+		case olc::PlayerObject::BEHIND_BACK:
+			vfWarp = { 0.005f, 0.005f };
+			break;
+		case olc::PlayerObject::RUN:
+			vfWarp = { 0.005f, 0.009f };
+			break;
+		case olc::PlayerObject::ATTACK:
+			break;
+		case olc::PlayerObject::THINK:
+			break;
+		case olc::PlayerObject::DOWN:
+			break;
+		case olc::PlayerObject::DRAG:
+			break;
+		case olc::PlayerObject::HURT:
+			break;
+		case olc::PlayerObject::WIDE:
+			break;
+		case olc::PlayerObject::ROPE:
+			break;
+		case olc::PlayerObject::WALK:
+			vfWarp = { 0.005f, 0.005f };
+			break;
+		case olc::PlayerObject::FALL_DOWN:
+			break;
+		case olc::PlayerObject::NONE:
+			break;
+		default:
+			break;
+		}
+
+		return olc::vf2d(Properties.vfMasterScaler + vfWarp);
+	}
+
+
+
+
 
 } // olc
 

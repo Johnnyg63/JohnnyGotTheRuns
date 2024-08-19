@@ -33,7 +33,8 @@ public:
 	// Font 
 	olc::Font font;
 
-
+	int8_t tempSwitch = 0;
+	
 	JGotTheRuns()
 	{
 		// Name your application
@@ -53,7 +54,7 @@ public:
 		pPlayer->Properties.nPlayerNumber = 0;        // Set our player numbner
 		// Load player details
 		pPlayer->Properties.nLives = 3;
-		pPlayer->Properties.vfVelocity = { 10.0f, 10.0f };
+		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
 
 	}
 
@@ -75,9 +76,9 @@ public:
 		font.AddFallbackFont("./assest/fonts/kenney_thick.ttf");
 
 		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 10.0f;
-		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 76.4f;
+		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 72.0f;
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
-		pPlayer->Properties.vfMasterScaler = { 0.40f, 0.40f }; // Out player is HD and Big, bring him down a little
+		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Out player is HD and Big, bring him down a little
 
 		return true;
 	}
@@ -89,7 +90,18 @@ public:
 		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
 		
-		pPlayer->UpdateAction(olc::PlayerObject::RUN);
+		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+		if (GetKey(olc::Key::RIGHT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
+		}
+		if (GetKey(olc::Key::LEFT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
+		}
+		
 		pPlayer->UpdatePlayer(fElapsedTime);
 	
 		return true;
