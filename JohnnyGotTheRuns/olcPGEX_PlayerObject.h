@@ -423,7 +423,7 @@ namespace olc
 		collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2)
 			* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
 
-		pge->FillCircle(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
+		//pge->FillCircle(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
 
 	}
 

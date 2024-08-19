@@ -127,6 +127,12 @@ namespace olc
 
 		std::string strToiletPath;
 
+		// std::u32string
+		olc::Decal* decHeaderMessage = nullptr;
+		olc::Decal* decFooterMessage = nullptr;
+		olc::Decal* decSettingMessage = nullptr;
+		olc::Decal* decButtonsMessage = nullptr;
+
 
 	};
 
@@ -169,7 +175,6 @@ namespace olc
 		strToiletPath = "assets/images/toilet.png";
 #endif
 
-
 	}
 
 	// See Step 3: Rename to your Class name
@@ -190,7 +195,7 @@ namespace olc
 
 		Properties.vecPartialImages.clear();
 
-
+	
 
 	}
 
@@ -291,7 +296,11 @@ namespace olc
 		vfStartPos.y += 12.0f;
 
 		// Memory Leak.... will correct later
-		//pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x / 100.0f) * 2.5f),  vfStartPos.y + 6.0f }, font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK), vfScaler);
+		if (decHeaderMessage == nullptr)
+		{
+			decHeaderMessage = font.RenderStringToDecal(U" Johnny Got The Runs...", olc::BLACK);
+		}
+		pge->DrawDecal({ vfStartPos.x + ((vfStartPos.x / 100.0f) * 2.5f),  vfStartPos.y + 6.0f }, decHeaderMessage, vfScaler);
 
 		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 12.5f;
 		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 90.0f;
@@ -314,10 +323,13 @@ namespace olc
 		vfStartPos.x = (pge->GetScreenSize().x / 100.0f) * 33.0f;
 		vfStartPos.y = (pge->GetScreenSize().y / 100.0f) * 92.5f;
 
-		//pge->DrawDecal(vfStartPos, font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK), vfScaler);
-		/* pge->DrawStringDecal({ 100, 440 }, "Can you get Johnny to the Throne in time...", olc::DARK_BLUE, { 1.4f, 1.5f });*/
+		if (decFooterMessage == nullptr)
+		{
+			decFooterMessage = font.RenderStringToDecal(U" Can you get Johnny to the Throne in time... ", olc::BLACK);
+		}
 
-
+		pge->DrawDecal(vfStartPos, decFooterMessage, vfScaler);
+		
 	}
 
 	void MainMenu::DrawOptionsMenu()
@@ -349,7 +361,7 @@ namespace olc
 
 		float newHeight = (pge->GetScreenSize().y / 100) * 33;	// New Height Size
 		float percentDiff = (59.0f / newHeight) * 100;			// Gives us the %differance between the widths	
-		float newScaleY = (100 / percentDiff);						// Tells us by what amount to scale x
+		float newScaleY = (100 / percentDiff);					// Tells us by what amount to scale x
 
 		//5: done
 		pge->DrawPartialDecal(
@@ -359,6 +371,12 @@ namespace olc
 			{ 264.0f, 50.0f },
 			{ vfScaler.x, newScaleY });
 
+		if (decSettingMessage == nullptr)
+		{
+			decSettingMessage = font.RenderStringToDecal(U" Settings ", olc::BLACK);
+		}
+
+		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decSettingMessage, vfScaler);
 
 		vfCenTopRight.x = (vfScreenSize.x / 100.0f) * 20.0f;
 		vfCenTopRight.y = (vfScreenSize.y / 100.0f) * 15.0f;
@@ -378,7 +396,12 @@ namespace olc
 			{ 264.0f, 50.0f },
 			{ vfScaler.x, newScaleY });
 
+		if (decButtonsMessage == nullptr)
+		{
+			decButtonsMessage = font.RenderStringToDecal(U" Lets Go! ", olc::BLACK);
+		}
 
+		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decButtonsMessage, vfScaler);
 
 	}
 
