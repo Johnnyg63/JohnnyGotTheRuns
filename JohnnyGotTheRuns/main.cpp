@@ -284,8 +284,8 @@ public:
 					if (tileId > 0.)
 					{
 						// Draw something
-						int tileX = (tileId - 1) % 980;
-						int tileY = (tileId - 1) / 980;
+						int tileX = (tileId - 1) % 14;		// Number of X tiles Johnngy!!!!... number of tiles 
+						int tileY = (tileId - 1) / 14;
 
 						float spriteX = x * 70;
 						float spriteY = y * 70;
