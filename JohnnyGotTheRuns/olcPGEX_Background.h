@@ -42,6 +42,9 @@ namespace olc
 		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created sprite
 		void DrawSprite();
 
+		// Loads a new background image
+		void LoadBackGround(std::string ImagePath);
+
 		// Add your own public methods here
 
 
@@ -119,20 +122,8 @@ namespace olc
 	{
 		bisSpriteSheet = bIsSpriteSheet;
 
-#if defined (_MSC_VER)
-		// Windows stuff
-
-		if (ImagePath.rfind("./", 0) != 0) {
-			Properties.strImagePath = "./" + ImagePath;
-		}
-#else
-		if (ImagePath.rfind("./", 0) == 0) {
-			Properties.strImagePath = ImagePath.substr(2);
-		}
-#endif
-
-
-			
+		LoadBackGround(ImagePath);
+		
 	}
 
 	// See Step 3: Rename to your Class name
@@ -210,6 +201,25 @@ namespace olc
 			Properties.renImage.Sprite(), 
 			Properties.sImageInfo.vSource, 
 			Properties.sImageInfo.vSize);
+	}
+
+	void BackgroundObject::LoadBackGround(std::string ImagePath)
+	{
+#if defined (_MSC_VER)
+		// Windows stuff
+
+		if (ImagePath.rfind("./", 0) != 0) {
+			Properties.strImagePath = "./" + ImagePath;
+		}
+#else
+		if (ImagePath.rfind("./", 0) == 0) {
+			Properties.strImagePath = ImagePath.substr(2);
+		}
+#endif
+		Properties.renImage.Load(ImagePath);
+		Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
+		Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+
 	}
 
 

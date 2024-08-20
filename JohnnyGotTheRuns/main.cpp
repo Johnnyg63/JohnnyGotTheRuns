@@ -175,7 +175,21 @@ public:
 			break;
 		}
 
-		
+		// TODO: Move to new location
+
+		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+		if (GetKey(olc::Key::RIGHT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
+		}
+		if (GetKey(olc::Key::LEFT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
+		}
+
+		pPlayer->UpdatePlayer(fElapsedTime);
 
 		return bResult;
 	}
@@ -191,19 +205,6 @@ public:
 
 		bResult = DisplayQuickGUI(fElapsedTime);
 
-		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
-		if (GetKey(olc::Key::RIGHT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
-		}
-		if (GetKey(olc::Key::LEFT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
-		}
-
-		pPlayer->UpdatePlayer(fElapsedTime);
 		return bResult;
 	}
 
@@ -250,6 +251,7 @@ public:
 
 		if (guiButton1->bPressed)
 		{
+			pBackGround->LoadBackGround("assets/images/background.png");
 			eGameMenu = GAME_MENU::GAME_LEVEL;
 		}
 
@@ -267,6 +269,7 @@ public:
 	bool DisplayGameLevel(float fElapsedTime)
 	{
 		// TODO: Add code to manage mulitple levels... for the jam one will do!
+		pBackGround->DrawDecal();
 		pLevelLoader->DrawLevel();
 		return true;
 	}
@@ -296,7 +299,7 @@ int main()
 	*/
 
 	// Lets use HD!
-	if (demo.Construct(1260, 770, 1, 1))
+	if (demo.Construct(1280, 720, 1, 1))
 		demo.Start();
 	return 0;
 }

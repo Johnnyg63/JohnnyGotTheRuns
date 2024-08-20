@@ -229,17 +229,17 @@ namespace olc
 						if (tileId > 0.)
 						{
 							// Draw something
-							int tileX = (tileId - 1) % 14;		// Number of X tiles Johnngy!!!!... number of tiles 
-							int tileY = (tileId - 1) / 14;
+							int tileX = (tileId - 1) % 28;		// Number of X tiles Johnngy!!!!... number of tiles 
+							int tileY = (tileId - 1) / 28;
 
-							float spriteX = x * 70;
-							float spriteY = y * 70;
+							float spriteX = x * 35;
+							float spriteY = y * 35;
 
-							float sourceX = tileX * 70;
-							float sourceY = tileY * 70;
+							float sourceX = tileX * 35;
+							float sourceY = tileY * 35;
 
-							pge->DrawRectDecal({ spriteX, spriteY }, { 70.0f, 70.0f });
-							pge->DrawPartialDecal({ spriteX, spriteY }, { 70.0f, 70.0f }, Properties.renSpriteSheet.Decal(), { sourceX, sourceY }, { 70.0f, 70.0f });
+							//pge->DrawRectDecal({ spriteX, spriteY }, { 70.0f, 70.0f });
+							pge->DrawPartialDecal({ spriteX, spriteY }, { 35.0f, 35.0f }, Properties.renSpriteSheet.Decal(), { sourceX, sourceY }, { 35.0f, 35.0f });
 
 						}
 
