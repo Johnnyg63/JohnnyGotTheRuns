@@ -160,6 +160,7 @@
     <ClInclude Include="olcPixelGameEngine.h" />
     <ClInclude Include="olcUTIL_Geometry2D.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="TMXParser.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png" />
@@ -168,12 +169,14 @@
     <Image Include="assets\images\LettersSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
+    <Image Include="assets\images\platformerPack_industrial_tilesheet.png" />
     <Image Include="assets\images\playerSpriteSheet.png" />
     <Image Include="assets\images\toilet.png" />
     <Image Include="assets\images\toiletmainmenu.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\maps\example1.city" />
+    <None Include="assets\maps\Level1Output.tmx" />
     <None Include="dlls\freetype.dll" />
   </ItemGroup>
   <ItemGroup>

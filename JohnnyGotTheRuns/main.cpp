@@ -46,7 +46,11 @@ public:
 	olc::QuickGUI::Label* guiLabelMasterVolume = nullptr;
 	olc::QuickGUI::Label* guiLabelSoundVolume = nullptr;
 
-
+	/*
+	* sigonasr2 stuff
+	*/
+	olc::Renderable renLevel;
+	Map map;
 
 	/*
 	* We will need some Smart Pointers to get use up and running and to manage memory
@@ -61,18 +65,18 @@ public:
 	olc::Font font;
 
 	int8_t tempSwitch = 0;
-	
+
 	JGotTheRuns()
 	{
 		// Name your application
 		sAppName = "Johnny Got The Runs... OLC CodeJam 2024";
 
 		// Instantiate out smart pointer
-		pMainMenu	= std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
+		pMainMenu = std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
 
-		
+
 		/*
 		*  Setup our player
 		*/
@@ -83,6 +87,7 @@ public:
 		pPlayer->Properties.nLives = 3;
 		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
 
+
 	}
 
 	~JGotTheRuns()
@@ -92,7 +97,7 @@ public:
 
 	/* Sprites */
 	olc::Sprite* sprTemp = nullptr;
-	
+
 
 public:
 	bool OnUserCreate() override
@@ -117,7 +122,7 @@ public:
 		// Diagonal Slider!
 		guiSlider2 = new olc::QuickGUI::Slider(guiManager,
 			{ 20.0f, 20.0f }, { 120.0f, 120.0f }, 0, 100, 50);
-		
+
 
 		// Labels for theme colour sliders
 		guiLabelMasterVolume = new olc::QuickGUI::Label(guiManager,
@@ -140,7 +145,8 @@ public:
 		guiButton2 = new olc::QuickGUI::Button(guiManager,
 			"Credits", { 30.0f, 170.0f }, { 100.0f, 16.0f });
 
-		
+		// TODO Remove
+		renLevel.Load("./assets/images/platformerPack_industrial_tilesheet.png");
 
 		return true;
 	}
@@ -227,9 +233,9 @@ public:
 		if (guiSlider1->bHeld)
 		{
 			guiLabelMasterVolume->sText = "Volume: " + std::to_string(guiSlider1->fValue);
-			
+
 		}
-		
+
 		if (guiSlider2->bHeld)
 		{
 			guiLabelSoundVolume->sText = "SFX: " + std::to_string(guiSlider2->fValue);
@@ -238,6 +244,9 @@ public:
 
 		if (guiButton1->bPressed)
 		{
+			TMXParser tmxParser = TMXParser("./assets/maps/Level1Output.tmx");
+			map = tmxParser.GetData();
+			
 			eGameMenu = GAME_MENU::GAME_LEVEL;
 		}
 
@@ -254,6 +263,48 @@ public:
 
 	bool DisplayGameLevel(float fElapsedTime)
 	{
+		size_t nCount = map.LayerData.size();
+		nCount = map.MapData.data.size();
+		nCount = map.TilesetData.data.size();
+
+		int x = 0;
+		int y = 0;
+		bool bTest = false;
+
+		for (auto& layer : map.LayerData)
+		{
+			auto rowYtiles = layer.tiles;  // 11 Rows
+			for (auto& tiles : rowYtiles)
+			{
+				x = 0;
+				for (auto& tile : tiles)
+				{
+					
+					int tileId = tile;
+					if (tileId > 0.)
+					{
+						// Draw something
+						int tileX = (tileId - 1) % 980;
+						int tileY = (tileId - 1) / 980;
+
+						float spriteX = x * 70;
+						float spriteY = y * 70;
+
+						float sourceX = tileX * 70;
+						float sourceY = tileY * 70;
+
+						DrawRectDecal({ spriteX, spriteY }, { 70.0f, 70.0f });
+						DrawPartialDecal({ spriteX, spriteY }, { 70.0f, 70.0f }, renLevel.Decal(), { sourceX, sourceY }, { 70.0f, 70.0f });
+
+					}
+
+					x++;
+				}
+
+				y++;
+			}
+			
+		}
 		return true;
 	}
 
@@ -277,12 +328,12 @@ int main()
 	* The engine will auto scale objects to ensure the same user experence across different screen size
 	* If you change the screen ratio, the engine will still auto scale objects on the base of HD 1280x720 1X1
 	* Play with the settings to see how it works... this will help you alot when developing games
-	* 
+	*
 	* In short there should be no hard coded values for sprites, except in the case of where the sprite is located on spritesheet
 	*/
 
 	// Lets use HD!
-	if (demo.Construct(1280, 720, 1, 1))
+	if (demo.Construct(1260, 770, 1, 1))
 		demo.Start();
 	return 0;
 }

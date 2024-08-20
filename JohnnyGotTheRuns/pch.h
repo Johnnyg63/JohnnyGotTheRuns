@@ -15,6 +15,8 @@
 #define OLC_PGEX_SPLASHSCREEN		// Manages the GPL-3.0 Licence requirements 
 //#include "olcPGEX_SplashScreen.h"
 
+#include "TMXParser.h"				// TMXParser Stuff
+
 #define OLC_PGEX_QUICKGUI			// Manages the Menu iteams buttons and sliders
 #include "olcPGEX_QuickGUI.h"
 
