@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ft2build.h" />
+    <ClInclude Include="olcPGEX_LevelLoader.h" />
     <ClInclude Include="olcPGEX_MessageController.h" />
     <ClInclude Include="olcPGEX_Background.h" />
     <ClInclude Include="olcPGEX_MainMenu.h" />

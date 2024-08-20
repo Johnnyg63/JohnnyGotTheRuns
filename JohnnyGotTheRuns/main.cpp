@@ -1,5 +1,6 @@
 #include "pch.h"
 
+
 /*
 * IMPORTANT : This game is based on scaling, the base scale for this game is HD 1280x720 1X1 pixels
 * The engine will auto scale objects to ensure the same user experence across different screen size
@@ -58,7 +59,8 @@ public:
 	*/
 	std::unique_ptr<olc::MainMenu> pMainMenu;					// Main Menu Smart pointer
 	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
-	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer, 
+	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer
+	std::unique_ptr<olc::LevelLoader> pLevelLoader;				// Level Loader Smart pointer
 	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
 
 	// Font 
@@ -75,6 +77,8 @@ public:
 		pMainMenu = std::make_unique<olc::MainMenu>("assets/images/interfacePack_sheet.png");					// Main Menu
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
+		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/images/platformerPack_industrial_tilesheet.png", 
+															"assets/maps/Level1Output.tmx", 1);					// TODO: Make file names shorter
 
 
 		/*
@@ -171,6 +175,8 @@ public:
 			break;
 		}
 
+		
+
 		return bResult;
 	}
 
@@ -244,9 +250,6 @@ public:
 
 		if (guiButton1->bPressed)
 		{
-			TMXParser tmxParser = TMXParser("./assets/maps/Level1Output.tmx");
-			map = tmxParser.GetData();
-			
 			eGameMenu = GAME_MENU::GAME_LEVEL;
 		}
 
@@ -263,48 +266,8 @@ public:
 
 	bool DisplayGameLevel(float fElapsedTime)
 	{
-		size_t nCount = map.LayerData.size();
-		nCount = map.MapData.data.size();
-		nCount = map.TilesetData.data.size();
-
-		int x = 0;
-		int y = 0;
-		bool bTest = false;
-
-		for (auto& layer : map.LayerData)
-		{
-			auto rowYtiles = layer.tiles;  // 11 Rows
-			for (auto& tiles : rowYtiles)
-			{
-				x = 0;
-				for (auto& tile : tiles)
-				{
-					
-					int tileId = tile;
-					if (tileId > 0.)
-					{
-						// Draw something
-						int tileX = (tileId - 1) % 14;		// Number of X tiles Johnngy!!!!... number of tiles 
-						int tileY = (tileId - 1) / 14;
-
-						float spriteX = x * 70;
-						float spriteY = y * 70;
-
-						float sourceX = tileX * 70;
-						float sourceY = tileY * 70;
-
-						DrawRectDecal({ spriteX, spriteY }, { 70.0f, 70.0f });
-						DrawPartialDecal({ spriteX, spriteY }, { 70.0f, 70.0f }, renLevel.Decal(), { sourceX, sourceY }, { 70.0f, 70.0f });
-
-					}
-
-					x++;
-				}
-
-				y++;
-			}
-			
-		}
+		// TODO: Add code to manage mulitple levels... for the jam one will do!
+		pLevelLoader->DrawLevel();
 		return true;
 	}
 

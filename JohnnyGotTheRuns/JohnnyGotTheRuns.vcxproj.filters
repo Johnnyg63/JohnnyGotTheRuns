@@ -55,6 +55,9 @@
     <Filter Include="sigonasr2">
       <UniqueIdentifier>{b6328169-8e02-403b-804c-29f5fe507f9b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Classes">
+      <UniqueIdentifier>{566a454d-273d-4bc3-9293-cda1d136ced3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -100,6 +103,9 @@
     </ClInclude>
     <ClInclude Include="TMXParser.h">
       <Filter>sigonasr2</Filter>
+    </ClInclude>
+    <ClInclude Include="olcPGEX_LevelLoader.h">
+      <Filter>olcPGEX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
