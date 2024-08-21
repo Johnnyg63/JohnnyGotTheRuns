@@ -58,6 +58,9 @@
     <Filter Include="Classes">
       <UniqueIdentifier>{566a454d-273d-4bc3-9293-cda1d136ced3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WASM">
+      <UniqueIdentifier>{5675c8ae-cd6c-4904-864d-61195cd86a1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -188,5 +191,10 @@
     <Library Include="lib\freetype.lib">
       <Filter>External\lib</Filter>
     </Library>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="WASM\Placeholder.txt">
+      <Filter>WASM</Filter>
+    </Text>
   </ItemGroup>
 </Project>

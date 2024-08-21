@@ -198,6 +198,9 @@
   <ItemGroup>
     <Library Include="lib\freetype.lib" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="WASM\Placeholder.txt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

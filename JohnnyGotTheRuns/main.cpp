@@ -188,13 +188,30 @@ public:
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
 			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
 		}
+		if (GetKey(olc::Key::UP).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
+			pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
+		}
+		if (GetKey(olc::Key::DOWN).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
+			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
+		}
+		if (GetKey(olc::Key::SPACE).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::JUMP);
+			pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime * 5.0f;
+		}
 
 		pPlayer->UpdatePlayer(fElapsedTime);
 
 		return bResult;
 	}
 
-
+	/*
+	* Loads and Displays the Main Menu
+	*/
 	bool DisplayMainMenu(float fElapsedTime)
 	{
 		bool bResult = false;
@@ -208,6 +225,9 @@ public:
 		return bResult;
 	}
 
+	/*
+	* Displays the Main Menu GUI Options and handles events
+	*/
 	bool DisplayQuickGUI(float fElapsedTime)
 	{
 		guiManager.Update(this);
@@ -266,6 +286,9 @@ public:
 	}
 
 
+	/*
+	* Displays the current level that is loaded
+	*/
 	bool DisplayGameLevel(float fElapsedTime)
 	{
 		// TODO: Add code to manage mulitple levels... for the jam one will do!
@@ -274,9 +297,12 @@ public:
 		return true;
 	}
 
+	/*
+	* Displays all the folks that help with this project
+	*/
 	bool DisplayCredits(float fElapsedTime)
 	{
-
+		// TODO: Get folks to help with this project ;)
 		return true;
 	}
 

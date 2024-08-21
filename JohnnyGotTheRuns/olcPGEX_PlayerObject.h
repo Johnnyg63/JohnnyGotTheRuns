@@ -161,7 +161,7 @@ namespace olc
 		olc::vf2d vfLeft = { -1.0f, 1.0f };		// Left Direction vector 
 		olc::vf2d vfRight = { 1.0f, 1.0f };		// Right Direction vector 
 		olc::vf2d vfDirection = vfRight;		// Direction vector Default: vfRight
-		bool bDirectionChanged = false;			// Use to stop flashing when we change direction
+		bool bisFlipped = false;				// Use to manage Decal offset when flipped
 
 
 
@@ -372,34 +372,35 @@ namespace olc
 				Properties.sprImageInfo.vSource = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSource;
 				Properties.sprImageInfo.vSize = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSize;
 				Properties.sprImageInfo.vScale = WarpFrame(actionFrame.nActionID);
+				Properties.sprImageInfo.vScaleSize = Properties.sprImageInfo.vSize * Properties.sprImageInfo.vScale;
 				Properties.sprImageInfo.vScale *= vfDirection;
 				
+				olc::vf2d vfDecolPos = Properties.vfPosition;
+
 				if (pge->GetKey(olc::Key::RIGHT).bPressed)
 				{
-					if (vfDirection != vfRight)
-					{
-						Properties.vfPosition.x -= (Properties.sprImageInfo.vSize.x * Properties.vfMasterScaler.x);
-						bDirectionChanged = true;
-					}
+			
+					bisFlipped = false;
 					vfDirection = vfRight;
 				}
 
 				if (pge->GetKey(olc::Key::LEFT).bPressed)
 				{
-					if (vfDirection != vfLeft)
-					{
-						Properties.vfPosition.x += (Properties.sprImageInfo.vSize.x * Properties.vfMasterScaler.x);
-						bDirectionChanged = true;
-					}
+					bisFlipped = true;
+					
 					vfDirection = vfLeft;
 				}
 				
+				if (bisFlipped)
+				{
+					vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
+				}
 
 				// 5: Draw the current decal frame
 				if (Properties.bIsVisiable)
 				{
 					pge->DrawPartialDecal(
-						Properties.vfPosition,
+						vfDecolPos,
 						Properties.decSpriteSheet,
 						Properties.sprImageInfo.vSource,
 						Properties.sprImageInfo.vSize,
@@ -408,6 +409,16 @@ namespace olc
 					);
 				}
 
+				//6: Lets get our center point
+				collCircle.vfCenterPos = Properties.vfPosition + (Properties.sprImageInfo.vSize / 2);
+				collCircle.vfCenterPos *= Properties.sprImageInfo.vScale;
+
+				//7: Lets get the radius, we want the small circle that can fit within the decal
+				collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2)
+					* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
+
+				pge->DrawRectDecal(Properties.vfPosition, Properties.sprImageInfo.vScaleSize, olc::BLUE);
+
 			}
 		}
 
@@ -415,13 +426,7 @@ namespace olc
 		// NOTE: The Decal World and Sprite World do not aline, you made need to play with the values to get it perfect
 		// Our collision circle will have an approx center of the decal with an approx radius
 
-		// 1: Lets get our center point
-		collCircle.vfCenterPos = Properties.vfPosition + (Properties.sprImageInfo.vSize / 2);
-		collCircle.vfCenterPos *= Properties.sprImageInfo.vScale;
-
-		// 2: Lets get the radius, we want the small circle that can fit within the decal
-		collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2)
-			* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
+		
 
 		//pge->FillCircle(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
 

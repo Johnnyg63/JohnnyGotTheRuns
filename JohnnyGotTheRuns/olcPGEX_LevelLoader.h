@@ -1,16 +1,15 @@
 #pragma once
 #include "pch.h"
-/*
-* See Step 2: Rename to your header file name
-*/
-#ifdef OLC_PGEX_LEVEL_LOADER
 
+
+#ifdef OLC_PGEX_LEVEL_LOADER
+// TODO:
 #endif
 
 namespace olc
 {
 	/*
-	* Manages the Background Images
+	* Manages the Loading of Level Graphics
 	*/
 	class LevelLoader : public PGEX
 	{
@@ -48,7 +47,7 @@ namespace olc
 		Map map; //TMXParser Map !
 
 		/*
-		* Stores data required for the background image(s) to display correctly
+		* Stores data required for the Sprite Sheet objects to display correctly
 		*/
 		struct ImageInfo
 		{
@@ -109,7 +108,7 @@ namespace olc
 namespace olc
 {
 
-	// See Step 3: Rename to your Class name
+	
 	LevelLoader::LevelLoader() : PGEX(true)
 	{
 		// Nothing to do here but to wait until we are ready for the level
@@ -156,7 +155,7 @@ namespace olc
 	void LevelLoader::OnBeforeUserCreate()
 	{
 		// Fires just before the main OnUserCreate
-		if (Properties.strTiledMapTMXPath == "" || Properties.strTiledMapTMXPath == "") return;
+		if (Properties.strSpriteSheetPath == "" || Properties.strTiledMapTMXPath == "") return;
 
 		LoadLevel(Properties.strSpriteSheetPath, Properties.strTiledMapTMXPath, Properties.nLevelNumber);
 
