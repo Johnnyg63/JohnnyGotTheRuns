@@ -107,6 +107,12 @@
     <ClInclude Include="olcPGEX_LevelLoader.h">
       <Filter>olcPGEX</Filter>
     </ClInclude>
+    <ClInclude Include="olcPGEX_TransformedView.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
+    <ClInclude Include="olcUTIL_Camera2D.h">
+      <Filter>olcPGEX</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">

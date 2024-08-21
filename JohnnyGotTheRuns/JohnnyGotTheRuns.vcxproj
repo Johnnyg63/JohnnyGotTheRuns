@@ -157,8 +157,10 @@
     <ClInclude Include="olcPGEX_QuickGUI.h" />
     <ClInclude Include="olcPGEX_SplashScreen.h" />
     <ClInclude Include="olcPGEX_Template.h" />
+    <ClInclude Include="olcPGEX_TransformedView.h" />
     <ClInclude Include="olcPGEX_TTF.h" />
     <ClInclude Include="olcPixelGameEngine.h" />
+    <ClInclude Include="olcUTIL_Camera2D.h" />
     <ClInclude Include="olcUTIL_Geometry2D.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TMXParser.h" />

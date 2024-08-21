@@ -218,7 +218,7 @@ namespace olc
 
 			for (auto& layer : map.LayerData)
 			{
-				auto rowYtiles = layer.tiles;  // 11 Rows
+				auto rowYtiles = layer.tiles;  
 				for (auto& tiles : rowYtiles)
 				{
 					x = 0;
