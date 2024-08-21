@@ -157,7 +157,7 @@ namespace olc
 		float fGodModeFlashTimer = 0.0f;    // Used to flash the Decal while in God mode
 
 		bool bWarpFrame = false;				// used to warp the decal 
-		
+
 		olc::vf2d vfLeft = { -1.0f, 1.0f };		// Left Direction vector 
 		olc::vf2d vfRight = { 1.0f, 1.0f };		// Right Direction vector 
 		olc::vf2d vfDirection = vfRight;		// Direction vector Default: vfRight
@@ -208,6 +208,14 @@ namespace olc
 		*/
 
 		std::vector<ActionFrame> vecActionFrames;
+
+	private:
+		std::vector<olc::vf2d> MakeUnitCircle(const size_t verts = 64);
+		std::vector<olc::vf2d> vertsUnitCircle = MakeUnitCircle();
+
+		void DrawCircleDecal(const olc::vf2d& vPos, const float fRadius, const olc::Pixel colour = olc::WHITE);
+
+		void FillCircleDecal(const olc::vf2d& vPos, const float fRadius, const olc::Pixel colour = olc::WHITE);
 
 	};
 
@@ -278,7 +286,7 @@ namespace olc
 
 		// find our direction
 		// Work out direction
-		
+
 
 		/* Update our postion  */
 
@@ -299,8 +307,8 @@ namespace olc
 		//if (Properties.vfPosition.y < 1.0f)
 		//		Properties.vfPosition.y = 1.0f;
 
-		
-		
+
+
 		return false;
 	}
 
@@ -329,7 +337,7 @@ namespace olc
 			fGodModeTimer = 0.0f;
 		}
 
-		
+
 
 	}
 
@@ -362,7 +370,7 @@ namespace olc
 				{
 					actionFrame.fFrameElapsedTime = 0.0f;
 					actionFrame.nCurrentFrame++;
-					
+
 				}
 				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size())
 				{
@@ -374,12 +382,12 @@ namespace olc
 				Properties.sprImageInfo.vScale = WarpFrame(actionFrame.nActionID);
 				Properties.sprImageInfo.vScaleSize = Properties.sprImageInfo.vSize * Properties.sprImageInfo.vScale;
 				Properties.sprImageInfo.vScale *= vfDirection;
-				
+
 				olc::vf2d vfDecolPos = Properties.vfPosition;
 
 				if (pge->GetKey(olc::Key::RIGHT).bPressed)
 				{
-			
+
 					bisFlipped = false;
 					vfDirection = vfRight;
 				}
@@ -387,10 +395,10 @@ namespace olc
 				if (pge->GetKey(olc::Key::LEFT).bPressed)
 				{
 					bisFlipped = true;
-					
+
 					vfDirection = vfLeft;
 				}
-				
+
 				if (bisFlipped)
 				{
 					vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
@@ -409,14 +417,15 @@ namespace olc
 					);
 				}
 
-				//6: Lets get our center point
-				collCircle.vfCenterPos = Properties.vfPosition + (Properties.sprImageInfo.vSize / 2);
-				collCircle.vfCenterPos *= Properties.sprImageInfo.vScale;
 
-				//7: Lets get the radius, we want the small circle that can fit within the decal
-				collCircle.fRadius = (std::min(Properties.sprImageInfo.vSize.x, Properties.sprImageInfo.vSize.y) / 2)
-					* std::min(Properties.sprImageInfo.vScale.x, Properties.sprImageInfo.vScale.y);
+				// TODO: Add Support for when the player is in DUCK mode
+				//6: Lets get our collision circle
+				collCircle.vfCenterPos = Properties.vfPosition + (Properties.sprImageInfo.vScaleSize / 2);
+				collCircle.fRadius = (std::min(Properties.sprImageInfo.vScaleSize.x, Properties.sprImageInfo.vScaleSize.y)/2);
+				// Move the circle to the buttom of he decal, we care about the players feet position
+				collCircle.vfCenterPos.y += (Properties.sprImageInfo.vScaleSize.y / 2) - collCircle.fRadius;
 
+				// Show the circle for debugging, thank Javid
 				pge->DrawRectDecal(Properties.vfPosition, Properties.sprImageInfo.vScaleSize, olc::BLUE);
 
 			}
@@ -426,12 +435,43 @@ namespace olc
 		// NOTE: The Decal World and Sprite World do not aline, you made need to play with the values to get it perfect
 		// Our collision circle will have an approx center of the decal with an approx radius
 
-		
-
-		//pge->FillCircle(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
+		DrawCircleDecal(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
 
 	}
 
+	// Javidx9 Stuff
+
+	// PGE doesnt have a DrawCircleDEcal routine by default for a number
+	// of reasons, so I've made one here that exploits a unit circle
+	// being pre-made...
+
+	std::vector<olc::vf2d> PlayerObject::MakeUnitCircle(const size_t verts)
+	{
+		std::vector<olc::vf2d> vOut(verts, { 0,0 });
+		float anglestep = 2.0f * 3.14159f / float(verts - 1);
+		for (size_t i = 0; i < verts; i++)
+			vOut[i] = olc::vf2d(1.0f, anglestep * float(i)).cart();
+		return vOut;
+	}
+
+	void PlayerObject::DrawCircleDecal(const olc::vf2d& vPos, const float fRadius, const olc::Pixel colour)
+	{
+		std::vector<olc::vf2d> vDraw(vertsUnitCircle.size(), { 0,0 });
+		std::transform(vertsUnitCircle.begin(), vertsUnitCircle.end(), vDraw.begin(),
+			[&](const olc::vf2d& vIn) { return vIn * fRadius + vPos; });
+		pge->SetDecalMode(olc::DecalMode::WIREFRAME);
+		pge->DrawPolygonDecal(nullptr, vDraw, vDraw, colour);
+		pge->SetDecalMode(olc::DecalMode::NORMAL);
+	}
+                       	
+	void PlayerObject::FillCircleDecal(const olc::vf2d& vPos, const float fRadius, const olc::Pixel colour)
+	{
+		std::vector<olc::vf2d> vDraw(vertsUnitCircle.size(), { 0,0 });
+		std::transform(vertsUnitCircle.begin(), vertsUnitCircle.end(), vDraw.begin(),
+			[&](const olc::vf2d& vIn) { return vIn * fRadius + vPos; });
+		pge->SetDecalMode(olc::DecalMode::NORMAL);
+		pge->DrawPolygonDecal(nullptr, vDraw, vDraw, colour);
+	}
 
 
 
