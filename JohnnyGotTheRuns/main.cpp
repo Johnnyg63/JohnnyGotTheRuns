@@ -164,17 +164,13 @@ public:
 		guiButton2 = new olc::QuickGUI::Button(guiManager,
 			"Credits", { 30.0f, 170.0f }, { 100.0f, 16.0f });
 
-		// TODO Remove
-		renLevel.Load("./assets/images/platformerPack_industrial_tilesheet.png");
-
-
 
 		// Transfrom View settings... Move to new location
 		// Construct transform view
 		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
 
 		// Construct Camera
-		vTrackedPoint = { 1.0f, 5.0f };
+		vTrackedPoint = { 2.0f, 20.0f };
 		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, vTrackedPoint);
 
 		// Configure Camera
@@ -185,9 +181,8 @@ public:
 
 		// Create our world grid
 		vWorldMapGraphics.resize(m_vWorldSize.x * m_vWorldSize.y);
-
-		renTemp.Load("./assets/images/toilet.png");
 		
+		renTemp.Load("./assets/images/toilet.png");
 
 		return true;
 	}
@@ -204,13 +199,14 @@ public:
 		{
 		case JGotTheRuns::MAIN_MENU:
 			bResult = DisplayMainMenu(fElapsedTime);
-			pPlayer->UpdatePlayer(fElapsedTime);
+			//pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::GAME_LEVEL:
-			bResult = UpdatePlayerPosition(fElapsedTime);
 			bResult = DisplayGameLevel(fElapsedTime);
 
-			pPlayer->UpdatePlayer(fElapsedTime);
+			bResult = UpdatePlayerPosition(fElapsedTime);
+			
+			//pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::CREDITS:
 			bResult = DisplayCredits(fElapsedTime);
@@ -312,30 +308,26 @@ public:
 		if (GetKey(olc::Key::UP).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
-			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
-			vfDirection = { 0.0f, -1.0f }; //up
+			vfDirection = { 0, -1}; //up
 
 		}
 
 		if (GetKey(olc::Key::DOWN).bHeld)
 		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
-			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
-			vfDirection = { 0.0f, +1.0f }; // down
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
+			vfDirection = { 0, +1.}; // down
 		}
 
 		if (GetKey(olc::Key::LEFT).bHeld)
 		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
-			vfDirection = { -1.0f, 0.0f }; // left
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
+			vfDirection = { -1, 0 }; // left
 		}
 
 		if (GetKey(olc::Key::RIGHT).bHeld)
 		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
-			vfDirection = { +1.0f, 0.0f }; // right
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
+			vfDirection = { +1, 0 }; // right
 		}
 
 		if (GetKey(olc::Key::SPACE).bHeld)
@@ -367,8 +359,7 @@ public:
 		tv.SetWorldOffset(camera.GetViewPosition());
 
 		// Where will object be worst case ?
-		pPlayer->Properties.vfPosition = pPlayer->Properties.vfPosition +
-			pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
+		pPlayer->Properties.vfPotentialPosition = pPlayer->Properties.vfPosition + pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
 
 
 		// Some borders TODO: Change to using olcUTIL_Geometry2D.h
@@ -395,7 +386,11 @@ public:
 			pPlayer->Properties.vfPosition.y = m_vWorldSize.y;
 		}
 
-		//tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
+		pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
+
+		pPlayer->UpdatePlayer(fElapsedTime);
+
+		tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
 
 		return true;
 	}

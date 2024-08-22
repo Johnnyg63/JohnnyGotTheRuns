@@ -34,12 +34,7 @@ namespace olc
 		// Loads the level, will also clear any existing level data
 		void LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel);
 
-		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created decal
-		//void DrawLevel(olc::vf2d vfStartPos, olc::vf2d vfEndPos);
-
-
 		
-
 		// Deletes the level
 		void ClearLevel();
 		// Add your own public methods here
@@ -60,9 +55,6 @@ namespace olc
 		};
 
 		DecalInfo sDecalInfo;
-
-		// Returns the decal info at the selected world tile
-		DecalInfo GetDecalInfo(int32_t nTileX, int32_t nTileY, int16_t nLayerNumber);
 
 		/*
 		* Stores data required for the Sprite Sheet objects to display correctly
@@ -286,70 +278,6 @@ namespace olc
 
 		bisLevelLoaded = true;
 	}
-
-
-	olc::LevelLoader::DecalInfo LevelLoader::GetDecalInfo(int32_t nTileX, int32_t nTileY,int16_t nLayerNumber)
-	{
-		size_t nResultPos = (nTileY * 140) + nTileX;
-
-		auto mapLayers = Properties.mapLayerInfo;
-
-		auto layer = mapLayers[nLayerNumber];
-
-		auto decalInfo = layer[nResultPos];
-
-		return decalInfo;
-	}
-
-
-	//void LevelLoader::DrawLevel(olc::vf2d vfStartPos, olc::vf2d vfEndPos)
-	//{
-	//	// Fires just After the main OnUserUpdate
-	//	if (bisLevelLoaded)
-	//	{
-	//		// Find our start and end position
-
-	//		//edge case for top row
-	//		if (vfStartPos.y < 0) vfStartPos.y = 0;
-	//		if (vfEndPos.y < 0) vfEndPos.y = 0;
-
-	//		size_t fCurrentPos = (vfStartPos.y * 140) + vfStartPos.x;
-	//		size_t fEndpos = (vfEndPos.y * 140) + vfEndPos.x;
-
-	//		olc::vf2d newDrawPos = { 0.0f, 0.0f };
-
-	//		for (auto& layer : Properties.mapLayerInfo)
-	//		{
-	//			for (size_t x = vfStartPos.x; x < vfEndPos.x; x++)
-	//			{
-	//				for (size_t y = vfStartPos.y; y < vfEndPos.y; y++)
-	//				{
-	//					fCurrentPos = (vfStartPos.y * 140) + vfStartPos.x;
-
-	//					auto it = layer.second.begin() + fCurrentPos;
-
-	//					if (it->nTiledID > 0)
-	//					{
-	//						// Now we need to work out the new position rela
-
-	//						pge->DrawPartialDecal(
-	//							it->vfDrawLocation - ,
-	//							Properties.renSpriteSheet.Decal(),
-	//							it->vfSourcePos,
-	//							it->vfSoureSizePos
-	//						);
-	//					}
-	//					
-	//				}
-	//			}
-	//		}
-
-
-
-	//	}
-
-
-	//}
 
 	void LevelLoader::ClearLevel()
 	{
