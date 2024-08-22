@@ -407,11 +407,15 @@ public:
 	{
 		// TODO: Add code to manage mulitple levels... for the jam one will do!
 		pBackGround->DrawDecal();
-		pLevelLoader->DrawLevel();
-
-		
 		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
 		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+
+		//pLevelLoader->DrawLevel(tv.WorldToScreen(vTileTL), tv.WorldToScreen(vTileBR));
+
+		
+		olc::LevelLoader::DecalInfo decalInfo;
+
+
 		olc::vi2d vTile;
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
@@ -419,6 +423,19 @@ public:
 			{
 				int idx = vTile.y * m_vWorldSize.x + vTile.x;
 				tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
+
+				decalInfo = pLevelLoader->GetDecalInfo(vTile.x, vTile.y, 0);
+
+				if (decalInfo.nTiledID > 0)
+				{
+					tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						pLevelLoader->Properties.renSpriteSheet.Decal(),
+						decalInfo.vfSourcePos,
+						decalInfo.vfSoureSizePos);
+				}
+				
+
+
 
 			}
 

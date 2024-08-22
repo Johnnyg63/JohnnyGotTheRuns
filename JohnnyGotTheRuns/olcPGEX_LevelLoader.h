@@ -35,7 +35,10 @@ namespace olc
 		void LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel);
 
 		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created decal
-		void DrawLevel();
+		//void DrawLevel(olc::vf2d vfStartPos, olc::vf2d vfEndPos);
+
+
+		
 
 		// Deletes the level
 		void ClearLevel();
@@ -55,6 +58,11 @@ namespace olc
 			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Stores Location on Sprite Sheet
 			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Stores size of Partial Decal
 		};
+
+		DecalInfo sDecalInfo;
+
+		// Returns the decal info at the selected world tile
+		DecalInfo GetDecalInfo(int32_t nTileX, int32_t nTileY, int16_t nLayerNumber);
 
 		/*
 		* Stores data required for the Sprite Sheet objects to display correctly
@@ -228,8 +236,6 @@ namespace olc
 		for (auto& layer : map.LayerData)
 		{
 			auto vecPartialDecalInfo = std::vector<DecalInfo>();
-			vecPartialDecalInfo.resize(140 * 24);
-
 			auto rowYtiles = layer.tiles;
 			for (auto& tiles : rowYtiles)
 			{
@@ -278,30 +284,80 @@ namespace olc
 		}
 
 
-
-
-
-
 		bisLevelLoaded = true;
 	}
 
 
-	void LevelLoader::DrawLevel()
+	olc::LevelLoader::DecalInfo LevelLoader::GetDecalInfo(int32_t nTileX, int32_t nTileY,int16_t nLayerNumber)
 	{
-		// Fires just After the main OnUserUpdate
-		if (bisLevelLoaded)
-		{
+		size_t nResultPos = (nTileY * 140) + nTileX;
 
-		}
+		auto mapLayers = Properties.mapLayerInfo;
 
+		auto layer = mapLayers[nLayerNumber];
 
+		auto decalInfo = layer[nResultPos];
+
+		return decalInfo;
 	}
+
+
+	//void LevelLoader::DrawLevel(olc::vf2d vfStartPos, olc::vf2d vfEndPos)
+	//{
+	//	// Fires just After the main OnUserUpdate
+	//	if (bisLevelLoaded)
+	//	{
+	//		// Find our start and end position
+
+	//		//edge case for top row
+	//		if (vfStartPos.y < 0) vfStartPos.y = 0;
+	//		if (vfEndPos.y < 0) vfEndPos.y = 0;
+
+	//		size_t fCurrentPos = (vfStartPos.y * 140) + vfStartPos.x;
+	//		size_t fEndpos = (vfEndPos.y * 140) + vfEndPos.x;
+
+	//		olc::vf2d newDrawPos = { 0.0f, 0.0f };
+
+	//		for (auto& layer : Properties.mapLayerInfo)
+	//		{
+	//			for (size_t x = vfStartPos.x; x < vfEndPos.x; x++)
+	//			{
+	//				for (size_t y = vfStartPos.y; y < vfEndPos.y; y++)
+	//				{
+	//					fCurrentPos = (vfStartPos.y * 140) + vfStartPos.x;
+
+	//					auto it = layer.second.begin() + fCurrentPos;
+
+	//					if (it->nTiledID > 0)
+	//					{
+	//						// Now we need to work out the new position rela
+
+	//						pge->DrawPartialDecal(
+	//							it->vfDrawLocation - ,
+	//							Properties.renSpriteSheet.Decal(),
+	//							it->vfSourcePos,
+	//							it->vfSoureSizePos
+	//						);
+	//					}
+	//					
+	//				}
+	//			}
+	//		}
+
+
+
+	//	}
+
+
+	//}
 
 	void LevelLoader::ClearLevel()
 	{
 		delete Properties.renSpriteSheet.Decal();
 		delete Properties.renSpriteSheet.Sprite();
 	}
+
+	
 
 
 
