@@ -422,19 +422,20 @@ public:
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{
 				int idx = vTile.y * m_vWorldSize.x + vTile.x;
-				tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
+				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
 
-				decalInfo = pLevelLoader->GetDecalInfo(vTile.x, vTile.y, 0);
 
-				if (decalInfo.nTiledID > 0)
+				for (auto& layer : pLevelLoader->Properties.mapLayerInfo)
 				{
-					tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-						pLevelLoader->Properties.renSpriteSheet.Decal(),
-						decalInfo.vfSourcePos,
-						decalInfo.vfSoureSizePos);
+					decalInfo = layer.second[idx];
+					if (decalInfo.nTiledID > 0)
+					{
+						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							pLevelLoader->Properties.renSpriteSheet.Decal(),
+							decalInfo.vfSourcePos,
+							decalInfo.vfSoureSizePos);
+					}
 				}
-				
-
 
 
 			}
