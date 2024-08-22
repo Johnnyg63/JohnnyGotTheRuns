@@ -46,6 +46,16 @@ namespace olc
 
 		Map map; //TMXParser Map !
 
+
+		struct DecalInfo
+		{
+			int16_t nLayer = 0;							// Stores layer number
+			int16_t nTiledID = 0;						// Stores Tiled Map Editor ID
+			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Stores the locatoin of where to draw
+			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Stores Location on Sprite Sheet
+			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Stores size of Partial Decal
+		};
+
 		/*
 		* Stores data required for the Sprite Sheet objects to display correctly
 		*/
@@ -88,7 +98,9 @@ namespace olc
 			*/
 			std::vector<ImageInfo> vecPartialImages;
 
+			std::vector<DecalInfo> vecPartialDecalInfo;		// Stores the DecalInfo struct for tiled map graphics
 
+			std::map<int, std::vector<DecalInfo>> mapLayerInfo; // Stores the layers of DecalInfo vectors
 
 		};
 
@@ -108,7 +120,7 @@ namespace olc
 namespace olc
 {
 
-	
+
 	LevelLoader::LevelLoader() : PGEX(true)
 	{
 		// Nothing to do here but to wait until we are ready for the level
@@ -177,7 +189,7 @@ namespace olc
 		// Fires just before the main OnUserUpdate
 		if (bisLevelLoaded)
 		{
-			
+
 		}
 
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
@@ -198,6 +210,78 @@ namespace olc
 		Properties.renSpriteSheet.Load(strSpriteSheetPath);
 		TMXParser tmxParser = TMXParser(Properties.strTiledMapTMXPath);
 		map = tmxParser.GetData();
+
+		// Lod the data into the vector for processing later
+		//vecPartialDecalInfo
+
+		Properties.vecPartialDecalInfo.clear();
+		int nLayerCount = 0;
+
+		// TODO Remove this crap
+		size_t nCount = map.LayerData.size();
+		nCount = map.MapData.data.size();
+		nCount = map.TilesetData.data.size();
+
+		int x = 0;
+		int y = 0;
+		nLayerCount = 0;
+		for (auto& layer : map.LayerData)
+		{
+			auto vecPartialDecalInfo = std::vector<DecalInfo>();
+			vecPartialDecalInfo.resize(140 * 24);
+
+			auto rowYtiles = layer.tiles;
+			for (auto& tiles : rowYtiles)
+			{
+				x = 0;
+				for (auto& tile : tiles)
+				{
+
+					int tileId = tile;
+
+					float spriteX = x * 35;
+					float spriteY = y * 35;
+
+
+					DecalInfo sDecalInfo;
+					sDecalInfo.nLayer = nLayerCount;
+					sDecalInfo.nTiledID = tileId;
+					sDecalInfo.vfDrawLocation = { spriteX , spriteY };
+					sDecalInfo.vfSoureSizePos = { 35.0f, 35.0f };
+										
+					if (tileId > 0)
+					{
+						// Draw something
+						int tileX = (tileId - 1) % 28;		// Number of X tiles Johnngy!!!!... number of tiles on the SpriteSheet!
+						int tileY = (tileId - 1) / 28;
+
+						float sourceX = tileX * 35;
+						float sourceY = tileY * 35;
+
+						//pge->DrawPartialDecal({ spriteX, spriteY }, { 35.0f, 35.0f }, Properties.renSpriteSheet.Decal(), { sourceX, sourceY }, { 35.0f, 35.0f });
+						sDecalInfo.vfSourcePos = { sourceX , sourceY };
+
+					}
+
+					vecPartialDecalInfo.push_back(sDecalInfo);
+
+					x++;
+				}
+
+				y++;
+			}
+
+
+			Properties.mapLayerInfo.insert({ nLayerCount, vecPartialDecalInfo });
+			nLayerCount++;
+
+		}
+
+
+
+
+
+
 		bisLevelLoaded = true;
 	}
 
@@ -207,50 +291,9 @@ namespace olc
 		// Fires just After the main OnUserUpdate
 		if (bisLevelLoaded)
 		{
-			size_t nCount = map.LayerData.size();
-			nCount = map.MapData.data.size();
-			nCount = map.TilesetData.data.size();
 
-			int x = 0;
-			int y = 0;
-			bool bTest = false;
-
-			for (auto& layer : map.LayerData)
-			{
-				auto rowYtiles = layer.tiles;  
-				for (auto& tiles : rowYtiles)
-				{
-					x = 0;
-					for (auto& tile : tiles)
-					{
-
-						int tileId = tile;
-						if (tileId > 0.)
-						{
-							// Draw something
-							int tileX = (tileId - 1) % 28;		// Number of X tiles Johnngy!!!!... number of tiles 
-							int tileY = (tileId - 1) / 28;
-
-							float spriteX = x * 35;
-							float spriteY = y * 35;
-
-							float sourceX = tileX * 35;
-							float sourceY = tileY * 35;
-
-							//pge->DrawRectDecal({ spriteX, spriteY }, { 70.0f, 70.0f });
-							pge->DrawPartialDecal({ spriteX, spriteY }, { 35.0f, 35.0f }, Properties.renSpriteSheet.Decal(), { sourceX, sourceY }, { 35.0f, 35.0f });
-
-						}
-
-						x++;
-					}
-
-					y++;
-				}
-
-			}
 		}
-	
+
 
 	}
 
