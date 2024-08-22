@@ -302,13 +302,14 @@ public:
 	bool UpdatePlayerPosition(float fElapsedTime)
 	{
 		// TODO: Move to new location
-		olc::vf2d vfDirection = { 0.0f, 0.0f };
+		olc::vf2d vfDirection = { 0.0f, 0.5f };
 		pPlayer->Properties.vfVelocity = vfDirection;
 		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
 		if (GetKey(olc::Key::UP).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
 			vfDirection = { 0, -1}; //up
+			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
 
 		}
 
@@ -316,18 +317,22 @@ public:
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
 			vfDirection = { 0, +1.}; // down
+			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+
 		}
 
 		if (GetKey(olc::Key::LEFT).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
 			vfDirection = { -1, 0 }; // left
+			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
 		}
 
 		if (GetKey(olc::Key::RIGHT).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
 			vfDirection = { +1, 0 }; // right
+			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
 		}
 
 		if (GetKey(olc::Key::SPACE).bHeld)
@@ -337,11 +342,10 @@ public:
 			// When we are jumping we only care about the up direction therefore we only subtract to the Y 
 			// more than the down force, 
 			vfDirection.y += -2.0f; // Jump
+			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
 		}
 
-		// Update player direction
-		pPlayer->Properties.vfVelocity += vfDirection;
-
+		
 		// Now we update our trackpoint in 
 		vTrackedPoint += pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
 
@@ -390,7 +394,7 @@ public:
 
 		pPlayer->UpdatePlayer(fElapsedTime);
 
-		tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
+		//tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
 
 		return true;
 	}
@@ -404,32 +408,54 @@ public:
 		pBackGround->DrawDecal();
 		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
 		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
-
-		//pLevelLoader->DrawLevel(tv.WorldToScreen(vTileTL), tv.WorldToScreen(vTileBR));
-
-		
+	
 		olc::LevelLoader::DecalInfo decalInfo;
-
-
 		olc::vi2d vTile;
+		int32_t idx = 0;
+		int16_t nLayer = 0;
+
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{
-				int idx = vTile.y * m_vWorldSize.x + vTile.x;
+				idx = vTile.y * m_vWorldSize.x + vTile.x;
+				
 				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
-
 
 				for (auto& layer : pLevelLoader->Properties.mapLayerInfo)
 				{
 					decalInfo = layer.second[idx];
-					if (decalInfo.nTiledID > 0)
+
+					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
+
+					switch (decalInfo.nLayer)
 					{
+					case 0:
+					{
+						// This is our collision layer
+						tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						break;
+					}
+					case 1:
+					{
+						// this is our Ladder layer
 						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							pLevelLoader->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
 							decalInfo.vfSoureSizePos);
+						break;
 					}
+					default:
+						// this is our drawing layer
+						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							pLevelLoader->Properties.renSpriteSheet.Decal(),
+							decalInfo.vfSourcePos,
+							decalInfo.vfSoureSizePos);
+						break;
+					}
+
+					nLayer++;
+					
 				}
 
 
