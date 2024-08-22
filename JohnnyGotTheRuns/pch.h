@@ -13,7 +13,12 @@
 */
 
 #define OLC_PGEX_SPLASHSCREEN		// Manages the GPL-3.0 Licence requirements 
-//#include "olcPGEX_SplashScreen.h"
+#include "olcPGEX_SplashScreen.h"
+
+#define OLC_PGEX_TRANSFORMEDVIEW	// Manages the Trnasform View
+#include "olcPGEX_TransformedView.h"
+
+#include "olcUTIL_Camera2D.h"		// Manages player camera
 
 #include "TMXParser.h"				// TMXParser Stuff
 

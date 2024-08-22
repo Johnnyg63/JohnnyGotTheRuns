@@ -66,7 +66,22 @@ public:
 	// Font 
 	olc::Font font;
 
-	int8_t tempSwitch = 0;
+	// Transformed view object to make world offsetting simple
+	olc::TileTransformedView tv;
+	// Conveninet constants to define tile map world
+	olc::vi2d m_vWorldSize = { 140, 24 }; // 2048 64 cells
+	olc::vi2d m_vTileSize = { 35, 35 };
+
+	std::vector<uint8_t> vWorldMapGraphics;	// Our basic grid map!
+
+	// The camera!
+	olc::utils::Camera2D camera;
+
+	// The point that represents the player, it is "tracked" by the camera
+	olc::vf2d vTrackedPoint;
+
+	// Temp Decal
+	olc::Renderable renTemp;
 
 	JGotTheRuns()
 	{
@@ -152,6 +167,28 @@ public:
 		// TODO Remove
 		renLevel.Load("./assets/images/platformerPack_industrial_tilesheet.png");
 
+
+
+		// Transfrom View settings... Move to new location
+		// Construct transform view
+		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
+
+		// Construct Camera
+		vTrackedPoint = { 1.0f, 5.0f };
+		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, vTrackedPoint);
+
+		// Configure Camera
+		camera.SetTarget(vTrackedPoint);
+		camera.SetMode(olc::utils::Camera2D::Mode::Simple);
+		camera.SetWorldBoundary({ 0.0f, 0.0f }, m_vWorldSize);
+		camera.EnableWorldBoundary(true);
+
+		// Create our world grid
+		vWorldMapGraphics.resize(m_vWorldSize.x * m_vWorldSize.y);
+
+		renTemp.Load("./assets/images/toilet.png");
+		
+
 		return true;
 	}
 
@@ -160,13 +197,20 @@ public:
 		// Called once per frame, draws random coloured pixels
 		bool bResult = false;
 
+		// TODO: Remove, just for debug
+		eGameMenu = GAME_MENU::GAME_LEVEL;
+
 		switch (eGameMenu)
 		{
 		case JGotTheRuns::MAIN_MENU:
 			bResult = DisplayMainMenu(fElapsedTime);
+			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::GAME_LEVEL:
+			bResult = UpdatePlayerPosition(fElapsedTime);
 			bResult = DisplayGameLevel(fElapsedTime);
+
+			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::CREDITS:
 			bResult = DisplayCredits(fElapsedTime);
@@ -175,36 +219,7 @@ public:
 			break;
 		}
 
-		// TODO: Move to new location
-
-		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
-		if (GetKey(olc::Key::RIGHT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
-		}
-		if (GetKey(olc::Key::LEFT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
-			pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
-		}
-		if (GetKey(olc::Key::UP).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
-			pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
-		}
-		if (GetKey(olc::Key::DOWN).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
-			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
-		}
-		if (GetKey(olc::Key::SPACE).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::JUMP);
-			pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime * 5.0f;
-		}
-
-		pPlayer->UpdatePlayer(fElapsedTime);
+		
 
 		return bResult;
 	}
@@ -285,6 +300,105 @@ public:
 		return true;
 	}
 
+	/*
+	* Updates the player position
+	*/
+	bool UpdatePlayerPosition(float fElapsedTime)
+	{
+		// TODO: Move to new location
+		olc::vf2d vfDirection = { 0.0f, 0.0f };
+		pPlayer->Properties.vfVelocity = vfDirection;
+		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+		if (GetKey(olc::Key::UP).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
+			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
+			vfDirection = { 0.0f, -1.0f }; //up
+
+		}
+
+		if (GetKey(olc::Key::DOWN).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
+			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
+			vfDirection = { 0.0f, +1.0f }; // down
+		}
+
+		if (GetKey(olc::Key::LEFT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
+			vfDirection = { -1.0f, 0.0f }; // left
+		}
+
+		if (GetKey(olc::Key::RIGHT).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);
+			//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
+			vfDirection = { +1.0f, 0.0f }; // right
+		}
+
+		if (GetKey(olc::Key::SPACE).bHeld)
+		{
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::JUMP);
+			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime * 5.0f;
+			// When we are jumping we only care about the up direction therefore we only subtract to the Y 
+			// more than the down force, 
+			vfDirection.y += -2.0f; // Jump
+		}
+
+		// Update player direction
+		pPlayer->Properties.vfVelocity += vfDirection;
+
+		// Now we update our trackpoint in 
+		vTrackedPoint += pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
+
+		// Edge case when the player gets stuck
+		if (std::isnan(vTrackedPoint.x) || std::isnan(vTrackedPoint.x))
+		{
+			//Player is stuck lets reset
+			// TODO: Add code for when the player is stuck
+		}
+
+		// true is returned
+		bool bOnScreen = camera.Update(fElapsedTime);
+
+		// Set the transformed view to that required by the camera
+		tv.SetWorldOffset(camera.GetViewPosition());
+
+		// Where will object be worst case ?
+		pPlayer->Properties.vfPosition = pPlayer->Properties.vfPosition +
+			pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
+
+
+		// Some borders TODO: Change to using olcUTIL_Geometry2D.h
+		if (vTrackedPoint.x < 0.00f)
+		{
+			vTrackedPoint.x = 0.00f;
+			pPlayer->Properties.vfPosition.x = 0.0f;
+		}
+		if (vTrackedPoint.x > m_vWorldSize.x)
+		{
+			vTrackedPoint.x = m_vWorldSize.x;
+			pPlayer->Properties.vfPosition.x = m_vWorldSize.x;
+		}
+
+		if (vTrackedPoint.y < 0.01f)
+		{
+			vTrackedPoint.y = 0.01f;
+			pPlayer->Properties.vfPosition.y = 0.01f;
+		}
+
+		if (vTrackedPoint.y > m_vWorldSize.y)
+		{
+			vTrackedPoint.y = m_vWorldSize.y;
+			pPlayer->Properties.vfPosition.y = m_vWorldSize.y;
+		}
+
+		//tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
+
+		return true;
+	}
 
 	/*
 	* Displays the current level that is loaded
@@ -294,6 +408,21 @@ public:
 		// TODO: Add code to manage mulitple levels... for the jam one will do!
 		pBackGround->DrawDecal();
 		pLevelLoader->DrawLevel();
+
+		
+		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
+		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+		olc::vi2d vTile;
+		// Then looping through them and drawing them
+		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
+			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
+			{
+				int idx = vTile.y * m_vWorldSize.x + vTile.x;
+				tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
+
+			}
+
+
 		return true;
 	}
 
@@ -325,7 +454,7 @@ int main()
 	*/
 
 	// Lets use HD!
-	if (demo.Construct(1280, 720, 1, 1))
+	if (demo.Construct(1280, 840, 1, 1))
 		demo.Start();
 	return 0;
 }

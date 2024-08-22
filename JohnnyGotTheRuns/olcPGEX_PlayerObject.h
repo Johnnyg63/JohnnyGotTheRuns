@@ -127,6 +127,8 @@ namespace olc
 
 			olc::vf2d vfPosition = { 0.0f,0.0f };	// Player current POS {x,y} (float), Default {0.0f,0.0f}, recommended for decals
 
+			olc::vf2d vfPotentialPosition = { 0.0f,0.0f };	// Player potential position used for collision 
+
 			ImageInfo sprImageInfo;					// Stores the Source and Size of the sprImage
 
 			std::string strSpriteSheetPath = "";    // SpriteSheetPath path, i.e. "images/mysprite.png", Default: ""
