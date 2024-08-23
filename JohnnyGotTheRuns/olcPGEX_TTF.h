@@ -36,26 +36,26 @@ namespace olc {
         Font(std::string path, int fontSize) : fontSize(fontSize) {
             FT_Error error = FT_New_Face(library, path.c_str(), 0, &fontFace);
             if (error) {
-                const char *errorString = FT_Error_String(error);
+               /* const char *errorString = FT_Error_String(error);
                 if (errorString == nullptr) {
                     std::cerr
                             << "An unknown error occured while loading the font! Error code: "
                             << error << "\n";
                 } else {
                     std::cerr << errorString << "\n";
-                }
+                }*/
             }
 
             error = FT_Set_Pixel_Sizes(fontFace, 0, fontSize);
             if (error) {
-                const char *errorString = FT_Error_String(error);
+               /* const char *errorString = FT_Error_String(error);
                 if (errorString == nullptr) {
                     std::cerr
                             << "An unknown error occured while loading the font!Error Code: "
                             << error << "\n";
                 } else {
                     std::cerr << errorString << "\n";
-                }
+                }*/
             }
         }
 
@@ -123,14 +123,14 @@ namespace olc {
                 FT_Error error = FT_Load_Char(toUse->fontFace, chr,
                                               FT_LOAD_RENDER | FT_LOAD_COLOR);
                 if (error) {
-                    const char *errorString = FT_Error_String(error);
+                   /* const char *errorString = FT_Error_String(error);
                     if (errorString == nullptr) {
                         std::cerr
                                 << "An unknown error occured while rendering a glyph!  Error code: "
                                 << error << "\n";
                     } else {
                         std::cerr << errorString << "\n";
-                    }
+                    }*/
                     return;
                 }
 
@@ -202,16 +202,16 @@ namespace olc {
 
                 FT_Set_Transform(toUse->fontFace, &rotMat, &pen);
                 FT_Error error = FT_Load_Char(toUse->fontFace, chr,
-                                              FT_LOAD_BITMAP_METRICS_ONLY);
+                                                    FT_LOAD_RENDER | FT_LOAD_COLOR);
                 if (error) {
-                    const char *errorString = FT_Error_String(error);
+                   /* const char *errorString = FT_Error_String(error);
                     if (errorString == nullptr) {
                         std::cerr
                                 << "An unknown error occured while loading a glyph!  Error code: "
                                 << error << "\n";
                     } else {
                         std::cerr << errorString << "\n";
-                    }
+                    }*/
                     return olc::FontRect{{0, 0}, {0, 0}};
                 }
 
@@ -297,14 +297,14 @@ namespace olc {
                 FT_Error error = FT_Load_Char(toUse->fontFace, chr,
                                               FT_LOAD_RENDER | FT_LOAD_COLOR);
                 if (error) {
-                    const char *errorString = FT_Error_String(error);
+                  /*  const char *errorString = FT_Error_String(error);
                     if (errorString == nullptr) {
                         std::cerr
                                 << "An unknown error occured while rendering a glyph!  Error code: "
                                 << error << "\n";
                     } else {
                         std::cerr << errorString << "\n";
-                    }
+                    }*/
                     return nullptr;
                 }
 
@@ -357,7 +357,7 @@ namespace olc {
             FT_Error error = FT_Init_FreeType(&library);
 
             if (error) {
-                const char *errorString = FT_Error_String(error);
+                /*const char *errorString = FT_Error_String(error);
                 if (errorString == nullptr) {
                     std::cerr
                             << "An unknown error occured while loading the font library! "
@@ -365,7 +365,7 @@ namespace olc {
                             << error << "\n";
                 } else {
                     std::cerr << errorString << "\n";
-                }
+                }*/
 
                 return false;
             }

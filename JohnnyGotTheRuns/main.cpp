@@ -17,7 +17,7 @@ class JGotTheRuns : public olc::PixelGameEngine
 public:
 
 	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
-	//olc::SplashScreen olcSplashScreen;
+	olc::SplashScreen olcSplashScreen;
 
 	/*
 	* GAME Menu
