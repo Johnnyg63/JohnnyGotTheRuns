@@ -119,7 +119,7 @@ namespace olc
 			Properties.strSpriteSheetPath = "./" + strSpriteSheetPath;
 		}
 #else
-		if (ImagePath.rfind("./", 0) == 0) {
+		if (strSpriteSheetPath.rfind("./", 0) == 0) {
 			Properties.strSpriteSheetPath = strSpriteSheetPath.substr(2);
 		}
 #endif

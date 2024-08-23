@@ -34,8 +34,16 @@
 #ifndef FT2BUILD_H_
 #define FT2BUILD_H_
 
-
+#ifdef WIN32
 #include <freetype/config/ftheader.h>
+
+#else
+
+#include "include\freetype\config\ftheader.h"
+#endif
+
+
+
 
 #endif /* FT2BUILD_H_ */
 

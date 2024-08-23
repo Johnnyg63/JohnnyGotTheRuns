@@ -61,6 +61,9 @@
     <Filter Include="WASM">
       <UniqueIdentifier>{5675c8ae-cd6c-4904-864d-61195cd86a1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="pge_ems">
+      <UniqueIdentifier>{a3049946-fd6d-440f-ad78-c8f3671dd2e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -158,6 +161,9 @@
     </None>
     <None Include="assets\maps\Level1Output.tmx">
       <Filter>assets\maps</Filter>
+    </None>
+    <None Include="ems_pge\pge2wasm.bat">
+      <Filter>pge_ems</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

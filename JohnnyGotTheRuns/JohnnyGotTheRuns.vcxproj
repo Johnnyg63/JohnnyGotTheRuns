@@ -181,6 +181,7 @@
     <None Include="assets\maps\example1.city" />
     <None Include="assets\maps\Level1Output.tmx" />
     <None Include="dlls\freetype.dll" />
+    <None Include="ems_pge\pge2wasm.bat" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3" />
