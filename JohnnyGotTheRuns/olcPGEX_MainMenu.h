@@ -165,6 +165,8 @@ namespace olc
 		// Set up default Properties
 		Properties.bIsActive = 0;
 
+		Properties.strSpriteSheetPath = sprSpriteSheetPath;
+
 #if defined (_MSC_VER)
 		// Windows stuff
 

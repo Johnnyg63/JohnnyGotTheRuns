@@ -111,7 +111,8 @@ namespace olc
 
 	MessageController::MessageController(std::string strSpriteSheetPath) : PGEX(true)
 	{
-		
+	
+		Properties.strSpriteSheetPath = strSpriteSheetPath;
 #if defined (_MSC_VER)
 		// Windows stuff
 

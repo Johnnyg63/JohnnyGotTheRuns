@@ -79,7 +79,7 @@ echo %CPP%
 	cd %EMSDK%
 	call emsdk_env.bat
 	cd %WORKINGDIR%
-	emrun .\WASM\pge.html
+	emrun .\WASM\index.html
 	goto :success
 
 :clean

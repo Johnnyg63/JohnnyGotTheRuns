@@ -205,6 +205,8 @@ namespace olc
 
 	void BackgroundObject::LoadBackGround(std::string ImagePath)
 	{
+
+		Properties.strImagePath = ImagePath;
 #if defined (_MSC_VER)
 		// Windows stuff
 

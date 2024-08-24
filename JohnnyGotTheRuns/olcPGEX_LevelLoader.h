@@ -133,6 +133,10 @@ namespace olc
 	{
 		bisLevelLoaded = false;
 
+		Properties.strSpriteSheetPath = strSpriteSheetPath;
+
+		Properties.strTiledMapTMXPath = strTiledMapTMXPath;
+
 #if defined (_MSC_VER)
 		// Windows stuff
 
