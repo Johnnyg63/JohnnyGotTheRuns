@@ -99,7 +99,7 @@ public:
 		/*
 		*  Setup our player
 		*/
-		pPlayer = std::make_unique<olc::PlayerObject>("assets/playerSpriteSheet.png", true);
+		pPlayer = std::make_unique<olc::PlayerObject>("assets/images/playerSpriteSheet.png", true);
 		pPlayer->Properties.strName = "Johnnyg63";    // Set our player name
 		pPlayer->Properties.nPlayerNumber = 0;        // Set our player numbner
 		// Load player details
