@@ -214,9 +214,9 @@ namespace olc
 			Properties.strImagePath = "./" + ImagePath;
 		}
 #else
-		if (ImagePath.rfind("./", 0) == 0) {
+		/*if (ImagePath.rfind("./", 0) == 0) {
 			Properties.strImagePath = ImagePath.substr(2);
-		}
+		}*/
 #endif
 		Properties.renImage.Load(ImagePath);
 		Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;

@@ -120,9 +120,9 @@ namespace olc
 			Properties.strSpriteSheetPath = "./" + strSpriteSheetPath;
 		}
 #else
-		if (strSpriteSheetPath.rfind("./", 0) == 0) {
+		/*if (strSpriteSheetPath.rfind("./", 0) == 0) {
 			Properties.strSpriteSheetPath = strSpriteSheetPath.substr(2);
-		}
+		}*/
 #endif
 		vecFonts.clear();
 		

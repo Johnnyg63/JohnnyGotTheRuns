@@ -89,9 +89,9 @@ public:
 		sAppName = "Johnny Got The Runs... OLC CodeJam 2024";
 
 		// Instantiate out smart pointer
-		pMainMenu = std::make_unique<olc::MainMenu>("./assets/interfacePack_sheet.png");					// Main Menu
-		pBackGround = std::make_unique<olc::BackgroundObject>("./assets/holytoilet.png", false);			// Background
-		pMessageController = std::make_unique<olc::MessageController>("./assets/LettersSpriteSheet.png");	// Message Controller
+		pMainMenu = std::make_unique<olc::MainMenu>("assets/interfacePack_sheet.png");					// Main Menu
+		pBackGround = std::make_unique<olc::BackgroundObject>("assets/holytoilet.png", false);			// Background
+		pMessageController = std::make_unique<olc::MessageController>("assets/LettersSpriteSheet.png");	// Message Controller
 		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/platformerPack_industrial_tilesheet.png", 
 															"assets/Level1Output.tmx", 1);					// TODO: Make file names shorter
 
