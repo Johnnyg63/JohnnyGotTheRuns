@@ -101,6 +101,8 @@ namespace olc
 	private:
 		bool bisSpriteSheet = false; // Flag for sprite sheet or 1 image
 
+		bool bChangeGround = false; // Flag used to change the background
+
 	};
 
 }
@@ -156,6 +158,14 @@ namespace olc
 	// See Step 3: Rename to your Class name
 	bool BackgroundObject::OnBeforeUserUpdate(float& fElapsedTime)
 	{
+		if (bChangeGround)
+		{
+			Properties.renImage.Load(Properties.strImagePath);
+			Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
+			Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+		};
+		
+
 		// Fires just before the main OnUserUpdate
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
 	}
@@ -218,9 +228,8 @@ namespace olc
 			Properties.strImagePath = ImagePath.substr(2);
 		}*/
 #endif
-		Properties.renImage.Load(ImagePath);
-		Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
-		Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+		
+		bChangeGround = true;
 
 	}
 

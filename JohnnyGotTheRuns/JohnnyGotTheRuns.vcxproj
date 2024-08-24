@@ -172,7 +172,7 @@
     <Image Include="assets\images\LettersSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
-    <Image Include="assets\images\platformerPackindustrialtilesheet.png" />
+    <Image Include="assets\images\levelSpriteSheet.png" />
     <Image Include="assets\images\playerSpriteSheet.png" />
     <Image Include="assets\images\toilet.png" />
     <Image Include="assets\images\toiletmainmenu.png" />

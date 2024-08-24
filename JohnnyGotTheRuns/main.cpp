@@ -90,10 +90,10 @@ public:
 
 		// Instantiate out smart pointer
 		pMainMenu = std::make_unique<olc::MainMenu>("assets/images/interfacePacksheet.png");					// Main Menu
-		pBackGround = std::make_unique<olc::BackgroundObject>("assets/holytoilet.png", false);			// Background
+		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
-		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/images/platformerPackindustrialtilesheet.png", 
-															"assets/images/Level1Output.tmx", 1);					// TODO: Make file names shorter
+		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/images/levelSpriteSheet.png", 
+															"assets/maps/Level1Output.tmx", 1);					// TODO: Make file names shorter
 
 
 		/*
@@ -123,8 +123,8 @@ public:
 	{
 		// Called once at the start, so create things here
 		olc::Font::init();
-		font = olc::Font{ "assets/kenney_bold.ttf", 16 };
-		font.AddFallbackFont("assets/kenney_thick.ttf");
+		font = olc::Font{ "assets/fonts/kenney_bold.ttf", 16 };
+		font.AddFallbackFont("assets/fonts/kenney_thick.ttf");
 
 		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 10.0f;
 		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 72.0f;
