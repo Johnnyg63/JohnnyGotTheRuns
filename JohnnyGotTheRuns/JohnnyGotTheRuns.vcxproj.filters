@@ -130,7 +130,7 @@
     <Image Include="assets\images\oip.jpg">
       <Filter>assets\images</Filter>
     </Image>
-    <Image Include="assets\images\interfacePack_sheet.png">
+    <Image Include="assets\images\interfacePacksheet.png">
       <Filter>assets\images</Filter>
     </Image>
     <Image Include="assets\images\holytoilet.png">
@@ -148,7 +148,7 @@
     <Image Include="assets\images\playerSpriteSheet.png">
       <Filter>assets\images</Filter>
     </Image>
-    <Image Include="assets\images\platformerPack_industrial_tilesheet.png">
+    <Image Include="assets\images\platformerPackindustrialtilesheet.png">
       <Filter>assets\images</Filter>
     </Image>
   </ItemGroup>

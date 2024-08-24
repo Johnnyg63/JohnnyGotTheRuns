@@ -89,11 +89,11 @@ public:
 		sAppName = "Johnny Got The Runs... OLC CodeJam 2024";
 
 		// Instantiate out smart pointer
-		pMainMenu = std::make_unique<olc::MainMenu>("assets/interfacePack_sheet.png");					// Main Menu
+		pMainMenu = std::make_unique<olc::MainMenu>("assets/images/interfacePacksheet.png");					// Main Menu
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/holytoilet.png", false);			// Background
-		pMessageController = std::make_unique<olc::MessageController>("assets/LettersSpriteSheet.png");	// Message Controller
-		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/platformerPack_industrial_tilesheet.png", 
-															"assets/Level1Output.tmx", 1);					// TODO: Make file names shorter
+		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
+		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/images/platformerPackindustrialtilesheet.png", 
+															"assets/images/Level1Output.tmx", 1);					// TODO: Make file names shorter
 
 
 		/*
@@ -182,7 +182,7 @@ public:
 		// Create our world grid
 		vWorldMapGraphics.resize(m_vWorldSize.x * m_vWorldSize.y);
 		
-		renTemp.Load("assets/toilet.png");
+		renTemp.Load("assets/images/toilet.png");
 
 		return true;
 	}
@@ -282,7 +282,7 @@ public:
 
 		if (guiButton1->bPressed)
 		{
-			pBackGround->LoadBackGround("assets/background.png");
+			pBackGround->LoadBackGround("assets/images/background.png");
 			eGameMenu = GAME_MENU::GAME_LEVEL;
 		}
 

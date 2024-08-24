@@ -168,11 +168,11 @@
   <ItemGroup>
     <Image Include="assets\images\background.png" />
     <Image Include="assets\images\holytoilet.png" />
-    <Image Include="assets\images\interfacePack_sheet.png" />
+    <Image Include="assets\images\interfacePacksheet.png" />
     <Image Include="assets\images\LettersSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
-    <Image Include="assets\images\platformerPack_industrial_tilesheet.png" />
+    <Image Include="assets\images\platformerPackindustrialtilesheet.png" />
     <Image Include="assets\images\playerSpriteSheet.png" />
     <Image Include="assets\images\toilet.png" />
     <Image Include="assets\images\toiletmainmenu.png" />
