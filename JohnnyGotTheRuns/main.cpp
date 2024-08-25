@@ -285,6 +285,8 @@ public:
 		{
 			pBackGround->LoadBackGround("assets/images/background.png");
 			eGameMenu = GAME_MENU::GAME_LEVEL;
+			pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 10.0f;
+			pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 55.0f;
 		}
 
 		if (guiButton2->bPressed)
