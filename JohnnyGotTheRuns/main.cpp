@@ -126,8 +126,8 @@ public:
 		font = olc::Font{ "assets/fonts/kenney_bold.ttf", 16 };
 		font.AddFallbackFont("assets/fonts/kenney_thick.ttf");
 
-		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 10.0f;
-		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 72.0f;
+		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 74.0f;
+		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 75.0f;
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
 		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Out player is HD and Big, bring him down a little
 
@@ -199,14 +199,15 @@ public:
 		{
 		case JGotTheRuns::MAIN_MENU:
 			bResult = DisplayMainMenu(fElapsedTime);
-			//pPlayer->UpdatePlayer(fElapsedTime);
+			
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::GAME_LEVEL:
 			bResult = DisplayGameLevel(fElapsedTime);
-
 			bResult = UpdatePlayerPosition(fElapsedTime);
 			
-			//pPlayer->UpdatePlayer(fElapsedTime);
+			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::CREDITS:
 			bResult = DisplayCredits(fElapsedTime);
@@ -232,7 +233,7 @@ public:
 		pMainMenu->DrawDecal();
 
 		bResult = DisplayQuickGUI(fElapsedTime);
-
+		
 		return bResult;
 	}
 
@@ -392,7 +393,7 @@ public:
 
 		pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
 
-		pPlayer->UpdatePlayer(fElapsedTime);
+		//pPlayer->UpdatePlayer(fElapsedTime);
 
 		//tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
 
@@ -439,18 +440,18 @@ public:
 					case 1:
 					{
 						// this is our Ladder layer
-						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							pLevelLoader->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 					default:
 						// this is our drawing layer
-						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							pLevelLoader->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 
