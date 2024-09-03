@@ -244,7 +244,7 @@ namespace olc
 	bool MainMenu::OnBeforeUserUpdate(float& fElapsedTime)
 	{
 		// If we are not acivated then we just return, we have nothing to do
-		if (!Properties.bIsActive) return false;
+		//if (!Properties.bIsActive) return false;
 
 		// Fires just before the main OnUserUpdate
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
@@ -255,7 +255,7 @@ namespace olc
 	{
 		// Fires just After the main OnUserUpdate
 		// If we are not acivated then we just return, we have nothing to do
-		if (!Properties.bIsActive) return;
+		//if (!Properties.bIsActive) return;
 	}
 
 	// See Step 3: Rename to your Class name

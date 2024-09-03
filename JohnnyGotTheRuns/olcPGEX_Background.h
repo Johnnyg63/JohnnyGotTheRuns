@@ -163,6 +163,7 @@ namespace olc
 			Properties.renImage.Load(Properties.strImagePath);
 			Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
 			Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+			bChangeGround = false; 
 		};
 		
 
