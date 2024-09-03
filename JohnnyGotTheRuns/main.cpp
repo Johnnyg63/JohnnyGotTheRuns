@@ -204,9 +204,9 @@ public:
 			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::GAME_LEVEL:
+			bResult = ManageKeyInputs(fElapsedTime);
 			bResult = DisplayGameLevel(fElapsedTime);
-			bResult = UpdatePlayerPosition(fElapsedTime);
-			
+					
 			pPlayer->UpdatePlayer(fElapsedTime);
 			break;
 		case JGotTheRuns::CREDITS:
@@ -302,25 +302,24 @@ public:
 	/*
 	* Updates the player position
 	*/
-	bool UpdatePlayerPosition(float fElapsedTime)
+	bool ManageKeyInputs(float fElapsedTime)
 	{
-		// TODO: Move to new location
+
 		olc::vf2d vfDirection = { 0.0f, 0.5f };
 		pPlayer->Properties.vfVelocity = vfDirection;
 		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
 		if (GetKey(olc::Key::UP).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
-			vfDirection = { 0, -1}; //up
-			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+			vfDirection = { 0, -1 }; //up
 
 		}
 
 		if (GetKey(olc::Key::DOWN).bHeld)
 		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime;
-			vfDirection = { 0, +1.}; // down
-			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
+			vfDirection = { 0, +1. }; // down
+
 
 		}
 
@@ -328,14 +327,14 @@ public:
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
 			vfDirection = { -1, 0 }; // left
-			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+
 		}
 
 		if (GetKey(olc::Key::RIGHT).bHeld)
 		{
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
 			vfDirection = { +1, 0 }; // right
-			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+
 		}
 
 		if (GetKey(olc::Key::SPACE).bHeld)
@@ -345,9 +344,18 @@ public:
 			// When we are jumping we only care about the up direction therefore we only subtract to the Y 
 			// more than the down force, 
 			vfDirection.y += -2.0f; // Jump
-			pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
+
 		}
 
+		UpdatePlayerPosition(fElapsedTime, vfDirection);
+			
+		return true;
+	}
+
+	bool UpdatePlayerPosition(float fElapsedTime, olc::vf2d vfDirection)
+	{
+		// TODO: Move to new location
+		pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
 		
 		// Now we update our trackpoint in 
 		vTrackedPoint += pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
@@ -360,7 +368,7 @@ public:
 		}
 
 		// true is returned
-		bool bOnScreen = camera.Update(fElapsedTime);
+		camera.Update(fElapsedTime);
 
 		// Set the transformed view to that required by the camera
 		tv.SetWorldOffset(camera.GetViewPosition());
@@ -417,6 +425,10 @@ public:
 		int32_t idx = 0;
 		int16_t nLayer = 0;
 
+		using namespace olc::utils::geom2d;
+
+		olc::vf2d vfDirection = { 0.0f, 0.0f };
+
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
@@ -437,23 +449,38 @@ public:
 					{
 						// This is our collision layer
 						tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+
+						// Check for collision here
+						auto test = tv.WorldToScreen(vTile);
+
+						bool bResult = overlaps(
+										circle<float>{pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius},
+										rect<float>{test, { 35.0f, 35.0f }}
+										);
+
+						if (bResult)
+						{
+							vfDirection = { 0.0f, -1.0f };
+							UpdatePlayerPosition(fElapsedTime, vfDirection);
+						}
+
 						break;
 					}
 					case 1:
 					{
 						// this is our Ladder layer
-						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							pLevelLoader->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
+							decalInfo.vfSoureSizePos);
 						break;
 					}
 					default:
 						// this is our drawing layer
-						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							pLevelLoader->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
+							decalInfo.vfSoureSizePos);
 						break;
 					}
 
