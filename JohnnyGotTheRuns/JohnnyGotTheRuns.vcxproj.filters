@@ -165,6 +165,21 @@
     <None Include="ems_pge\pge2wasm.bat">
       <Filter>pge_ems</Filter>
     </None>
+    <None Include="WASM\index.html">
+      <Filter>WASM</Filter>
+    </None>
+    <None Include="WASM\pge.data">
+      <Filter>WASM</Filter>
+    </None>
+    <None Include="WASM\pge.html">
+      <Filter>WASM</Filter>
+    </None>
+    <None Include="WASM\pge.js">
+      <Filter>WASM</Filter>
+    </None>
+    <None Include="WASM\pge.wasm">
+      <Filter>WASM</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3">

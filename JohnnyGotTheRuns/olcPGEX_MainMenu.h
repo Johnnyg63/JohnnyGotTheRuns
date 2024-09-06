@@ -175,10 +175,10 @@ namespace olc
 		}
 		strToiletPath = "./assets/images/toilet.png";
 #else
-		/*if (sprSpriteSheetPath.rfind("./", 0) == 0) {
+		if (sprSpriteSheetPath.rfind("./", 0) == 0) {
 			Properties.strSpriteSheetPath = sprSpriteSheetPath.substr(2);
 		}
-		strToiletPath = "assets/images/toilet.png";*/
+		strToiletPath = "assets/images/toilet.png";
 #endif
 
 	}

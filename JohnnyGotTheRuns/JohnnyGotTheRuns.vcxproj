@@ -182,6 +182,11 @@
     <None Include="assets\maps\Level1Output.tmx" />
     <None Include="dlls\freetype.dll" />
     <None Include="ems_pge\pge2wasm.bat" />
+    <None Include="WASM\index.html" />
+    <None Include="WASM\pge.data" />
+    <None Include="WASM\pge.html" />
+    <None Include="WASM\pge.js" />
+    <None Include="WASM\pge.wasm" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="assets\sounds\engineCircular_001.mp3" />

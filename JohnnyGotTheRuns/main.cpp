@@ -466,7 +466,7 @@ public:
 					case 0:
 					{
 						// This is our collision layer
-						tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
 
 						// Check for collision here
 						worldTile.pos = tv.WorldToScreen(vTile);
