@@ -428,6 +428,24 @@ public:
 		using namespace olc::utils::geom2d;
 
 		olc::vf2d vfDirection = { 0.0f, 0.0f };
+		float fClosestX = 0.0f;
+		float fClosestY = 0.0f;
+		float fDistanceX = 0.0f;
+		float fDistanceY = 0.0f;
+		float fDistance = 0.0f;
+		float fOverlap = 0.0f;
+		//olc::vf2d worldTile = { 0.0f, 0.0f };
+
+		rect<float> worldTile;
+		worldTile.pos.x = 0.0f;
+		worldTile.pos.y = 0.0f;
+		worldTile.size = { 35.0f, 35.0f };
+
+
+
+
+
+
 
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
@@ -451,43 +469,41 @@ public:
 						tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
 
 						// Check for collision here
-						auto worldTile = tv.WorldToScreen(vTile);
+						worldTile.pos = tv.WorldToScreen(vTile);
 
 						bool bResult = overlaps(
 										circle<float>{pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius},
-										rect<float>{worldTile, { 35.0f, 35.0f }}
-										);
+										worldTile);
 
 						if (bResult)
 						{
-							float closestX = std::clamp(pPlayer->collCircle.vfCenterPos.x, worldTile.x, worldTile.x + 35.0f);
-							float closestY = std::clamp(pPlayer->collCircle.vfCenterPos.y, worldTile.y, worldTile.y + 35.0f);
+							fClosestX = std::clamp(pPlayer->collCircle.vfCenterPos.x, worldTile.pos.x, worldTile.pos.x + worldTile.size.x);
+							fClosestY = std::clamp(pPlayer->collCircle.vfCenterPos.y, worldTile.pos.y, worldTile.pos.y + worldTile.size.y);
 
-							float distanceX = pPlayer->collCircle.vfCenterPos.x - closestX;
-							float distanceY = pPlayer->collCircle.vfCenterPos.y - closestY;
+							fDistanceX = pPlayer->collCircle.vfCenterPos.x - fClosestX;
+							fDistanceY = pPlayer->collCircle.vfCenterPos.y - fClosestY;
 
-							float distance = std::sqrt(distanceX * distanceX + distanceY * distanceY);
-							float overlap = pPlayer->collCircle.fRadius - distance;
+							fDistance = std::sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
+							fOverlap = pPlayer->collCircle.fRadius - fDistance;
 
-							if (distance != 0) {
-								pPlayer->collCircle.vfCenterPos.x += (distanceX / distance) * overlap;
-								pPlayer->collCircle.vfCenterPos.y += (distanceY / distance) * overlap;
-								vfDirection.x += (distanceX / distance) * overlap;
-								vfDirection.y += (distanceY / distance) * overlap;
+							if (fDistance != 0) {
+								pPlayer->collCircle.vfCenterPos.x += (fDistanceX / fDistance) * fOverlap;
+								pPlayer->collCircle.vfCenterPos.y += (fDistanceY / fDistance) * fOverlap;
+								vfDirection.x += (fDistanceX / fDistance) * fOverlap;
+								vfDirection.y += (fDistanceY / fDistance) * fOverlap;
 							}
 							else {
 								// Handle the case where the circle's center is exactly on the rectangle's edge
-								if (distanceX == 0) {
-									pPlayer->collCircle.vfCenterPos.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.y + 35.0f / 2) ? overlap : -overlap;
-									vfDirection.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.y + 35.0f / 2) ? overlap : -overlap;
+								if (fDistanceX == 0) {
+									pPlayer->collCircle.vfCenterPos.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
+									vfDirection.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
 								}
 								else {
-									pPlayer->collCircle.vfCenterPos.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.x + 35.0f / 2) ? overlap : -overlap;
-									vfDirection.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.x + 35.0f / 2) ? overlap : -overlap;
+									pPlayer->collCircle.vfCenterPos.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.pos.x + worldTile.size.x / 2) ? fOverlap : -fOverlap;
+									vfDirection.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.pos.x + worldTile.size.x / 2) ? fOverlap : -fOverlap;
 								}
 							}
 
-							//vTrackedPoint = pPlayer->Properties.vfPotentialPosition;
 							UpdatePlayerPosition(fElapsedTime, vfDirection);
 						}
 
