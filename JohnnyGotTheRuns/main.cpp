@@ -451,16 +451,43 @@ public:
 						tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
 
 						// Check for collision here
-						auto test = tv.WorldToScreen(vTile);
+						auto worldTile = tv.WorldToScreen(vTile);
 
 						bool bResult = overlaps(
 										circle<float>{pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius},
-										rect<float>{test, { 35.0f, 35.0f }}
+										rect<float>{worldTile, { 35.0f, 35.0f }}
 										);
 
 						if (bResult)
 						{
-							vfDirection = { 0.0f, -1.0f };
+							float closestX = std::clamp(pPlayer->collCircle.vfCenterPos.x, worldTile.x, worldTile.x + 35.0f);
+							float closestY = std::clamp(pPlayer->collCircle.vfCenterPos.y, worldTile.y, worldTile.y + 35.0f);
+
+							float distanceX = pPlayer->collCircle.vfCenterPos.x - closestX;
+							float distanceY = pPlayer->collCircle.vfCenterPos.y - closestY;
+
+							float distance = std::sqrt(distanceX * distanceX + distanceY * distanceY);
+							float overlap = pPlayer->collCircle.fRadius - distance;
+
+							if (distance != 0) {
+								pPlayer->collCircle.vfCenterPos.x += (distanceX / distance) * overlap;
+								pPlayer->collCircle.vfCenterPos.y += (distanceY / distance) * overlap;
+								vfDirection.x += (distanceX / distance) * overlap;
+								vfDirection.y += (distanceY / distance) * overlap;
+							}
+							else {
+								// Handle the case where the circle's center is exactly on the rectangle's edge
+								if (distanceX == 0) {
+									pPlayer->collCircle.vfCenterPos.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.y + 35.0f / 2) ? overlap : -overlap;
+									vfDirection.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.y + 35.0f / 2) ? overlap : -overlap;
+								}
+								else {
+									pPlayer->collCircle.vfCenterPos.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.x + 35.0f / 2) ? overlap : -overlap;
+									vfDirection.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.x + 35.0f / 2) ? overlap : -overlap;
+								}
+							}
+
+							//vTrackedPoint = pPlayer->Properties.vfPotentialPosition;
 							UpdatePlayerPosition(fElapsedTime, vfDirection);
 						}
 
