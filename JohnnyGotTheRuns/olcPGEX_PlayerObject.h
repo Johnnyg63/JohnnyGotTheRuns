@@ -428,7 +428,7 @@ namespace olc
 				collCircle.vfCenterPos.y += (Properties.sprImageInfo.vScaleSize.y / 2) - collCircle.fRadius;
 
 				// Show the circle for debugging, thank Javid
-				pge->DrawRectDecal(Properties.vfPosition, Properties.sprImageInfo.vScaleSize, olc::BLUE);
+				//pge->DrawRectDecal(Properties.vfPosition, Properties.sprImageInfo.vScaleSize, olc::BLUE);
 
 			}
 		}
@@ -437,7 +437,7 @@ namespace olc
 		// NOTE: The Decal World and Sprite World do not aline, you made need to play with the values to get it perfect
 		// Our collision circle will have an approx center of the decal with an approx radius
 
-		DrawCircleDecal(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
+		//DrawCircleDecal(collCircle.vfCenterPos, collCircle.fRadius, olc::GREEN);
 
 	}
 
@@ -971,10 +971,10 @@ namespace olc
 		case olc::PlayerObject::SHOW:
 			break;
 		case olc::PlayerObject::BEHIND_BACK:
-			vfWarp = { 0.005f, 0.005f };
+			vfWarp = { 0.003f, 0.003f };
 			break;
 		case olc::PlayerObject::RUN:
-			vfWarp = { 0.005f, 0.009f };
+			//vfWarp = { 0.005f, 0.009f };
 			break;
 		case olc::PlayerObject::ATTACK:
 			break;
@@ -991,7 +991,7 @@ namespace olc
 		case olc::PlayerObject::ROPE:
 			break;
 		case olc::PlayerObject::WALK:
-			vfWarp = { 0.005f, 0.005f };
+			//vfWarp = { 0.005f, 0.005f };
 			break;
 		case olc::PlayerObject::FALL_DOWN:
 			break;

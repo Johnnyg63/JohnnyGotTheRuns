@@ -504,7 +504,10 @@ public:
 								}
 							}
 
-							UpdatePlayerPosition(fElapsedTime, vfDirection);
+							vTrackedPoint += vfDirection * fElapsedTime;
+							pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
+
+							//UpdatePlayerPosition(fElapsedTime, (vfDirection / 10.0f));
 						}
 
 						break;
