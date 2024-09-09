@@ -441,12 +441,6 @@ public:
 		worldTile.pos.y = 0.0f;
 		worldTile.size = { 35.0f, 35.0f };
 
-
-
-
-
-
-
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
