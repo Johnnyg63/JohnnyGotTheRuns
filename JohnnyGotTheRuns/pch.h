@@ -43,3 +43,5 @@
 #define OLC_PGEX_PLAYER_OBJECT		// Manages the Player object
 #include "olcPGEX_PlayerObject.h"
 
+#define OLC_PGEX_COLLISION			// Manages the Collisions of objects
+#include "olcPGEX_Collision.h"

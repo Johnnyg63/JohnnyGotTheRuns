@@ -62,15 +62,17 @@ public:
 	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer
 	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
 	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
+	std::unique_ptr<olc::Collision> pCollision;					// Collision Smart pointer
 
 	// Font 
 	olc::Font font;
 
-	// Transformed view object to make world offsetting simple
-	olc::TileTransformedView tv;
+	
+	olc::TileTransformedView tileTransformedView;						// Transformed view object to make world offsetting simple
+
 	// Conveninet constants to define tile map world
-	olc::vi2d m_vWorldSize = { 140, 24 }; // 2048 64 cells
-	olc::vi2d m_vTileSize = { 35, 35 };
+	olc::vi2d m_vWorldSize = { 140, 24 };						// 140X24 Tiles
+	olc::vi2d m_vTileSize = { 35, 35 };							// Tile Size (Screen Size 35X35, World Size 1 X 1)
 
 	std::vector<uint8_t> vWorldMapGraphics;	// Our basic grid map!
 
@@ -93,15 +95,27 @@ public:
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
 		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
-															"assets/maps/Level1Output.tmx", 1);					// TODO: Make file names shorter
+															"assets/maps/Level1Output.tmx", 1);					// Game Level Manager
+		pCollision = std::make_unique<olc::Collision>();															// Collision Controller
+
+		/* -- Order is important -- */
 
 		/*
 		* Setup our level manager
 		*/
-		pLevelManager->Properties.tv = &tv;
+		pLevelManager->Properties.tv = &tileTransformedView;
 		pLevelManager->Properties.viWorldSize = m_vWorldSize;
 		pLevelManager->Properties.viTileSize = m_vTileSize;
 
+		/*
+		* Setup our collision  // TODO: Sort out pointers to properites 
+		*/
+		pCollision->Properties.ptrTileTransFormedView = &tileTransformedView;
+		pCollision->Properties.ptrmapLayerInfo = &pLevelManager->Properties.mapLayerInfo;
+		pCollision->Properties.viSpriteSheetTiles = { 28, 14 };
+		pCollision->Properties.ptrvTrackedPoint = &vTrackedPoint;
+		pCollision->Properties.viWorldSize = m_vWorldSize;
+		pCollision->Properties.viTileSize = m_vTileSize;
 
 		/*
 		*  Setup our player
@@ -174,7 +188,7 @@ public:
 
 		// Transfrom View settings... Move to new location
 		// Construct transform view
-		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
+		tileTransformedView = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
 
 		// Construct Camera
 		vTrackedPoint = { 2.0f, 20.0f };
@@ -378,7 +392,7 @@ public:
 		camera.Update(fElapsedTime);
 
 		// Set the transformed view to that required by the camera
-		tv.SetWorldOffset(camera.GetViewPosition());
+		tileTransformedView.SetWorldOffset(camera.GetViewPosition());
 
 		// Where will object be worst case ?
 		pPlayer->Properties.vfPotentialPosition = pPlayer->Properties.vfPosition + pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
@@ -408,7 +422,7 @@ public:
 			pPlayer->Properties.vfPosition.y = m_vWorldSize.y;
 		}
 
-		pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
+		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
 
 		//pPlayer->UpdatePlayer(fElapsedTime);
 
@@ -424,128 +438,20 @@ public:
 	{
 		// TODO: Add code to manage mulitple levels... for the jam one will do!
 		pBackGround->DrawDecal();
-		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
-		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+		olc::vi2d vTileTL = tileTransformedView.GetTopLeftTile().max({ 0,0 });
+		olc::vi2d vTileBR = tileTransformedView.GetBottomRightTile().min(m_vWorldSize);
 
 		// Display the Level
 		pLevelManager->DisplayLevel(fElapsedTime, vTileTL, vTileBR);
-	
 
 		// collision
+		vTileTL = tileTransformedView.GetTopLeftTile().max({ 0,0 });
+		vTileBR = tileTransformedView.GetBottomRightTile().min(m_vWorldSize);
 
-		vTileTL = tv.GetTopLeftTile().max({ 0,0 });
-		vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+		pCollision->UpdateCollisions(pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius, fElapsedTime);
 
-		olc::LevelManager::DecalInfo decalInfo;
-		olc::vi2d vTile;
-		int32_t idx = 0;
-		int16_t nLayer = 0;
-
-		using namespace olc::utils::geom2d;
-
-		olc::vf2d vfDirection = { 0.0f, 0.0f };
-		float fClosestX = 0.0f;
-		float fClosestY = 0.0f;
-		float fDistanceX = 0.0f;
-		float fDistanceY = 0.0f;
-		float fDistance = 0.0f;
-		float fOverlap = 0.0f;
-		//olc::vf2d worldTile = { 0.0f, 0.0f };
-
-		rect<float> worldTile;
-		worldTile.pos.x = 0.0f;
-		worldTile.pos.y = 0.0f;
-		worldTile.size = { 35.0f, 35.0f };
-
-		// Then looping through them and drawing them
-		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
-			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
-			{
-				idx = vTile.y * m_vWorldSize.x + vTile.x;
-				
-				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
-
-				for (auto& layer : pLevelManager->Properties.mapLayerInfo)
-				{
-					decalInfo = layer.second[idx];
-
-					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
-
-					switch (decalInfo.nLayer)
-					{
-					case 0:
-					{
-						// This is our collision layer
-						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
-
-						// Check for collision here
-						worldTile.pos = tv.WorldToScreen(vTile);
-
-						bool bResult = overlaps(
-										circle<float>{pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius},
-										worldTile);
-
-						if (bResult)
-						{
-							fClosestX = std::clamp(pPlayer->collCircle.vfCenterPos.x, worldTile.pos.x, worldTile.pos.x + worldTile.size.x);
-							fClosestY = std::clamp(pPlayer->collCircle.vfCenterPos.y, worldTile.pos.y, worldTile.pos.y + worldTile.size.y);
-
-							fDistanceX = pPlayer->collCircle.vfCenterPos.x - fClosestX;
-							fDistanceY = pPlayer->collCircle.vfCenterPos.y - fClosestY;
-
-							fDistance = std::sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
-							fOverlap = pPlayer->collCircle.fRadius - fDistance;
-
-							if (fDistance != 0) {
-								pPlayer->collCircle.vfCenterPos.x += (fDistanceX / fDistance) * fOverlap;
-								pPlayer->collCircle.vfCenterPos.y += (fDistanceY / fDistance) * fOverlap;
-								vfDirection.x += (fDistanceX / fDistance) * fOverlap;
-								vfDirection.y += (fDistanceY / fDistance) * fOverlap;
-							}
-							else {
-								// Handle the case where the circle's center is exactly on the rectangle's edge
-								if (fDistanceX == 0) {
-									pPlayer->collCircle.vfCenterPos.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
-									vfDirection.y += (pPlayer->collCircle.vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
-								}
-								else {
-									pPlayer->collCircle.vfCenterPos.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.pos.x + worldTile.size.x / 2) ? fOverlap : -fOverlap;
-									vfDirection.x += (pPlayer->collCircle.vfCenterPos.x > worldTile.pos.x + worldTile.size.x / 2) ? fOverlap : -fOverlap;
-								}
-							}
-
-							vTrackedPoint += vfDirection * fElapsedTime;
-							pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
-
-							//UpdatePlayerPosition(fElapsedTime, (vfDirection / 10.0f));
-						}
-
-						break;
-					}
-					case 1:
-					{
-						// this is our Ladder layer
-						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							pLevelManager->Properties.renSpriteSheet.Decal(),
-							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
-						break;
-					}
-					default:
-						// this is our drawing layer
-						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							pLevelManager->Properties.renSpriteSheet.Decal(),
-							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
-						break;
-					}
-
-					nLayer++;
-					
-				}
-
-
-			}
+		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
+	
 
 
 		return true;
