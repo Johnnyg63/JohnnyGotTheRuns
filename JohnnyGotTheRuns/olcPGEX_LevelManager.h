@@ -2,7 +2,7 @@
 #include "pch.h"
 
 
-#ifdef OLC_PGEX_LEVEL_LOADER
+#ifdef OLC_PGEX_LEVEL_MANAGER
 // TODO:
 #endif
 
@@ -11,13 +11,13 @@ namespace olc
 	/*
 	* Manages the Loading of Level Graphics
 	*/
-	class LevelLoader : public PGEX
+	class LevelManager : public PGEX
 	{
 
 	public:
-		LevelLoader();
-		LevelLoader(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel);
-		virtual ~LevelLoader();
+		LevelManager();
+		LevelManager(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel);
+		virtual ~LevelManager();
 
 		// Fires just before the main OnUserCreate
 		virtual void OnBeforeUserCreate() override;
@@ -34,10 +34,19 @@ namespace olc
 		// Loads the level, will also clear any existing level data
 		void LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel);
 
-		
 		// Deletes the level
 		void ClearLevel();
-		// Add your own public methods here
+
+
+		/*
+		* Displays the current loaded level
+		* vTileTL = Top left tile in World Space
+		* vTileBR = Bottom right tile in World Space
+		* decalInfo = Level Loader DecalInfo so we can display the level
+		*/
+		void DisplayLevel(float fElapsedTime, olc::vi2d vTileTL, olc::vi2d vTileBR);
+
+
 
 
 	public:
@@ -70,7 +79,7 @@ namespace olc
 		struct ObjectProperites
 		{
 			std::string strName = "LevelX";	// Object Name. Default "New Player"
-			uint16_t nLevelNumber = 0;	    // Object Number, Default 0 i.e. Backupground 1 , LevelLoader 2 etc
+			uint16_t nLevelNumber = 0;	    // Object Number, Default 0 i.e. Backupground 1 , LevelManager 2 etc
 
 			bool bAutoScale = true;				// Automatically scales the background image to fit within the screen size
 
@@ -83,24 +92,17 @@ namespace olc
 
 			std::vector<olc::Renderable> vecPlayerFrames;   // Holds the different frames for a object
 
-			/*
-			* Holds the vSource and vSize of the image
-			* Edit this value to the location of the Sprite when using a Sprite sheet
-			*/
-			ImageInfo sImageInfo;
-
-			/*
-			*
-			* Stores the location of the partial image from the sprSpriteSheet
-			* ImageInfo.vSource {x,y} of the top left of the partial image to draw
-			* ImageInfo.vSize {w, h} size of the partial image to be drawn
-			*
-			*/
-			std::vector<ImageInfo> vecPartialImages;
-
 			std::vector<DecalInfo> vecPartialDecalInfo;		// Stores the DecalInfo struct for tiled map graphics
 
 			std::map<int, std::vector<DecalInfo>> mapLayerInfo; // Stores the layers of DecalInfo vectors
+
+			olc::TileTransformedView* tv;		// Pointer to Transformed view object to make world offsetting simple
+
+			// Conveninet constants to define tile map world
+			olc::vi2d viWorldSize = { 140, 24 }; // 2048 64 cells
+			olc::vi2d viTileSize = { 35, 35 };
+
+			olc::vi2d viSpriteSheetTiles = { 28, 14 };	// Stores the total number of tiles x,y in the sprite sheet (Important!)
 
 		};
 
@@ -114,20 +116,20 @@ namespace olc
 }
 
 
-#ifdef OLC_PGEX_LEVEL_LOADER
-#undef OLC_PGEX_LEVEL_LOADER
+#ifdef OLC_PGEX_LEVEL_MANAGER
+#undef OLC_PGEX_LEVEL_MANAGER
 
 namespace olc
 {
 
 
-	LevelLoader::LevelLoader() : PGEX(true)
+	LevelManager::LevelManager() : PGEX(true)
 	{
 		// Nothing to do here but to wait until we are ready for the level
 		bisLevelLoaded = false;
 	}
 
-	LevelLoader::LevelLoader(std::string strSpriteSheetPath,
+	LevelManager::LevelManager(std::string strSpriteSheetPath,
 		std::string strTiledMapTMXPath,
 		uint16_t nLevel) : PGEX(true)
 	{
@@ -147,15 +149,6 @@ namespace olc
 		if (strTiledMapTMXPath.rfind("./", 0) != 0) {
 			Properties.strTiledMapTMXPath = "./" + strTiledMapTMXPath;
 		}
-
-#else
-		/*if (strSpriteSheetPath.rfind("./", 0) == 0) {
-			Properties.strSpriteSheetPath = strSpriteSheetPath.substr(2);
-		}
-
-		if (strTiledMapTMXPath.rfind("./", 0) == 0) {
-			Properties.strTiledMapTMXPath = strTiledMapTMXPath.substr(2);
-		}*/
 #endif
 
 
@@ -163,12 +156,12 @@ namespace olc
 	}
 
 
-	LevelLoader::~LevelLoader()
+	LevelManager::~LevelManager()
 	{
 
 	}
 
-	void LevelLoader::OnBeforeUserCreate()
+	void LevelManager::OnBeforeUserCreate()
 	{
 		// Fires just before the main OnUserCreate
 		if (Properties.strSpriteSheetPath == "" || Properties.strTiledMapTMXPath == "") return;
@@ -179,7 +172,7 @@ namespace olc
 	}
 
 
-	void LevelLoader::OnAfterUserCreate()
+	void LevelManager::OnAfterUserCreate()
 	{
 		// Fires just After the main OnUserCreate
 		if (bisLevelLoaded)
@@ -188,7 +181,7 @@ namespace olc
 		}
 	}
 
-	bool LevelLoader::OnBeforeUserUpdate(float& fElapsedTime)
+	bool LevelManager::OnBeforeUserUpdate(float& fElapsedTime)
 	{
 		// Fires just before the main OnUserUpdate
 		if (bisLevelLoaded)
@@ -199,7 +192,7 @@ namespace olc
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
 	}
 
-	void LevelLoader::OnAfterUserUpdate(float fElapsedTime)
+	void LevelManager::OnAfterUserUpdate(float fElapsedTime)
 	{
 		// Fires just After the main OnUserUpdate
 		if (bisLevelLoaded)
@@ -209,7 +202,7 @@ namespace olc
 
 	}
 
-	void LevelLoader::LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel)
+	void LevelManager::LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel)
 	{
 		Properties.renSpriteSheet.Load(strSpriteSheetPath);
 		TMXParser tmxParser = TMXParser(Properties.strTiledMapTMXPath);
@@ -250,7 +243,7 @@ namespace olc
 					sDecalInfo.nTiledID = tileId;
 					sDecalInfo.vfDrawLocation = { spriteX , spriteY };
 					sDecalInfo.vfSoureSizePos = { 35.0f, 35.0f };
-										
+
 					if (tileId > 0)
 					{
 						// Draw something
@@ -283,14 +276,84 @@ namespace olc
 		bisLevelLoaded = true;
 	}
 
-	void LevelLoader::ClearLevel()
+	void LevelManager::ClearLevel()
 	{
 		delete Properties.renSpriteSheet.Decal();
 		delete Properties.renSpriteSheet.Sprite();
 	}
 
-	
+	void LevelManager::DisplayLevel(float fElapsedTime, olc::vi2d vTileTL, olc::vi2d vTileBR)
+	{
+		// Displays the level
+		olc::vi2d vTile;
+		int32_t idx = 0;
+		int16_t nLayer = 0;
+		DecalInfo decalInfo;
 
+		using namespace olc::utils::geom2d;
+
+		olc::vf2d vfDirection = { 0.0f, 0.0f };
+		float fClosestX = 0.0f;
+		float fClosestY = 0.0f;
+		float fDistanceX = 0.0f;
+		float fDistanceY = 0.0f;
+		float fDistance = 0.0f;
+		float fOverlap = 0.0f;
+		//olc::vf2d worldTile = { 0.0f, 0.0f };
+
+		rect<float> worldTile;
+		worldTile.pos.x = 0.0f;
+		worldTile.pos.y = 0.0f;
+		worldTile.size = { 35.0f, 35.0f };
+
+		// Then looping through them and drawing them
+		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
+			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
+			{
+				idx = vTile.y * Properties.viWorldSize.x + vTile.x;
+
+				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
+
+				for (auto& layer : Properties.mapLayerInfo)
+				{
+					decalInfo = layer.second[idx];
+
+					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
+
+					switch (decalInfo.nLayer)
+					{
+					case 0:
+					{
+						// This is our collision layer
+						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						break;
+					}
+					case 1:
+					{
+						// this is our Ladder layer
+						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							Properties.renSpriteSheet.Decal(),
+							decalInfo.vfSourcePos,
+							decalInfo.vfSoureSizePos);
+						break;
+					}
+					default:
+						// this is our drawing layer
+						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							Properties.renSpriteSheet.Decal(),
+							decalInfo.vfSourcePos,
+							decalInfo.vfSoureSizePos);
+						break;
+					}
+
+					nLayer++;
+
+				}
+
+
+			} // End for Loop vtiles
+
+	}
 
 
 } // olc

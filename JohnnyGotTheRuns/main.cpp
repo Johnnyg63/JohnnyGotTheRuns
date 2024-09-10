@@ -17,7 +17,7 @@ class JGotTheRuns : public olc::PixelGameEngine
 public:
 
 	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
-	olc::SplashScreen olcSplashScreen;
+	//olc::SplashScreen olcSplashScreen;
 
 	/*
 	* GAME Menu
@@ -60,7 +60,7 @@ public:
 	std::unique_ptr<olc::MainMenu> pMainMenu;					// Main Menu Smart pointer
 	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
 	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer
-	std::unique_ptr<olc::LevelLoader> pLevelLoader;				// Level Loader Smart pointer
+	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
 	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
 
 	// Font 
@@ -92,8 +92,15 @@ public:
 		pMainMenu = std::make_unique<olc::MainMenu>("assets/images/interfacePacksheet.png");					// Main Menu
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
-		pLevelLoader = std::make_unique<olc::LevelLoader>("assets/images/levelSpriteSheet.png", 
+		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
 															"assets/maps/Level1Output.tmx", 1);					// TODO: Make file names shorter
+
+		/*
+		* Setup our level manager
+		*/
+		pLevelManager->Properties.tv = &tv;
+		pLevelManager->Properties.viWorldSize = m_vWorldSize;
+		pLevelManager->Properties.viTileSize = m_vTileSize;
 
 
 		/*
@@ -419,8 +426,17 @@ public:
 		pBackGround->DrawDecal();
 		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
 		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+
+		// Display the Level
+		pLevelManager->DisplayLevel(fElapsedTime, vTileTL, vTileBR);
 	
-		olc::LevelLoader::DecalInfo decalInfo;
+
+		// collision
+
+		vTileTL = tv.GetTopLeftTile().max({ 0,0 });
+		vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
+
+		olc::LevelManager::DecalInfo decalInfo;
 		olc::vi2d vTile;
 		int32_t idx = 0;
 		int16_t nLayer = 0;
@@ -449,7 +465,7 @@ public:
 				
 				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
 
-				for (auto& layer : pLevelLoader->Properties.mapLayerInfo)
+				for (auto& layer : pLevelManager->Properties.mapLayerInfo)
 				{
 					decalInfo = layer.second[idx];
 
@@ -509,18 +525,18 @@ public:
 					case 1:
 					{
 						// this is our Ladder layer
-						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							pLevelLoader->Properties.renSpriteSheet.Decal(),
+						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							pLevelManager->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 					default:
 						// this is our drawing layer
-						tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							pLevelLoader->Properties.renSpriteSheet.Decal(),
+						/*tv.DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							pLevelManager->Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 
