@@ -170,9 +170,9 @@ namespace olc
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
-					switch (decalInfo.nLayer)
+					switch (decalInfo.nLayerID)
 					{
-					case 0:
+					case 1:
 					{
 						// This is our collision layer
 						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);

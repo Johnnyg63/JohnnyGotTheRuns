@@ -53,14 +53,44 @@ namespace olc
 
 		Map map; //TMXParser Map !
 
+		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
+		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"
+
+		struct MapInfo
+		{
+			std::string strVersion = "";		// Version
+			std::string strTiledVersion = "";	// Tiled Map Version
+			std::string strOrientation = "";	// Orientation
+			std::string strRenderorder = "";	// Order and direction to render (Keep is simple folks use right-down
+			int32_t nWidth = 0;					// Layer Width
+			int32_t nHeight = 0;				// Layer Height
+			int32_t nTileWidth = 0;				// Layer Width
+			int32_t nTileHeight = 0;			// Layer Height
+			bool bIsInfinite = false;			// Is the layer infinite
+			int32_t nNextLayerID = 0;			// The next layer id
+			int32_t nNextObjectID = 0;			// The next object id
+
+
+		};
+
+		MapInfo sMapInfo;
+
+
+		//<layer id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
 
 		struct DecalInfo
 		{
-			int16_t nLayer = 0;							// Stores layer number
-			int16_t nTiledID = 0;						// Stores Tiled Map Editor ID
-			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Stores the locatoin of where to draw
-			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Stores Location on Sprite Sheet
-			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Stores size of Partial Decal
+			bool bIsVisable = true;						// Is layer is visable
+			bool bIsLocked = true;						// Is layer is locked
+			int16_t nLayerID = 0;						// Layer id number
+			std::string strName = "";					// Layer name
+			std::string strClass = "";					// Layer Class name
+			int32_t nWidth = 0;							// Layer Width
+			int32_t nHeight = 0;						// Layer Height
+			int16_t nTiledID = 0;						// Tiled Map Editor ID
+			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Locatoin of where to draw
+			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Location on Sprite Sheet
+			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Size of Partial Decal
 		};
 
 		DecalInfo sDecalInfo;
@@ -204,28 +234,63 @@ namespace olc
 
 	void LevelManager::LoadLevel(std::string strSpriteSheetPath, std::string strTiledMapTMXPath, uint16_t nLevel)
 	{
+		// Lets load and parse our data
 		Properties.renSpriteSheet.Load(strSpriteSheetPath);
 		TMXParser tmxParser = TMXParser(Properties.strTiledMapTMXPath);
 		map = tmxParser.GetData();
 
-		// Lod the data into the vector for processing later
-		//vecPartialDecalInfo
+		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
+		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"
 
+		for (auto& mapInfo : map.MapData.data)
+		{
+			if (mapInfo.first == "version") sMapInfo.strVersion = mapInfo.second;
+			if (mapInfo.first == "tiledversion") sMapInfo.strTiledVersion = mapInfo.second;
+			if (mapInfo.first == "orientation") sMapInfo.strOrientation = mapInfo.second;
+			if (mapInfo.first == "renderorder") sMapInfo.strRenderorder = mapInfo.second;
+
+			if (mapInfo.first == "width") sMapInfo.nWidth = std::stoi(mapInfo.second);
+			if (mapInfo.first == "height") sMapInfo.nHeight = std::stoi(mapInfo.second);
+			if (mapInfo.first == "tilewidth") sMapInfo.nTileWidth = std::stoi(mapInfo.second);
+			if (mapInfo.first == "tileheight") sMapInfo.nTileHeight = std::stoi(mapInfo.second);
+			if (mapInfo.first == "nextlayerid") sMapInfo.nNextLayerID = std::stoi(mapInfo.second);
+			if (mapInfo.first == "nextobjectid") sMapInfo.nNextObjectID = std::stoi(mapInfo.second);
+
+			if (mapInfo.first == "infinite") sMapInfo.bIsInfinite = (std::stoi(mapInfo.second) > 0) ? true : false;
+
+		}
+
+		// lets clear things up
 		Properties.vecPartialDecalInfo.clear();
-		int nLayerCount = 0;
+		int16_t nLayerCount = 0;
+		int32_t x = 0;
+		int32_t y = 0;
 
-		// TODO Remove this crap
-		size_t nCount = map.LayerData.size();
-		nCount = map.MapData.data.size();
-		nCount = map.TilesetData.data.size();
+		// Important this is needed to ensure the DrawPartialDecal correctly finds the location with the spritesheet
+		int16_t nSpriteSheetTileCount = Properties.renSpriteSheet.Sprite()->width / sMapInfo.nTileWidth;
 
-		int x = 0;
-		int y = 0;
-		nLayerCount = 0;
 		for (auto& layer : map.LayerData)
 		{
 			auto vecPartialDecalInfo = std::vector<DecalInfo>();
 			auto rowYtiles = layer.tiles;
+			auto layerTags = layer.tag.data;
+
+			DecalInfo sDecalInfo;
+
+			// // id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
+			for (auto& tag : layerTags)
+			{
+				if (tag.first == "id") sDecalInfo.nLayerID = std::stoi(tag.second);
+				if (tag.first == "name") sDecalInfo.strName = tag.second;
+				if (tag.first == "class") sDecalInfo.strName = tag.second;
+				if (tag.first == "width") sDecalInfo.nWidth = std::stoi(tag.second);
+				if (tag.first == "height") sDecalInfo.nHeight = std::stoi(tag.second);
+				if (tag.first == "visable") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0)? true : false;
+				if (tag.first == "locked") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
+
+			}
+
+
 			for (auto& tiles : rowYtiles)
 			{
 				x = 0;
@@ -234,26 +299,22 @@ namespace olc
 
 					int tileId = tile;
 
-					float spriteX = x * 35;
-					float spriteY = y * 35;
+					float spriteX = x * sMapInfo.nTileWidth;
+					float spriteY = y * sMapInfo.nTileHeight;
 
-
-					DecalInfo sDecalInfo;
-					sDecalInfo.nLayer = nLayerCount;
 					sDecalInfo.nTiledID = tileId;
 					sDecalInfo.vfDrawLocation = { spriteX , spriteY };
-					sDecalInfo.vfSoureSizePos = { 35.0f, 35.0f };
+					sDecalInfo.vfSoureSizePos = { (float)sMapInfo.nTileWidth, (float)sMapInfo.nTileHeight };
 
 					if (tileId > 0)
 					{
 						// Draw something
-						int tileX = (tileId - 1) % 28;		// Number of X tiles Johnngy!!!!... number of tiles on the SpriteSheet!
-						int tileY = (tileId - 1) / 28;
+						int tileX = (tileId - 1) % nSpriteSheetTileCount;		// Number of X tiles Johnngy!!!!... number of tiles on the SpriteSheet!
+						int tileY = (tileId - 1) / nSpriteSheetTileCount;
 
-						float sourceX = tileX * 35;
-						float sourceY = tileY * 35;
+						float sourceX = tileX * sMapInfo.nTileWidth;
+						float sourceY = tileY * sMapInfo.nTileHeight;
 
-						//pge->DrawPartialDecal({ spriteX, spriteY }, { 35.0f, 35.0f }, Properties.renSpriteSheet.Decal(), { sourceX, sourceY }, { 35.0f, 35.0f });
 						sDecalInfo.vfSourcePos = { sourceX , sourceY };
 
 					}
@@ -287,7 +348,6 @@ namespace olc
 		// Displays the level
 		olc::vi2d vTile;
 		int32_t idx = 0;
-		int16_t nLayer = 0;
 		DecalInfo decalInfo;
 
 		using namespace olc::utils::geom2d;
@@ -320,15 +380,14 @@ namespace olc
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
-					switch (decalInfo.nLayer)
+					switch (decalInfo.nLayerID)
 					{
-					case 0:
+					case 1:
 					{
-						// This is our collision layer
-						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						// This is our collision Layer, nothing to do just move on
 						break;
 					}
-					case 1:
+					case 2:
 					{
 						// this is our Ladder layer
 						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
@@ -337,7 +396,8 @@ namespace olc
 							decalInfo.vfSoureSizePos);
 						break;
 					}
-					default:
+					case 3:
+					{
 						// this is our drawing layer
 						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							Properties.renSpriteSheet.Decal(),
@@ -345,8 +405,9 @@ namespace olc
 							decalInfo.vfSoureSizePos);
 						break;
 					}
-
-					nLayer++;
+					default:
+						break;
+					}
 
 				}
 
