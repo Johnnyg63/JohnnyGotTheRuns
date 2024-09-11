@@ -40,9 +40,9 @@ namespace olc
 
 	public:
 
-
 		struct ObjectProperites
 		{
+			bool bIsEnabled = false;			// Important, we only set this to true when we need to use this class
 			std::string strName = "Collision Manager";	// Object Name. Default "New Player"
 			int8_t nObjectNumber = 0;	        // Object Number, Default 0 i.e. Backupground 1 , Collision 2 etc
 
@@ -57,7 +57,7 @@ namespace olc
 
 			olc::vi2d viSpriteSheetTiles = { 28, 14 };	// Stores the total number of tiles x,y in the sprite sheet (Important!)
 
-			
+			std::vector<std::shared_ptr<olc::PlayerObject>> vecPlayerObjects;
 
 		};
 
@@ -79,40 +79,77 @@ namespace olc
 namespace olc
 {
 
-	// See Step 3: Rename to your Class name
+
 	Collision::Collision() : PGEX(true)
 	{
 		
 	}
 
-	// See Step 3: Rename to your Class name
+
 	Collision::~Collision()
 	{
 
 		
 	}
 
-	// See Step 3: Rename to your Class name
+
 	void Collision::OnBeforeUserCreate()
 	{
-		// Fires just before the main OnUserCreate
-
-	
 
 	}
 
-	// See Step 3: Rename to your Class name
+
 	void Collision::OnAfterUserCreate()
 	{
 		// Fires just After the main OnUserCreate
 	}
 
-	// See Step 3: Rename to your Class name
 	bool Collision::OnBeforeUserUpdate(float& fElapsedTime)
 	{
-		
-
 		// Fires just before the main OnUserUpdate
+		if (Properties.bIsEnabled)
+		{
+			// We manage collisions before we draw
+
+			for (auto& playerObject : Properties.vecPlayerObjects)
+			{
+				switch (playerObject->Properties.eObjectType)
+				{
+				case PlayerObject::OBJECT_TYPE::ENEMY:
+				{
+					// TODO: 
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::GAME_CHAR:
+				{
+					UpdateCollisions(&playerObject->Properties.vfPosition, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
+					playerObject->UpdateAction(PlayerObject::ACTION::TALK);
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::NONE:
+				{
+
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::OTHER_PLAYER:
+				{
+					// For the player we update the vTrackpoint as this controlls the player position
+					UpdateCollisions(Properties.ptrvTrackedPoint, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::PLAYER:
+				{
+
+					break;
+				}
+
+				default:
+					break;
+				}
+			}
+		}
+
+		
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
 	}
 
@@ -120,6 +157,10 @@ namespace olc
 	void Collision::OnAfterUserUpdate(float fElapsedTime)
 	{
 		// Fires just After the main OnUserUpdate
+		if (Properties.bIsEnabled)
+		{
+
+		}
 	}
 
 	// See Step 3: Rename to your Class name
@@ -158,8 +199,6 @@ namespace olc
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{
 				idx = vTile.y * Properties.viWorldSize.x + vTile.x;
-
-			
 				/*
 				* Note we add a* to declare we want to access the value
 				* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
@@ -220,11 +259,6 @@ namespace olc
 
 							
 							*vfPositionPos += vfDirection * fElapsedTime;
-
-							//*Properties.ptrvTrackedPoint += vfDirection * fElapsedTime;
-
-							//pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
-
 						}
 
 						break;

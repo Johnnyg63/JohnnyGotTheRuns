@@ -63,8 +63,8 @@ public:
 	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
 	std::unique_ptr<olc::Collision> pCollision;					// Collision Smart pointer
 
-	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
-	std::unique_ptr<olc::PlayerObject> pMale;					// Male Char smart pointer
+	std::shared_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
+	std::shared_ptr<olc::PlayerObject> pMale;					// Male Char smart pointer
 
 
 
@@ -100,7 +100,7 @@ public:
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
 		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
 															"assets/maps/Level1Output.tmx", 1);					// Game Level Manager
-		pCollision = std::make_unique<olc::Collision>();															// Collision Controller
+		pCollision = std::make_unique<olc::Collision>();														// Collision Controller
 
 		/* -- Order is important -- */
 
@@ -124,21 +124,31 @@ public:
 		/*
 		*  Setup our player
 		*/
-		pPlayer = std::make_unique<olc::PlayerObject>("assets/images/playerSpriteSheet.png", true);
+		pPlayer = std::make_unique<olc::PlayerObject>("assets/images/playerSpriteSheet.png", PlayerObject::OBJECT_TYPE::PLAYER);
 		pPlayer->Properties.strName = "Johnnyg63";    // Set our player name
-		pPlayer->Properties.nPlayerNumber = 0;        // Set our player numbner
+		pPlayer->Properties.nObjectNumber = 0;        // Set our player numbner
 		pPlayer->Properties.nLives = 3;
 		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
+		pPlayer->Properties.eObjectType = PlayerObject::OBJECT_TYPE::PLAYER;
 
 
 		/*
-		* Setup our enemies 
+		* Setup our characters 
 		*/
-		pMale = std::make_unique<olc::PlayerObject>("assets/images/maleSpriteSheet.png", true);
+		pMale = std::make_unique<olc::PlayerObject>("assets/images/maleSpriteSheet.png", PlayerObject::OBJECT_TYPE::GAME_CHAR);
 		pMale->Properties.strName = "Jim the Janitor";
-		pPlayer->Properties.nPlayerNumber = 1;
-		pPlayer->Properties.nLives = 3;
-		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
+		pMale->Properties.nObjectNumber = 1;
+		pMale->Properties.nLives = 3;
+		pMale->Properties.vfVelocity = { 100.0f, 100.0f };
+		pMale->Properties.eObjectType = PlayerObject::OBJECT_TYPE::GAME_CHAR;
+
+		/*
+		* Setup our Collision
+		*/
+		pCollision->Properties.vecPlayerObjects.push_back(pPlayer);
+		pCollision->Properties.vecPlayerObjects.push_back(pMale);
+
+
 
 	}
 
@@ -236,20 +246,30 @@ public:
 		switch (eGameMenu)
 		{
 		case JGotTheRuns::MAIN_MENU:
+		{
+			pCollision->Properties.bIsEnabled = false;
 			bResult = DisplayMainMenu(fElapsedTime);
-			
 			pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
-			pPlayer->UpdatePlayer(fElapsedTime);
+			pPlayer->Update(fElapsedTime);
 			break;
+		}
 		case JGotTheRuns::GAME_LEVEL:
+		{
+			pCollision->Properties.bIsEnabled = true;
 			bResult = ManageKeyInputs(fElapsedTime);
 			bResult = DisplayGameLevel(fElapsedTime);
-					
-			pPlayer->UpdatePlayer(fElapsedTime);
+
+			//TODO : Create vector to update all objects
+			pPlayer->Update(fElapsedTime);
+			pMale->Update(fElapsedTime);
 			break;
+		}	
 		case JGotTheRuns::CREDITS:
+		{
+			pCollision->Properties.bIsEnabled = false;
 			bResult = DisplayCredits(fElapsedTime);
 			break;
+		}	
 		default:
 			break;
 		}
@@ -471,10 +491,6 @@ public:
 
 		pCollision->UpdateCollisions(&pMale->Properties.vfPosition, pMale->collCircle.vfCenterPos, pMale->collCircle.fRadius, fElapsedTime);
 	
-		pMale->UpdateAction(PlayerObject::CHEER);
-		pMale->UpdatePlayer(fElapsedTime);
-
-
 		return true;
 	}
 

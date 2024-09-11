@@ -13,6 +13,17 @@ namespace olc
 
 	public:
 
+
+		enum OBJECT_TYPE
+		{
+			NONE = 0,		// None object type
+			PLAYER,			// Main player 
+			GAME_CHAR,		// Game character
+			OTHER_PLAYER,	// Network players
+			ENEMY			// Standard Enemy
+
+		};
+
 		// Object Actions
 		enum ACTION
 		{
@@ -46,8 +57,7 @@ namespace olc
 			WIDE,
 			ROPE,
 			WALK,
-			FALL_DOWN,
-			NONE
+			FALL_DOWN
 		};
 
 		/*
@@ -59,10 +69,10 @@ namespace olc
 
 		/*
 		* Recommended Constructor:
-		* The class will create and setup renImage or renSpriteSheet depending on bIsSpriteSheet flag
-		* You can still update the renImage and renSpriteSheet manually from your code
+		* strSpriteSheetPath: Full path to your sprite sheet
+		* bIsPlayer: true: Players, false: Game Object
 		*/
-		PlayerObject(std::string ImagePath, bool bIsSpriteSheet = false);
+		PlayerObject(std::string strSpriteSheetPath, OBJECT_TYPE eObjectType = OBJECT_TYPE::NONE);
 
 		// virtual Default De-Constructor:
 		virtual ~PlayerObject();
@@ -82,8 +92,8 @@ namespace olc
 		// Changes the player action
 		void UpdateAction(ACTION action);
 
-		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the created decal
-		void UpdatePlayer(float fElapsedTime);
+		// Call this method from the onUserUpdate of Main.cpp, or anywhere, to draw the updated decal
+		void Update(float fElapsedTime);
 
 
 	public:
@@ -113,7 +123,8 @@ namespace olc
 		struct ObjectProperites
 		{
 			std::string strName = "GameObject";		// Object name. Default "GameObject"
-			int8_t nPlayerNumber = 0;				// Object number, Default 0 i.e. Player 1 , Player 2 etc
+			int8_t nObjectNumber = 0;				// Object number, Default 0 i.e. Player 1 , Player 2 etc
+			OBJECT_TYPE eObjectType = OBJECT_TYPE::NONE;	// Object Type: PLAYER, GAME_CHAR, OTHER_PLAYER, ENEMY, Default: OBJECT_TYPE::NONE
 
 			int32_t nLives = 3;						// Lives, Default 3
 			bool bIsGodMode = false;				// Stores if the player is in God Mode, Default: false
@@ -153,7 +164,6 @@ namespace olc
 
 	private:
 		bool bIsEmptySprite = false;
-		bool bisSpriteSheet = false;
 		std::string strImagePath = "";
 		float fGodModeTimer = 0.0f;         // Use to timeout GodMode when the timeout is reached
 		float fGodModeFlashTimer = 0.0f;    // Used to flash the Decal while in God mode
@@ -175,6 +185,7 @@ namespace olc
 		struct ActionFrame
 		{
 			ACTION nActionID = IDLE;                // Action ID, Default: IDLE
+
 			bool bActive = false;					// Is Active, Default: false
 			std::string strActionName = "Unknown";  // Action name, i.e. "Walk", "Jump" etc. , Default "Unknown"
 
@@ -194,6 +205,7 @@ namespace olc
 			std::vector<ImageInfo> vecPartialImages; // 
 
 		};
+
 		ActionFrame sActionFrame;
 
 		// Loads the actions to the frames,
@@ -234,12 +246,14 @@ namespace olc
 	PlayerObject::PlayerObject() : PGEX(true)
 	{
 		bIsEmptySprite = true;
+		Properties.eObjectType = OBJECT_TYPE::NONE;
+
 	}
 
-	PlayerObject::PlayerObject(std::string ImagePath, bool bIsSpriteSheet) : PGEX(true)
+	PlayerObject::PlayerObject(std::string strSpriteSheetPath, OBJECT_TYPE eObjectType) : PGEX(true)
 	{
-		bisSpriteSheet = bIsSpriteSheet;
-		strImagePath = ImagePath;
+		strImagePath = strSpriteSheetPath;
+		Properties.eObjectType = eObjectType;
 	}
 
 
@@ -285,32 +299,6 @@ namespace olc
 
 	bool PlayerObject::OnBeforeUserUpdate(float& fElapsedTime)
 	{
-
-		// find our direction
-		// Work out direction
-
-
-		/* Update our postion  */
-
-		// Ok we are falling....
-		//Properties.vfPosition.y += Properties.vfVelocity.y * fElapsedTime;
-
-		// Have we hit the bottom?
-		//if (Properties.vfPosition.y > (pge->ScreenHeight() - Properties.sprImageInfo.vSize.y))
-		//	Properties.vfPosition.y = pge->ScreenHeight() - Properties.sprImageInfo.vSize.y;//
-
-		//if (pge->GetTouch().bReleased)
-		//{
-			// We are tap...tap..tapping
-	   //     Properties.vfPosition.y -= Properties.vfVelocity.y * 200.0f * fElapsedTime;
-		//}
-
-		// Have we hit the top
-		//if (Properties.vfPosition.y < 1.0f)
-		//		Properties.vfPosition.y = 1.0f;
-
-
-
 		return false;
 	}
 
@@ -355,7 +343,7 @@ namespace olc
 		}
 	}
 
-	void PlayerObject::UpdatePlayer(float fElapsedTime)
+	void PlayerObject::Update(float fElapsedTime)
 	{
 		for (auto& actionFrame : vecActionFrames)
 		{
@@ -387,23 +375,59 @@ namespace olc
 
 				olc::vf2d vfDecolPos = Properties.vfPosition;
 
-				if (pge->GetKey(olc::Key::RIGHT).bPressed)
+				/*
+				* Player only options
+				*/
+
+				switch (Properties.eObjectType)
 				{
+					case PlayerObject::OBJECT_TYPE::ENEMY:
+					{
+						// TODO: 
+						break;
+					}
+					case PlayerObject::OBJECT_TYPE::GAME_CHAR:
+					{
+						// TODO:
+						break;
+					}
+					case PlayerObject::OBJECT_TYPE::NONE:
+					{
+						// TODO:
+						break;
+					}
+					case PlayerObject::OBJECT_TYPE::OTHER_PLAYER:
+					{
+						// For the player we update the vTrackpoint as this controlls the player position
+						// TODO
+						break;
+					}
+					case PlayerObject::OBJECT_TYPE::PLAYER:
+					{
+						if (pge->GetKey(olc::Key::RIGHT).bPressed)
+						{
 
-					bisFlipped = false;
-					vfDirection = vfRight;
-				}
+							bisFlipped = false;
+							vfDirection = vfRight;
+						}
 
-				if (pge->GetKey(olc::Key::LEFT).bPressed)
-				{
-					bisFlipped = true;
+						if (pge->GetKey(olc::Key::LEFT).bPressed)
+						{
+							bisFlipped = true;
 
-					vfDirection = vfLeft;
-				}
+							vfDirection = vfLeft;
+						}
 
-				if (bisFlipped)
-				{
-					vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
+						if (bisFlipped)
+						{
+							vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
+						}
+
+						break;
+					}
+
+				default:
+					break;
 				}
 
 				// 5: Draw the current decal frame
@@ -423,7 +447,7 @@ namespace olc
 				// TODO: Add Support for when the player is in DUCK mode
 				//6: Lets get our collision circle
 				collCircle.vfCenterPos = Properties.vfPosition + (Properties.sprImageInfo.vScaleSize / 2);
-				collCircle.fRadius = (std::min(Properties.sprImageInfo.vScaleSize.x, Properties.sprImageInfo.vScaleSize.y)/2);
+				collCircle.fRadius = (std::min(Properties.sprImageInfo.vScaleSize.x, Properties.sprImageInfo.vScaleSize.y) / 2);
 				// Move the circle to the buttom of he decal, we care about the players feet position
 				collCircle.vfCenterPos.y += (Properties.sprImageInfo.vScaleSize.y / 2) - collCircle.fRadius;
 
@@ -465,7 +489,7 @@ namespace olc
 		pge->DrawPolygonDecal(nullptr, vDraw, vDraw, colour);
 		pge->SetDecalMode(olc::DecalMode::NORMAL);
 	}
-                       	
+
 	void PlayerObject::FillCircleDecal(const olc::vf2d& vPos, const float fRadius, const olc::Pixel colour)
 	{
 		std::vector<olc::vf2d> vDraw(vertsUnitCircle.size(), { 0,0 });
@@ -994,8 +1018,6 @@ namespace olc
 			//vfWarp = { 0.005f, 0.005f };
 			break;
 		case olc::PlayerObject::FALL_DOWN:
-			break;
-		case olc::PlayerObject::NONE:
 			break;
 		default:
 			break;
