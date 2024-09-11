@@ -171,6 +171,7 @@
     <Image Include="assets\images\holytoilet.png" />
     <Image Include="assets\images\interfacePacksheet.png" />
     <Image Include="assets\images\LettersSpriteSheet.png" />
+    <Image Include="assets\images\maleSpriteSheet.png" />
     <Image Include="assets\images\oip.jpg" />
     <Image Include="assets\images\olcpgemobilelogo.png" />
     <Image Include="assets\images\levelSpriteSheet.png" />
@@ -196,6 +197,7 @@
   <ItemGroup>
     <Xml Include="assets\maps\interfacePack_sheet.xml" />
     <Xml Include="assets\maps\LettersSpriteSheet.xml" />
+    <Xml Include="assets\maps\maleSpriteSheet.xml" />
     <Xml Include="assets\maps\playerSpriteSheet.xml" />
   </ItemGroup>
   <ItemGroup>

@@ -154,6 +154,9 @@
     <Image Include="assets\images\levelSpriteSheet.png">
       <Filter>assets\images</Filter>
     </Image>
+    <Image Include="assets\images\maleSpriteSheet.png">
+      <Filter>assets\images</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\maps\example1.city">
@@ -200,6 +203,9 @@
       <Filter>assets\maps</Filter>
     </Xml>
     <Xml Include="assets\maps\playerSpriteSheet.xml">
+      <Filter>assets\maps</Filter>
+    </Xml>
+    <Xml Include="assets\maps\maleSpriteSheet.xml">
       <Filter>assets\maps</Filter>
     </Xml>
   </ItemGroup>

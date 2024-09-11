@@ -35,7 +35,7 @@ namespace olc
 		void DrawDecal();
 
 		// Add your own public methods here
-		void UpdateCollisions(olc::vf2d vfCenterPos, float fRadius, float fElapsedTime);
+		void UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime);
 
 
 	public:
@@ -128,7 +128,7 @@ namespace olc
 		
 	}
 
-	void Collision::UpdateCollisions(olc::vf2d vfCenterPos, float fRadius, float fElapsedTime)
+	void Collision::UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime)
 	{
 		olc::vi2d vTileTL = Properties.ptrTileTransFormedView->GetTopLeftTile().max({ 0,0 });
 		olc::vi2d vTileBR = Properties.ptrTileTransFormedView->GetBottomRightTile().min(Properties.viWorldSize);
@@ -217,7 +217,11 @@ namespace olc
 							* Note we add a* to declare we want to update the value
 							* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
 							*/ 
-							*Properties.ptrvTrackedPoint += vfDirection * fElapsedTime;
+
+							
+							*vfPositionPos += vfDirection * fElapsedTime;
+
+							//*Properties.ptrvTrackedPoint += vfDirection * fElapsedTime;
 
 							//pPlayer->Properties.vfPosition = tv.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
 

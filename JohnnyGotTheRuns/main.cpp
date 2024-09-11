@@ -61,8 +61,12 @@ public:
 	std::unique_ptr<olc::BackgroundObject> pBackGround;			// Background smart pointer
 	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer
 	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
-	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
 	std::unique_ptr<olc::Collision> pCollision;					// Collision Smart pointer
+
+	std::unique_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
+	std::unique_ptr<olc::PlayerObject> pMale;					// Male Char smart pointer
+
+
 
 	// Font 
 	olc::Font font;
@@ -123,10 +127,18 @@ public:
 		pPlayer = std::make_unique<olc::PlayerObject>("assets/images/playerSpriteSheet.png", true);
 		pPlayer->Properties.strName = "Johnnyg63";    // Set our player name
 		pPlayer->Properties.nPlayerNumber = 0;        // Set our player numbner
-		// Load player details
 		pPlayer->Properties.nLives = 3;
 		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
 
+
+		/*
+		* Setup our enemies 
+		*/
+		pMale = std::make_unique<olc::PlayerObject>("assets/images/maleSpriteSheet.png", true);
+		pMale->Properties.strName = "Jim the Janitor";
+		pPlayer->Properties.nPlayerNumber = 1;
+		pPlayer->Properties.nLives = 3;
+		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
 
 	}
 
@@ -150,7 +162,12 @@ public:
 		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 74.0f;
 		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 75.0f;
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
-		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Out player is HD and Big, bring him down a little
+		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
+
+		pMale->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 20.0f;
+		pMale->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 61.0f;
+		pMale->Properties.vfPosition = pMale->Properties.vfStartPosition;
+		pMale->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 
 		/*
 		* Quick GUI Stuff
@@ -448,10 +465,14 @@ public:
 		vTileTL = tileTransformedView.GetTopLeftTile().max({ 0,0 });
 		vTileBR = tileTransformedView.GetBottomRightTile().min(m_vWorldSize);
 
-		pCollision->UpdateCollisions(pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius, fElapsedTime);
+		pCollision->UpdateCollisions(&vTrackedPoint, pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius, fElapsedTime);
 
 		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
+
+		pCollision->UpdateCollisions(&pMale->Properties.vfPosition, pMale->collCircle.vfCenterPos, pMale->collCircle.fRadius, fElapsedTime);
 	
+		pMale->UpdateAction(PlayerObject::CHEER);
+		pMale->UpdatePlayer(fElapsedTime);
 
 
 		return true;
