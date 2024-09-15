@@ -64,6 +64,7 @@ public:
 	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
 	std::unique_ptr<olc::Collision> pCollision;					// Collision Smart pointer
 	std::unique_ptr<olc::GameObjects> pGameObjects;				// Game Object smart pointer
+	std::unique_ptr<olc::ObjectActions> pObjectActions;			// Game Object actions manager
 
 	std::shared_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
 	
@@ -101,7 +102,8 @@ public:
 		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
 															"assets/maps/Level1Output.tmx", 1);					// Game Level Manager
 		pCollision = std::make_unique<olc::Collision>();														// Collision Controller
-		pGameObjects = std::make_unique<olc::GameObjects>();
+		pGameObjects = std::make_unique<olc::GameObjects>();													// Game Objects Manager
+		pObjectActions = std::make_unique<olc::ObjectActions>();												// Game Objects Actions Manager
 
 		/* -- Order is important -- */
 
@@ -120,6 +122,8 @@ public:
 		*  Setup collision
 		*/
 		pCollision->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
+		pObjectActions->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
+
 
 
 		/*
@@ -139,7 +143,16 @@ public:
 		pCollision->Properties.viWorldSize = m_vWorldSize;
 		pCollision->Properties.viTileSize = m_vTileSize;
 
-
+		/*
+		* Setup our Object Actions
+		*/
+		pObjectActions->Properties.ptrTileTransFormedView = &tileTransformedView;
+		pObjectActions->Properties.ptrmapLayerInfo = &pLevelManager->Properties.mapLayerInfo;
+		pObjectActions->Properties.viSpriteSheetTiles = { 28, 14 };
+		pObjectActions->Properties.ptrvTrackedPoint = &vTrackedPoint;
+		pObjectActions->Properties.ptrCamera = &camera;
+		pObjectActions->Properties.viWorldSize = m_vWorldSize;
+		pObjectActions->Properties.viTileSize = m_vTileSize;
 
 
 	}
@@ -232,6 +245,7 @@ public:
 		case JGotTheRuns::MAIN_MENU:
 		{
 			pCollision->Properties.bIsEnabled = false;
+			pObjectActions->Properties.bIsEnabled = false;
 			bResult = DisplayMainMenu(fElapsedTime);
 			//pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
 			//pPlayer->Update(fElapsedTime);
@@ -240,17 +254,16 @@ public:
 		case JGotTheRuns::GAME_LEVEL:
 		{
 			pCollision->Properties.bIsEnabled = true;
-			bResult = ManageKeyInputs(fElapsedTime);
+			pObjectActions->Properties.bIsEnabled = true;
 			bResult = DisplayGameLevel(fElapsedTime);
+			bResult = DisplayGameObjects(fElapsedTime);
 
-			//TODO : Create vector to update all objects
-			pPlayer->Update(fElapsedTime);
-			
 			break;
 		}	
 		case JGotTheRuns::CREDITS:
 		{
 			pCollision->Properties.bIsEnabled = false;
+			pObjectActions->Properties.bIsEnabled = false;
 			bResult = DisplayCredits(fElapsedTime);
 			break;
 		}	
@@ -341,116 +354,6 @@ public:
 		return true;
 	}
 
-	/*
-	* Updates the player position
-	*/
-	bool ManageKeyInputs(float fElapsedTime)
-	{
-
-		olc::vf2d vfDirection = { 0.0f, 0.5f };
-		pPlayer->Properties.vfVelocity = vfDirection;
-		pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
-		if (GetKey(olc::Key::UP).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
-			vfDirection = { 0, -1 }; //up
-
-		}
-
-		if (GetKey(olc::Key::DOWN).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::DUCK);
-			vfDirection = { 0, +1. }; // down
-
-
-		}
-
-		if (GetKey(olc::Key::LEFT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x -= pPlayer->Properties.vfVelocity.x * fElapsedTime;
-			vfDirection = { -1, 0 }; // left
-
-		}
-
-		if (GetKey(olc::Key::RIGHT).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::WALK);//pPlayer->Properties.vfPosition.x += pPlayer->Properties.vfVelocity.x * fElapsedTime;
-			vfDirection = { +1, 0 }; // right
-
-		}
-
-		if (GetKey(olc::Key::SPACE).bHeld)
-		{
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::JUMP);
-			//pPlayer->Properties.vfPosition.y -= pPlayer->Properties.vfVelocity.y * fElapsedTime * 5.0f;
-			// When we are jumping we only care about the up direction therefore we only subtract to the Y 
-			// more than the down force, 
-			vfDirection.y += -2.0f; // Jump
-
-		}
-
-		UpdatePlayerPosition(fElapsedTime, vfDirection);
-			
-		return true;
-	}
-
-	bool UpdatePlayerPosition(float fElapsedTime, olc::vf2d vfDirection)
-	{
-		// TODO: Move to new location
-		pPlayer->Properties.vfVelocity += vfDirection; // Update player direction
-		
-		// Now we update our trackpoint in 
-		vTrackedPoint += pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
-
-		// Edge case when the player gets stuck
-		if (std::isnan(vTrackedPoint.x) || std::isnan(vTrackedPoint.x))
-		{
-			//Player is stuck lets reset
-			// TODO: Add code for when the player is stuck
-		}
-
-		// true is returned
-		camera.Update(fElapsedTime);
-
-		// Set the transformed view to that required by the camera
-		tileTransformedView.SetWorldOffset(camera.GetViewPosition());
-
-		// Where will object be worst case ?
-		pPlayer->Properties.vfPotentialPosition = pPlayer->Properties.vfPosition + pPlayer->Properties.vfVelocity * 4.0f * fElapsedTime;
-
-
-		// Some borders TODO: Change to using olcUTIL_Geometry2D.h
-		if (vTrackedPoint.x < 0.00f)
-		{
-			vTrackedPoint.x = 0.00f;
-			pPlayer->Properties.vfPosition.x = 0.0f;
-		}
-		if (vTrackedPoint.x > m_vWorldSize.x)
-		{
-			vTrackedPoint.x = m_vWorldSize.x;
-			pPlayer->Properties.vfPosition.x = m_vWorldSize.x;
-		}
-
-		if (vTrackedPoint.y < 0.01f)
-		{
-			vTrackedPoint.y = 0.01f;
-			pPlayer->Properties.vfPosition.y = 0.01f;
-		}
-
-		if (vTrackedPoint.y > m_vWorldSize.y)
-		{
-			vTrackedPoint.y = m_vWorldSize.y;
-			pPlayer->Properties.vfPosition.y = m_vWorldSize.y;
-		}
-
-		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
-
-		//pPlayer->UpdatePlayer(fElapsedTime);
-
-		//tv.DrawDecal(vTrackedPoint - olc::vf2d(1.5f, 1.5f), renTemp.Decal());
-
-		return true;
-	}
 
 	/*
 	* Displays the current level that is loaded
@@ -465,16 +368,16 @@ public:
 		// Display the Level
 		pLevelManager->DisplayLevel(fElapsedTime, vTileTL, vTileBR);
 
-		// collision
-		vTileTL = tileTransformedView.GetTopLeftTile().max({ 0,0 });
-		vTileBR = tileTransformedView.GetBottomRightTile().min(m_vWorldSize);
+		return true;
+	}
 
-		pCollision->UpdateCollisions(&vTrackedPoint, pPlayer->collCircle.vfCenterPos, pPlayer->collCircle.fRadius, fElapsedTime);
+	bool DisplayGameObjects(float fElapsedTime)
+	{
+		for (auto& pPlayerObject : pGameObjects->Properties.vecPlayerObjects)
+		{
+			pPlayerObject->Update(fElapsedTime);
+		}
 
-		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
-
-		//pCollision->UpdateCollisions(&pMale->Properties.vfPosition, pMale->collCircle.vfCenterPos, pMale->collCircle.fRadius, fElapsedTime);
-	
 		return true;
 	}
 

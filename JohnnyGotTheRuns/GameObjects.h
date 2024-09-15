@@ -316,8 +316,8 @@ namespace olc
 			"Jim the Janitor", 1, 3, { 100.0f, 100.0f });
 
 
-		pMale->Properties.vfStartPosition.x = 20.0f; // (GetScreenSize().x / 100.0f) * 20.0f;
-		pMale->Properties.vfStartPosition.y = 20.0f; // (GetScreenSize().y / 100.0f) * 61.0f;
+		pMale->Properties.vfStartPosition.x = 280.0f; // (GetScreenSize().x / 100.0f) * 20.0f;
+		pMale->Properties.vfStartPosition.y = 500.0f; // (GetScreenSize().y / 100.0f) * 61.0f;
 		pMale->Properties.vfPosition = pMale->Properties.vfStartPosition;
 		pMale->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 

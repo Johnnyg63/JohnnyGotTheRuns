@@ -48,3 +48,6 @@
 
 #define OLC_PGEX_COLLISION			// Manages the Collisions of objects
 #include "olcPGEX_Collision.h"
+
+#define OLC_PGEX_OBJECT_ACTIONS		// Manages the actions of the game objects (movemenmt etc)
+#include "olcPGEX_Object_Actions.h"

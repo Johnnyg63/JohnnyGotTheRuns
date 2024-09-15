@@ -57,7 +57,7 @@ namespace olc
 
 			olc::vi2d viSpriteSheetTiles = { 28, 14 };	// Stores the total number of tiles x,y in the sprite sheet (Important!)
 
-			
+
 			std::vector<std::shared_ptr<olc::PlayerObject>>* vecPlayerObjects;
 
 		};
@@ -83,14 +83,14 @@ namespace olc
 
 	Collision::Collision() : PGEX(true)
 	{
-		
+
 	}
 
 
 	Collision::~Collision()
 	{
 
-		
+
 	}
 
 
@@ -124,7 +124,7 @@ namespace olc
 				case PlayerObject::OBJECT_TYPE::GAME_CHAR:
 				{
 					UpdateCollisions(&playerObject->Properties.vfPosition, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
-					playerObject->UpdateAction(PlayerObject::ACTION::TALK);
+					
 					break;
 				}
 				case PlayerObject::OBJECT_TYPE::NONE:
@@ -134,12 +134,12 @@ namespace olc
 				}
 				case PlayerObject::OBJECT_TYPE::OTHER_PLAYER:
 				{
-					// For the player we update the vTrackpoint as this controlls the player position
-					UpdateCollisions(Properties.ptrvTrackedPoint, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
 					break;
 				}
 				case PlayerObject::OBJECT_TYPE::PLAYER:
 				{
+					// For the player we update the vTrackpoint as this controlls the player position
+					UpdateCollisions(Properties.ptrvTrackedPoint, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
 
 					break;
 				}
@@ -150,7 +150,7 @@ namespace olc
 			}
 		}
 
-		
+
 		return false; // Return true to cancel any other OnBeforeUserUpdate() not recommended 
 	}
 
@@ -167,7 +167,7 @@ namespace olc
 	// See Step 3: Rename to your Class name
 	void Collision::DrawDecal()
 	{
-		
+
 	}
 
 	void Collision::UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime)
@@ -256,9 +256,9 @@ namespace olc
 							/*
 							* Note we add a* to declare we want to update the value
 							* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
-							*/ 
+							*/
 
-							
+
 							*vfPositionPos += vfDirection * fElapsedTime;
 						}
 
@@ -280,7 +280,7 @@ namespace olc
 
 
 
-	
+
 
 
 
