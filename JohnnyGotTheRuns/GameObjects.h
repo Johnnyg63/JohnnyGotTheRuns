@@ -304,8 +304,8 @@ namespace olc
 			PlayerObject::OBJECT_TYPE::PLAYER,
 			"Johnny", 0, 3, { 100.0f, 100.0f });
 
-		pPlayer->Properties.vfStartPosition.x = 200.0f; //(GetScreenSize().x / 100.0f) * 74.0f;
-		pPlayer->Properties.vfStartPosition.y = 200.0f;//(GetScreenSize().y / 100.0f) * 75.0f;
+		pPlayer->Properties.vfStartPosition.x = 10.0f; //(GetScreenSize().x / 100.0f) * 74.0f;
+		pPlayer->Properties.vfStartPosition.y = 10.0f;//(GetScreenSize().y / 100.0f) * 75.0f;
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
 		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 
@@ -316,8 +316,8 @@ namespace olc
 			"Jim the Janitor", 1, 3, { 100.0f, 100.0f });
 
 
-		pMale->Properties.vfStartPosition.x = 200.0f; // (GetScreenSize().x / 100.0f) * 20.0f;
-		pMale->Properties.vfStartPosition.y = 200.0f; // (GetScreenSize().y / 100.0f) * 61.0f;
+		pMale->Properties.vfStartPosition.x = 20.0f; // (GetScreenSize().x / 100.0f) * 20.0f;
+		pMale->Properties.vfStartPosition.y = 20.0f; // (GetScreenSize().y / 100.0f) * 61.0f;
 		pMale->Properties.vfPosition = pMale->Properties.vfStartPosition;
 		pMale->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 

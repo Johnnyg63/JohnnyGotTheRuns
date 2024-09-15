@@ -106,6 +106,23 @@ public:
 		/* -- Order is important -- */
 
 		/*
+		* Load our Game Objects
+		*/
+		pGameObjects->LoadLevelObjects(1);
+
+
+		/*
+		* TODO: Remove just here temp
+		*/
+		pPlayer = pGameObjects->GetGameObject("Johnny");
+
+		/*
+		*  Setup collision
+		*/
+		pCollision->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
+
+
+		/*
 		* Setup our level manager
 		*/
 		pLevelManager->Properties.tv = &tileTransformedView;
@@ -144,21 +161,7 @@ public:
 		font = olc::Font{ "assets/fonts/kenney_bold.ttf", 16 };
 		font.AddFallbackFont("assets/fonts/kenney_thick.ttf");
 
-		/*
-		* Load our Game Objects
-		*/
-		pGameObjects->LoadLevelObjects(1);
-
-
-		/*
-		* TODO: Remove just here temp
-		*/
-		pPlayer = pGameObjects->GetGameObject("Johnny");
-
-		/*
-		*  Setup collision
-		*/
-		pCollision->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
+		
 		
 		/*
 		* Quick GUI Stuff
@@ -230,8 +233,8 @@ public:
 		{
 			pCollision->Properties.bIsEnabled = false;
 			bResult = DisplayMainMenu(fElapsedTime);
-			pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
-			pPlayer->Update(fElapsedTime);
+			//pPlayer->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+			//pPlayer->Update(fElapsedTime);
 			break;
 		}
 		case JGotTheRuns::GAME_LEVEL:
