@@ -2,7 +2,6 @@
 
 #include "pch.h"
 
-
 /*
 * See Step 2: Rename to your header file name
 */
@@ -13,6 +12,24 @@
 namespace olc
 {
 	/*
+	*  Unique ID Manager
+	*/
+	class UniqueID {
+	private:
+		static int counter;
+		int id = 0;
+
+	public:
+		UniqueID() : id(++counter) {}
+
+		int getID() const {
+			return id;
+		}
+	};
+
+	int UniqueID::counter = 0;
+
+	/*
 	* Manages the Background Images
 	*/
 	class GameObjects
@@ -21,6 +38,14 @@ namespace olc
 	public:
 		GameObjects();
 		virtual ~GameObjects();
+
+		enum RESULT {
+			SUCCESS = 0,
+			FAIL,
+			NOT_FOUND
+		};
+
+
 
 		/*
 		* Add a game object
@@ -37,6 +62,38 @@ namespace olc
 															const int8_t nObjectNumber = 0,
 															const int32_t nLives = 3, 
 															const olc::vf2d vfVelocity = { 100.0f, 100.0f });
+
+		/*
+		* Returns the first pointer found by strName, else nullptr
+		*/
+		std::shared_ptr<olc::PlayerObject> GetGameObject(const std::string strName);
+
+		/*
+		* Returns the first pointer found by bObjectNumber, else nullptr
+		*/
+		std::shared_ptr<olc::PlayerObject> GetGameObject(const int8_t nObjectNumber);
+
+		/*
+		* Returns the pointer by nObjectID (Unique), else nullptr
+		*/
+		std::shared_ptr<olc::PlayerObject> GetGameObject(const uint16_t nObjectID);
+
+		/*
+		* Erases All Game Object by strName
+		*/
+		olc::GameObjects::RESULT EraseGameObject(const std::string strName);
+
+		/*
+		* Erases All Game Object by nObjectNumber
+		*/
+		olc::GameObjects::RESULT EraseGameObject(const int8_t nObjectNumber);
+
+		/*
+		* Erases the pointer by nObjectID (Unique)
+		*/
+		olc::GameObjects::RESULT EraseGameObject(const uint16_t nObjectID);
+
+
 		/*
 		*  Loads the game objects for the passed level
 		*/
@@ -47,6 +104,7 @@ namespace olc
 		* bIncludePlayer: Clears the player object if set to true
 		*/
 		void ClearGameObjects(bool bIncludePlayer = false);
+
 
 	public:
 
@@ -98,6 +156,9 @@ namespace olc
 		std::shared_ptr<olc::PlayerObject> pPlayerObject;
 		pPlayerObject = std::make_unique<olc::PlayerObject>(strSpriteSheetPath, eObjectType);
 
+		UniqueID uniqueID;
+		pPlayerObject->Properties.nObjectID = uniqueID.getID();
+
 		pPlayerObject->Properties.strName = strObjectName;
 		pPlayerObject->Properties.nObjectNumber = nObjectNumber;
 		pPlayerObject->Properties.nLives = nLives;
@@ -107,6 +168,102 @@ namespace olc
 
 		return pPlayerObject;
 
+	}
+
+	std::shared_ptr<olc::PlayerObject> GameObjects::GetGameObject(const std::string strName)
+	{
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = nullptr;
+
+		for (auto& playerObject : Properties.vecPlayerObjects)
+		{
+			if (playerObject->Properties.strName == strName)
+			{
+				pPlayerObject = playerObject;
+				break;
+			}
+		}
+
+		return pPlayerObject;
+	}
+
+	std::shared_ptr<olc::PlayerObject> GameObjects::GetGameObject(const int8_t nObjectNumber)
+	{
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = nullptr;
+
+		for (auto& playerObject : Properties.vecPlayerObjects)
+		{
+			if (playerObject->Properties.nObjectNumber == nObjectNumber)
+			{
+				pPlayerObject = playerObject;
+				break;
+			}
+		}
+
+		return pPlayerObject;
+	}
+
+	std::shared_ptr<olc::PlayerObject> GameObjects::GetGameObject(const uint16_t nObjectID)
+	{
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = nullptr;
+
+		for (auto& playerObject : Properties.vecPlayerObjects)
+		{
+			if (playerObject->Properties.nObjectID == nObjectID)
+			{
+				pPlayerObject = playerObject;
+				break;
+			}
+		}
+
+		return pPlayerObject;
+	}
+
+	olc::GameObjects::RESULT GameObjects::EraseGameObject(const std::string strName)
+	{
+		olc::GameObjects::RESULT result = olc::GameObjects::RESULT::NOT_FOUND;
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = GetGameObject(strName);
+
+		if (pPlayerObject != nullptr)
+		{
+			Properties.vecPlayerObjects.erase(std::remove(Properties.vecPlayerObjects.begin(),
+															Properties.vecPlayerObjects.end(),
+															pPlayerObject),
+															Properties.vecPlayerObjects.end());
+		}
+
+		return result;
+	}
+
+	olc::GameObjects::RESULT GameObjects::EraseGameObject(const int8_t nObjectNumber)
+	{
+		olc::GameObjects::RESULT result = olc::GameObjects::RESULT::NOT_FOUND;
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = GetGameObject(nObjectNumber);
+
+		if (pPlayerObject != nullptr)
+		{
+			Properties.vecPlayerObjects.erase(std::remove(Properties.vecPlayerObjects.begin(), 
+															Properties.vecPlayerObjects.end(), 
+															pPlayerObject), 
+															Properties.vecPlayerObjects.end());
+		}
+
+		return result;
+	}
+
+	olc::GameObjects::RESULT GameObjects::EraseGameObject(const uint16_t nObjectID)
+	{
+		olc::GameObjects::RESULT result = olc::GameObjects::RESULT::NOT_FOUND;
+		std::shared_ptr<olc::PlayerObject> pPlayerObject = GetGameObject(nObjectID);
+
+		if (pPlayerObject != nullptr)
+		{
+			Properties.vecPlayerObjects.erase(std::remove(Properties.vecPlayerObjects.begin(),
+															Properties.vecPlayerObjects.end(),
+															pPlayerObject),
+															Properties.vecPlayerObjects.end());
+		}
+
+		return result;
 	}
 
 

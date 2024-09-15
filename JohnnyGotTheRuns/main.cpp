@@ -151,6 +151,11 @@ public:
 
 
 		/*
+		* TODO: Remove just here temp
+		*/
+		pPlayer = pGameObjects->GetGameObject("Johnny");
+
+		/*
 		*  Setup collision
 		*/
 		pCollision->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
@@ -237,7 +242,7 @@ public:
 
 			//TODO : Create vector to update all objects
 			pPlayer->Update(fElapsedTime);
-			pMale->Update(fElapsedTime);
+			
 			break;
 		}	
 		case JGotTheRuns::CREDITS:
@@ -263,7 +268,7 @@ public:
 		bool bResult = false;
 		SetDrawTarget(nullptr);
 		Clear(olc::BLACK);
-		//pBackGround->DrawDecal();
+		pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
 
 		bResult = DisplayQuickGUI(fElapsedTime);
@@ -465,7 +470,7 @@ public:
 
 		pPlayer->Properties.vfPosition = tileTransformedView.WorldToScreen((vTrackedPoint - olc::vf2d(1.5f, 1.5f)));
 
-		pCollision->UpdateCollisions(&pMale->Properties.vfPosition, pMale->collCircle.vfCenterPos, pMale->collCircle.fRadius, fElapsedTime);
+		//pCollision->UpdateCollisions(&pMale->Properties.vfPosition, pMale->collCircle.vfCenterPos, pMale->collCircle.fRadius, fElapsedTime);
 	
 		return true;
 	}

@@ -126,6 +126,8 @@ namespace olc
 			int8_t nObjectNumber = 0;				// Object number, Default 0 i.e. Player 1 , Player 2 etc
 			OBJECT_TYPE eObjectType = OBJECT_TYPE::NONE;	// Object Type: PLAYER, GAME_CHAR, OTHER_PLAYER, ENEMY, Default: OBJECT_TYPE::NONE
 
+			uint16_t nObjectID = 0;					// An Unique Object ID, Default: Auto Genterated (Edit if you dare!)
+
 			int32_t nLives = 3;						// Lives, Default 3
 			bool bIsGodMode = false;				// Stores if the player is in God Mode, Default: false
 			bool bIsVisiable = true;				// Enable/Disable visiabilty 
