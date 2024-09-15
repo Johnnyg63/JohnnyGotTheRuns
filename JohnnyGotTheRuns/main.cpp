@@ -19,8 +19,9 @@ public:
 	// IMPORTANT: Include olcPGEX_SplashScreen to the the GPL-3.0 Licence requirements
 	//olc::SplashScreen olcSplashScreen;
 
+
 	/*
-	* GAME Menu
+	* Game Menu
 	*/
 	enum GAME_MENU
 	{
@@ -62,11 +63,10 @@ public:
 	std::unique_ptr<olc::MessageController> pMessageController;	// Message smart pointer
 	std::unique_ptr<olc::LevelManager> pLevelManager;			// Level Manager Smart pointer
 	std::unique_ptr<olc::Collision> pCollision;					// Collision Smart pointer
+	std::unique_ptr<olc::GameObjects> pGameObjects;				// Game Object smart pointer
 
 	std::shared_ptr<olc::PlayerObject> pPlayer;					// Player smart pointer
-	std::shared_ptr<olc::PlayerObject> pMale;					// Male Char smart pointer
-
-
+	
 
 	// Font 
 	olc::Font font;
@@ -101,6 +101,7 @@ public:
 		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
 															"assets/maps/Level1Output.tmx", 1);					// Game Level Manager
 		pCollision = std::make_unique<olc::Collision>();														// Collision Controller
+		pGameObjects = std::make_unique<olc::GameObjects>();
 
 		/* -- Order is important -- */
 
@@ -121,32 +122,6 @@ public:
 		pCollision->Properties.viWorldSize = m_vWorldSize;
 		pCollision->Properties.viTileSize = m_vTileSize;
 
-		/*
-		*  Setup our player
-		*/
-		pPlayer = std::make_unique<olc::PlayerObject>("assets/images/playerSpriteSheet.png", PlayerObject::OBJECT_TYPE::PLAYER);
-		pPlayer->Properties.strName = "Johnnyg63";    // Set our player name
-		pPlayer->Properties.nObjectNumber = 0;        // Set our player numbner
-		pPlayer->Properties.nLives = 3;
-		pPlayer->Properties.vfVelocity = { 100.0f, 100.0f };
-		pPlayer->Properties.eObjectType = PlayerObject::OBJECT_TYPE::PLAYER;
-
-
-		/*
-		* Setup our characters 
-		*/
-		pMale = std::make_unique<olc::PlayerObject>("assets/images/maleSpriteSheet.png", PlayerObject::OBJECT_TYPE::GAME_CHAR);
-		pMale->Properties.strName = "Jim the Janitor";
-		pMale->Properties.nObjectNumber = 1;
-		pMale->Properties.nLives = 3;
-		pMale->Properties.vfVelocity = { 100.0f, 100.0f };
-		pMale->Properties.eObjectType = PlayerObject::OBJECT_TYPE::GAME_CHAR;
-
-		/*
-		* Setup our Collision
-		*/
-		pCollision->Properties.vecPlayerObjects.push_back(pPlayer);
-		pCollision->Properties.vecPlayerObjects.push_back(pMale);
 
 
 
@@ -169,16 +144,17 @@ public:
 		font = olc::Font{ "assets/fonts/kenney_bold.ttf", 16 };
 		font.AddFallbackFont("assets/fonts/kenney_thick.ttf");
 
-		pPlayer->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 74.0f;
-		pPlayer->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 75.0f;
-		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
-		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
+		/*
+		* Load our Game Objects
+		*/
+		pGameObjects->LoadLevelObjects(1);
 
-		pMale->Properties.vfStartPosition.x = (GetScreenSize().x / 100.0f) * 20.0f;
-		pMale->Properties.vfStartPosition.y = (GetScreenSize().y / 100.0f) * 61.0f;
-		pMale->Properties.vfPosition = pMale->Properties.vfStartPosition;
-		pMale->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 
+		/*
+		*  Setup collision
+		*/
+		pCollision->Properties.vecPlayerObjects = &pGameObjects->Properties.vecPlayerObjects;
+		
 		/*
 		* Quick GUI Stuff
 		*/
@@ -287,7 +263,7 @@ public:
 		bool bResult = false;
 		SetDrawTarget(nullptr);
 		Clear(olc::BLACK);
-		pBackGround->DrawDecal();
+		//pBackGround->DrawDecal();
 		pMainMenu->DrawDecal();
 
 		bResult = DisplayQuickGUI(fElapsedTime);

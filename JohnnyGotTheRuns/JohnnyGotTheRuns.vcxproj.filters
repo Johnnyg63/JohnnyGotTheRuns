@@ -122,6 +122,9 @@
     <ClInclude Include="olcPGEX_LevelManager.h">
       <Filter>olcPGEX</Filter>
     </ClInclude>
+    <ClInclude Include="GameObjects.h">
+      <Filter>Classes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png">

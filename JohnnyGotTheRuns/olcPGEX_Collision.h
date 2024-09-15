@@ -57,7 +57,8 @@ namespace olc
 
 			olc::vi2d viSpriteSheetTiles = { 28, 14 };	// Stores the total number of tiles x,y in the sprite sheet (Important!)
 
-			std::vector<std::shared_ptr<olc::PlayerObject>> vecPlayerObjects;
+			
+			std::vector<std::shared_ptr<olc::PlayerObject>>* vecPlayerObjects;
 
 		};
 
@@ -111,7 +112,7 @@ namespace olc
 		{
 			// We manage collisions before we draw
 
-			for (auto& playerObject : Properties.vecPlayerObjects)
+			for (auto& playerObject : *Properties.vecPlayerObjects)
 			{
 				switch (playerObject->Properties.eObjectType)
 				{

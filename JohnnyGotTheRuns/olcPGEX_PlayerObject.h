@@ -237,7 +237,7 @@ namespace olc
 
 
 #ifdef OLC_PGEX_PLAYER_OBJECT
-#undef OLC_PGEX_GAME_OBJECT
+#undef OLC_PGEX_PLAYER_OBJECT
 
 namespace olc
 {
