@@ -64,6 +64,9 @@
     <Filter Include="pge_ems">
       <UniqueIdentifier>{a3049946-fd6d-440f-ad78-c8f3671dd2e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="assets\tiledprojects">
+      <UniqueIdentifier>{1af0ee21-26a5-4708-888f-a780fd5ce14b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -191,6 +194,12 @@
     </None>
     <None Include="WASM\pge.wasm">
       <Filter>WASM</Filter>
+    </None>
+    <None Include="assets\tiledprojects\Industrial35x35.tsx">
+      <Filter>assets\tiledprojects</Filter>
+    </None>
+    <None Include="assets\tiledprojects\Level1Output.tmx">
+      <Filter>assets\tiledprojects</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

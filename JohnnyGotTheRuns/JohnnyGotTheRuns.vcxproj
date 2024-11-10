@@ -184,6 +184,8 @@
   <ItemGroup>
     <None Include="assets\maps\example1.city" />
     <None Include="assets\maps\Level1Output.tmx" />
+    <None Include="assets\tiledprojects\Industrial35x35.tsx" />
+    <None Include="assets\tiledprojects\Level1Output.tmx" />
     <None Include="dlls\freetype.dll" />
     <None Include="ems_pge\pge2wasm.bat" />
     <None Include="WASM\index.html" />
