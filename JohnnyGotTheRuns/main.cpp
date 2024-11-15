@@ -100,7 +100,7 @@ public:
 		pBackGround = std::make_unique<olc::BackgroundObject>("assets/images/holytoilet.png", false);			// Background
 		pMessageController = std::make_unique<olc::MessageController>("assets/images/LettersSpriteSheet.png");	// Message Controller
 		pLevelManager = std::make_unique<olc::LevelManager>("assets/images/levelSpriteSheet.png", 
-															"assets/maps/Level1Output.tmx", 1);					// Game Level Manager
+															"assets/tiledprojects/Level1Output.tmx", 1);					// Game Level Manager
 		pCollision = std::make_unique<olc::Collision>();														// Collision Controller
 		pGameObjects = std::make_unique<olc::GameObjects>();													// Game Objects Manager
 		pObjectActions = std::make_unique<olc::ObjectActions>();												// Game Objects Actions Manager

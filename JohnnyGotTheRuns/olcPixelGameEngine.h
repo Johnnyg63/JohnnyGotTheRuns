@@ -1030,7 +1030,7 @@ namespace olc
 		// Gets the mouse as a vector to keep Tarriest happy
 		const olc::vi2d& GetMousePos() const;
 
-		static const std::map<size_t, uint8_t>& GetKeyMap() { return mapKeys; }
+		const std::map<size_t, uint8_t>& GetKeyMap() { return mapKeys; }
 
 		// Muck about with the GUI
 		olc::rcode SetWindowSize(const olc::vi2d& vPos, const olc::vi2d& vSize);

@@ -81,8 +81,25 @@ class TMXParser{
 
 	void ParseTag(std::string tag) {
 		XMLTag newTag;
-		//First character is a '<' so we discard it.
-		tag.erase(0,1); tag.erase(tag.length()-1,1); //Erase the first and last characters in the tag. Now parse by spaces.
+		
+        //First character is a '<' so we discard it.
+		tag.erase(0,1); 
+
+        //last characters in the tag '>'. 
+        tag.erase(tag.length() - 1, 1);
+
+       
+        // We have an edge case, where the last characters can be > or /> 
+        // We need to manage this with a conditional statement
+        char lastChar = tag.at(tag.length() - 1);
+        if (lastChar == '/')
+        {
+            //last characters in the tag '/'. 
+            tag.erase(tag.length() - 1, 1);
+        }
+
+
+        // Now parse by spaces.
 		std::stringstream s(tag); //Turn it into a string stream to now parse into individual whitespaces.
 		std::string data;
 		while (s.good()) {

@@ -56,6 +56,7 @@ namespace olc
 		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
 		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"
 
+
 		struct MapInfo
 		{
 			std::string strVersion = "";		// Version
@@ -73,8 +74,17 @@ namespace olc
 
 		};
 
+		// Holds the tiledmap map info
 		MapInfo sMapInfo;
 
+		struct TileSetInfo
+		{
+			std::string strFirstgid = "";		// Version
+			std::string strScource = "";	// Tiled Map Version
+		};
+
+		// Holds the tiledmap TileSet info
+		TileSetInfo sTileSetInfo;
 
 		//<layer id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
 
@@ -238,6 +248,14 @@ namespace olc
 		Properties.renSpriteSheet.Load(strSpriteSheetPath);
 		TMXParser tmxParser = TMXParser(Properties.strTiledMapTMXPath);
 		map = tmxParser.GetData();
+
+
+		// TileSet
+		for (auto& tileSetInfo : map.TilesetData.data)
+		{
+			if (tileSetInfo.first == "firstgid") sTileSetInfo.strFirstgid = tileSetInfo.second;
+			if (tileSetInfo.first == "source") sTileSetInfo.strScource = tileSetInfo.second;
+		}
 
 		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
 		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"
