@@ -20,7 +20,8 @@
 
 #include "olcUTIL_Camera2D.h"		// Manages player camera
 
-#include "TMXParser.h"				// TMXParser Stuff
+#include "TMXParser.h"				// TMXParser Stuff for TiledMap graphics
+#include "TSXParser.h"				// TSXParser stuff for collisions
 
 #define OLC_PGEX_LEVEL_MANAGER		// Manages the loading of the levels graphices etc
 #include "olcPGEX_LevelManager.h"

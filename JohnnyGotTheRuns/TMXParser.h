@@ -136,7 +136,9 @@ class TMXParser{
 	}
 
 	public:
-	TMXParser(std::string file){
+	TMXParser(std::string file)
+    
+    {
 		std::ifstream f(file,std::ios::in);
 		
 		std::string accumulator="";

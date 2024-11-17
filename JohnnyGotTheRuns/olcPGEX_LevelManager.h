@@ -52,6 +52,7 @@ namespace olc
 	public:
 
 		Map map; //TMXParser Map !
+		Map_TSX map_TSX; //TSXParser Map
 
 		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
 		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"
@@ -191,7 +192,7 @@ namespace olc
 		}
 #endif
 
-
+		//Properties.strTiledMapTMXPath = "C:/Users/jgalv/source/repos/JohnnyGotTheRuns/JohnnyGotTheRuns/assets/tiledprojects/Industrial35x35.tsx";
 
 	}
 
@@ -254,8 +255,25 @@ namespace olc
 		for (auto& tileSetInfo : map.TilesetData.data)
 		{
 			if (tileSetInfo.first == "firstgid") sTileSetInfo.strFirstgid = tileSetInfo.second;
-			if (tileSetInfo.first == "source") sTileSetInfo.strScource = tileSetInfo.second;
+			if (tileSetInfo.first == "source")
+			{
+				sTileSetInfo.strScource = tileSetInfo.second;
+				// Load the tsx file for collections etc
+				if (sTileSetInfo.strScource != "")
+				{
+					TSXParser tsxParser = TSXParser(sTileSetInfo.strScource);
+					map_TSX = tsxParser.GetData();
+				}
+
+			}
+				
+
+			
+
 		}
+
+		
+
 
 		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
 		//		tilewidth="35" tileheight="35" infinite="0" nextlayerid="5" nextobjectid="1"

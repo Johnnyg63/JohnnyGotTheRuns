@@ -167,6 +167,7 @@
     <ClInclude Include="olcUTIL_Geometry2D.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TMXParser.h" />
+    <ClInclude Include="TSXParser.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\images\background.png" />
