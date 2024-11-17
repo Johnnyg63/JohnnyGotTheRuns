@@ -54,32 +54,6 @@ struct XMLTag_TSX
 };
 
 
-struct Tile_TSX
-{
-	std::string strTileID = "0";
-	std::string strTileType = "NOT_SET";
-
-	struct ObjectGroup
-	{
-		std::string strObjectGrpID = "0";
-		std::string strDrawOrder = "NOT_SET";
-
-		struct Object
-		{
-			std::string strObjectID = "0";
-			std::string strType = "NOT_SET";
-			std::string strX = "0.0";
-			std::string strY = "0.0";
-			std::string strWidth = "0.0";
-			std::string strHeight = "0.0";
-
-		};
-
-		std::string strType = "rect";
-
-	};
-};
-
 
 struct Tile
 {
@@ -189,9 +163,6 @@ private:
 			sTile.sTypeData.tag = "RECT";
 			sTile.sTypeData.data.clear();
 			sTile.sTileData = newTag;
-
-			//LayerTagTBA l = { newTag };
-			//parsedMapInfo.LayerData.push_back(l);
 		}
 		else if (newTag.tag == "objectgroup")
 		{
@@ -201,11 +172,11 @@ private:
 		{
 			sTile.sObjectData = newTag;
 		}
-		else if (newTag.tag == "point/>")
+		else if (newTag.tag == "point")
 		{
 			sTile.sTypeData = newTag;
 		}
-		else if (newTag.tag == "ellipse/>")
+		else if (newTag.tag == "ellipse")
 		{
 			sTile.sTypeData = newTag;
 
@@ -215,18 +186,18 @@ private:
 			sTile.sTypeData = newTag;
 
 		}
-		else if (newTag.tag == "/object>")
+		else if (newTag.tag == "/object")
 		{
-			//UpdateVectorIfRequired();
+			UpdateVectorIfRequired();
 
 		}
-		else if (newTag.tag == "/objectgroup>")
+		else if (newTag.tag == "/objectgroup")
 		{
-			//UpdateVectorIfRequired();
+			UpdateVectorIfRequired();
 		}
-		else if (newTag.tag == "/tile>")
+		else if (newTag.tag == "/tile")
 		{
-			//UpdateVectorIfRequired();
+			UpdateVectorIfRequired();
 		}
 		else
 		{
