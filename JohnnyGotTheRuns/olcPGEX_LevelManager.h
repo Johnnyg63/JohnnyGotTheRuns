@@ -133,6 +133,7 @@ namespace olc
 			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
 			olc::vf2d vfPosition = { 0.0f, 0.0f };	// Object Start Poistion X,Y
 			olc::vf2d vfSize = { 0.0f, 0.0f };		// Object Size	Width, Height
+			Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
 
 		};
 
@@ -382,29 +383,11 @@ namespace olc
 				if (objectGroupData.first == "draworder") sTile.strDrawOrder = objectGroupData.second;
 			}
 
-			// Get the Object Data
-			TileObject sTileObject;
-			for (auto& objectData : tileInfo.sObjectData.data)
-			{
-				
-				if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
-				if (objectData.first == "type") sTileObject.strClassType = objectData.second;
-				if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
-				if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
-				if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
-				if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
-				
-			}
-
-			sTile.vecTileObjects.push_back(sTileObject);
-
-
-
 			// Get the ObjectType
 			CollisionType sCollisionType;
 			sCollisionType.eCollision = Collision::RECT;
 
-			if(tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision == Collision::RECT;
+			if (tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision == Collision::RECT;
 			if (tileInfo.sTypeData.tag == "point") sCollisionType.eCollision == Collision::POINT;
 			if (tileInfo.sTypeData.tag == "polygon") sCollisionType.eCollision == Collision::POLYGON;
 			if (tileInfo.sTypeData.tag == "ellipse") sCollisionType.eCollision == Collision::ELLIPSE;
@@ -427,6 +410,26 @@ namespace olc
 
 			sTile.eCollision = sCollisionType.eCollision;
 			sTile.sCollisionType = sCollisionType;
+
+			
+
+			// Get the Object Data
+			TileObject sTileObject;
+			sTileObject.eCollision = sTile.eCollision;
+			for (auto& objectData : tileInfo.sObjectData.data)
+			{
+				
+				if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
+				if (objectData.first == "type") sTileObject.strClassType = objectData.second;
+				if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
+				if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
+				if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
+				if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
+				
+			}
+			
+			sTile.vecTileObjects.push_back(sTileObject);
+
 
 			vecTiles.push_back(sTile);
 
@@ -572,7 +575,11 @@ namespace olc
 		float fDistanceY = 0.0f;
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
-		//olc::vf2d worldTile = { 0.0f, 0.0f };
+		
+		// Collision resizing
+		olc::vf2d vfCollsionSize = { 0.0f, 0.0f };
+		olc::vf2d vfOffSet = { 0.0f, 0.0f };
+		
 
 		rect<float> worldTile;
 		worldTile.pos.x = 0.0f;
@@ -598,9 +605,38 @@ namespace olc
 
 					if (decalInfo.bHasCollision)
 					{
-						// TODO... we need to do something here
-						Properties.tv->DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
-						test++;
+						// NOTE: We are in world space so we need to get realworld....
+						
+						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
+						{
+							switch (tileObject.eCollision)
+							{
+
+							case Collision::RECT:
+							{
+								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
+								vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
+								Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
+								
+							}
+							case Collision::ELLIPSE:
+							{
+								break;
+							}
+							case Collision::POLYGON:
+							{
+								break;
+							}
+							case Collision::POINT:
+							{
+								break;
+							}
+
+							default:
+								break;
+							}
+						}
+
 					}
 
 					switch (decalInfo.nLayerID)
