@@ -219,6 +219,36 @@ namespace olc
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
 
+						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
+						{
+							switch (tileObject.eCollision)
+							{
+
+							case LevelManager::Collision::RECT:
+							{
+								worldTile.pos += tileObject.vfPosition;
+								worldTile.size = tileObject.vfSize;
+								
+							}
+							case LevelManager::Collision::ELLIPSE:
+							{
+								break;
+							}
+							case LevelManager::Collision::POLYGON:
+							{
+								break;
+							}
+							case LevelManager::Collision::POINT:
+							{
+								break;
+							}
+
+							default:
+								break;
+							}
+						}
+
+
 						bool bResult = overlaps(
 							circle<float>{vfCenterPos, fRadius},
 							worldTile);
