@@ -134,7 +134,7 @@ private:
 				std::string value = data.substr(data.find("=") + 1, std::string::npos);
 
 				//Strip Quotation marks, if they exist. 
-				if (value.substr(1, 1) == "\"")  value = value.substr(1, std::string::npos);
+				if (value.substr(0, 1) == "\"") value = value.substr(1, std::string::npos);
 				if (value.substr(value.length() - 1, 1) == "\"") value = value.substr(0, value.length() - 1);
 
 				newTag.data[key] = value;

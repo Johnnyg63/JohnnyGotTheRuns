@@ -78,16 +78,77 @@ namespace olc
 		// Holds the tiledmap map info
 		MapInfo sMapInfo;
 
-		struct TileSetInfo
+		struct TileSetLocation
 		{
-			std::string strFirstgid = "";		// Version
-			std::string strScource = "";	// Tiled Map Version
+			std::string strFirstgid = "";	// ID
+			std::string strScource = "";	// Tiled Map TSX file location
 		};
 
 		// Holds the tiledmap TileSet info
+		TileSetLocation sTileSetLocation;
+
+		struct TileSetInfo
+		{
+			std::string strVersion = "";
+			std::string strTiledVersion = "";
+			std::string strName = "";
+			olc::vf2d vfTileSize = { 0.0f, 0.0f };
+			int32_t nTileCount = 0;
+			int32_t nColumns = 0;
+
+
+		};
+
 		TileSetInfo sTileSetInfo;
 
-		//<layer id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
+		struct TileSetSpriteImage
+		{
+			std::string strSource = "";
+			olc::vf2d vfSize = { 0.0f, 0.0f };
+
+		};
+
+		TileSetSpriteImage sTileSetSpriteImage;
+
+
+		enum Collision
+		{
+			RECT = 0,
+			POINT,
+			ELLIPSE,
+			POLYGON
+		};
+
+		//<polygon points="0,0 32.6667,33.3333 -0.666667,32.6667"/>
+
+		struct CollisionType
+		{
+			Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+			std::vector<olc::vf2d> vecPoints;
+		};
+
+		struct TileObject
+		{
+			int32_t nTileObjectID = 0;				// Tile Object ID
+			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
+			olc::vf2d vfPosition = { 0.0f, 0.0f };	// Object Start Poistion X,Y
+			olc::vf2d vfSize = { 0.0f, 0.0f };		// Object Size	Width, Height
+
+		};
+
+		struct Tile
+		{
+			int32_t nTileID = 0;					// Tile ID
+			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
+			std::string strDrawOrder = "NOT_SET";	// Draw Order if passed, default: "NOT_SET"
+			int32_t nObjectGroupID = 0;				// Object Group ID
+			std::vector<TileObject> vecTileObjects;	// Vector of TileObject
+			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
+			Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+
+		};
+
+		std::vector<Tile> vecTiles;
 
 		struct DecalInfo
 		{
@@ -99,9 +160,19 @@ namespace olc
 			int32_t nWidth = 0;							// Layer Width
 			int32_t nHeight = 0;						// Layer Height
 			int16_t nTiledID = 0;						// Tiled Map Editor ID
+			int16_t nTileID = 0;						// Tile ID in the SpriteSheet 
 			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Locatoin of where to draw
 			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Location on Sprite Sheet
 			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Size of Partial Decal
+
+			// Collision Info
+			bool bHasCollision = false;					// Has collision object 
+			Collision eCollisionType = Collision::RECT;  // Collision object type, Default RECT
+			olc::vf2d fPosition = { 0.0f, 0.0f };		// X,Y start position within the decal
+			olc::vf2d fSize = { 0.0f, 0.0f };			// Width, Height of the Object
+			std::vector<vf2d> fPoints;					// Vector of vf2d points, used for Points, Polygons and Ellipses
+
+
 		};
 
 		DecalInfo sDecalInfo;
@@ -251,28 +322,120 @@ namespace olc
 		map = tmxParser.GetData();
 
 
-		// TileSet
+		// TileSet Location
 		for (auto& tileSetInfo : map.TilesetData.data)
 		{
-			if (tileSetInfo.first == "firstgid") sTileSetInfo.strFirstgid = tileSetInfo.second;
-			if (tileSetInfo.first == "source")
+			if (tileSetInfo.first == "firstgid") sTileSetLocation.strFirstgid = tileSetInfo.second;
+			if (tileSetInfo.first == "source") sTileSetLocation.strScource = tileSetInfo.second;
+
+			// Load the tsx file for collections etc
+			if (sTileSetLocation.strScource != "")
 			{
-				sTileSetInfo.strScource = tileSetInfo.second;
-				// Load the tsx file for collections etc
-				if (sTileSetInfo.strScource != "")
-				{
-					TSXParser tsxParser = TSXParser(sTileSetInfo.strScource);
-					map_TSX = tsxParser.GetData();
-				}
-
+				TSXParser tsxParser = TSXParser(sTileSetLocation.strScource);
+				map_TSX = tsxParser.GetData();
 			}
-				
+		}
 
-			
+		// Get the tileset data
+		for (auto& tileSetInfo : map_TSX.TilesetData.data)
+		{
+			if (tileSetInfo.first == "version") sTileSetInfo.strVersion = tileSetInfo.second;
+			if (tileSetInfo.first == "tiledversion") sTileSetInfo.strTiledVersion = tileSetInfo.second;
+			if (tileSetInfo.first == "name") sTileSetInfo.strName = tileSetInfo.second;
+			if (tileSetInfo.first == "tilewidth") sTileSetInfo.vfTileSize.x = std::stof(tileSetInfo.second);
+			if (tileSetInfo.first == "tileheight") sTileSetInfo.vfTileSize.y = std::stof(tileSetInfo.second);
+			if (tileSetInfo.first == "tilecount") sTileSetInfo.nTileCount = std::stoi(tileSetInfo.second);
+			if (tileSetInfo.first == "columns") sTileSetInfo.nColumns = std::stoi(tileSetInfo.second);
 
 		}
 
-		
+
+
+		// Get the Sprite image used for the tile set
+		for (auto& imageInfo : map_TSX.ImageData.data)
+		{
+			if (imageInfo.first == "source") sTileSetSpriteImage.strSource = imageInfo.second;
+			if (imageInfo.first == "width") sTileSetSpriteImage.vfSize.x = std::stof(imageInfo.second);
+			if (imageInfo.first == "height") sTileSetSpriteImage.vfSize.y = std::stof(imageInfo.second);
+
+		}
+
+		/*
+		* XMLTag_TSX sTileData;
+		XMLTag_TSX sObjectGroupData;
+		XMLTag_TSX sObjectData;
+		XMLTag_TSX sTypeData;
+		*/
+
+		for (auto& tileInfo : map_TSX.vecTiles)
+		{
+			// 1: Create a new struct
+			Tile sTile;
+
+			// Get the tile Data
+			for (auto& tileData : tileInfo.sTileData.data)
+			{
+				if (tileData.first == "id") sTile.nTileID = std::stoi(tileData.second);
+				if (tileData.first == "type") sTile.strClassType = tileData.second;
+			}
+
+			// Get the Object Group data
+			for (auto& objectGroupData : tileInfo.sObjectGroupData.data)
+			{
+				if (objectGroupData.first == "id") sTile.nObjectGroupID = std::stoi(objectGroupData.second);
+				if (objectGroupData.first == "draworder") sTile.strDrawOrder = objectGroupData.second;
+			}
+
+			// Get the Object Data
+			TileObject sTileObject;
+			for (auto& objectData : tileInfo.sObjectData.data)
+			{
+				
+				if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
+				if (objectData.first == "type") sTileObject.strClassType = objectData.second;
+				if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
+				if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
+				if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
+				if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
+				
+			}
+
+			sTile.vecTileObjects.push_back(sTileObject);
+
+
+
+			// Get the ObjectType
+			CollisionType sCollisionType;
+			sCollisionType.eCollision = Collision::RECT;
+
+			if(tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision == Collision::RECT;
+			if (tileInfo.sTypeData.tag == "point") sCollisionType.eCollision == Collision::POINT;
+			if (tileInfo.sTypeData.tag == "polygon") sCollisionType.eCollision == Collision::POLYGON;
+			if (tileInfo.sTypeData.tag == "ellipse") sCollisionType.eCollision == Collision::ELLIPSE;
+
+			for (auto& typeData : tileInfo.sTypeData.data)
+			{
+				/*
+				* Lets parse out our points to string --> olc::vf2d
+				* example: -0.666667,32.6667 (x, y)
+				* As we are dealing with data we use typeData.second as this is where the data is stored
+				*/
+				std::string strX = typeData.second.substr(0, typeData.second.find(","));
+				std::string strY = typeData.second.substr(typeData.second.find(",") + 1, std::string::npos);
+				olc::vf2d vfPoint = { 0.0f, 0.0f };
+				vfPoint.x = std::stof(strX);
+				vfPoint.y = std::stof(strY);
+				sCollisionType.vecPoints.push_back(vfPoint);
+
+			}
+
+			sTile.eCollision = sCollisionType.eCollision;
+			sTile.sCollisionType = sCollisionType;
+
+			vecTiles.push_back(sTile);
+
+
+		}
 
 
 		//<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="140" height="24" 
@@ -348,8 +511,14 @@ namespace olc
 						int tileX = (tileId - 1) % nSpriteSheetTileCount;		// Number of X tiles Johnngy!!!!... number of tiles on the SpriteSheet!
 						int tileY = (tileId - 1) / nSpriteSheetTileCount;
 
-						float sourceX = tileX * sMapInfo.nTileWidth;
-						float sourceY = tileY * sMapInfo.nTileHeight;
+						float sourceX = tileX * sTileSetInfo.vfTileSize.x; // sMapInfo.nTileWidth;
+						float sourceY = tileY * sTileSetInfo.vfTileSize.y; // sMapInfo.nTileHeight;
+
+						// Temp Code
+						sDecalInfo.nTileID = tileX * tileY;
+
+						// Ok we need to check if this tile has collision?
+
 
 						sDecalInfo.vfSourcePos = { sourceX , sourceY };
 
