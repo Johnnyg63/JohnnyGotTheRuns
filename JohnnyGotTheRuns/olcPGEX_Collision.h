@@ -60,6 +60,8 @@ namespace olc
 
 			std::vector<std::shared_ptr<olc::PlayerObject>>* vecPlayerObjects;
 
+
+
 		};
 
 		ObjectProperites Properties;
@@ -210,12 +212,9 @@ namespace olc
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
-					switch (decalInfo.nLayerID)
+					if (decalInfo.bHasCollision)
 					{
-					case 1:
-					{
-						// This is our collision layer
-						//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						Properties.ptrTileTransFormedView->DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
 
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
@@ -262,6 +261,15 @@ namespace olc
 							*vfPositionPos += vfDirection * fElapsedTime;
 						}
 
+					}
+
+
+					switch (decalInfo.nLayerID)
+					{
+					case 1:
+					{
+						// This is our collision layer
+						
 						break;
 					}
 					default:

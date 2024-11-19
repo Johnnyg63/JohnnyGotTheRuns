@@ -159,18 +159,14 @@ namespace olc
 			std::string strClass = "";					// Layer Class name
 			int32_t nWidth = 0;							// Layer Width
 			int32_t nHeight = 0;						// Layer Height
-			int16_t nTiledID = 0;						// Tiled Map Editor ID
-			int16_t nTileID = 0;						// Tile ID in the SpriteSheet 
+			int16_t nTiledID = 0;						// Tiled Map Editor ID 
 			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Locatoin of where to draw
 			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Location on Sprite Sheet
 			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Size of Partial Decal
 
 			// Collision Info
 			bool bHasCollision = false;					// Has collision object 
-			Collision eCollisionType = Collision::RECT;  // Collision object type, Default RECT
-			olc::vf2d fPosition = { 0.0f, 0.0f };		// X,Y start position within the decal
-			olc::vf2d fSize = { 0.0f, 0.0f };			// Width, Height of the Object
-			std::vector<vf2d> fPoints;					// Vector of vf2d points, used for Points, Polygons and Ellipses
+			Tile sCollisionTile;						// Stores the tile collision details
 
 
 		};
@@ -468,6 +464,8 @@ namespace olc
 		// Important this is needed to ensure the DrawPartialDecal correctly finds the location with the spritesheet
 		int16_t nSpriteSheetTileCount = Properties.renSpriteSheet.Sprite()->width / sMapInfo.nTileWidth;
 
+		int test = 0; // TODO: Remove
+
 		for (auto& layer : map.LayerData)
 		{
 			auto vecPartialDecalInfo = std::vector<DecalInfo>();
@@ -488,6 +486,7 @@ namespace olc
 				if (tag.first == "locked") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
 
 			}
+
 
 
 			for (auto& tiles : rowYtiles)
@@ -514,11 +513,16 @@ namespace olc
 						float sourceX = tileX * sTileSetInfo.vfTileSize.x; // sMapInfo.nTileWidth;
 						float sourceY = tileY * sTileSetInfo.vfTileSize.y; // sMapInfo.nTileHeight;
 
-						// Temp Code
-						sDecalInfo.nTileID = tileX * tileY;
-
 						// Ok we need to check if this tile has collision?
-
+						for (auto& sTile : vecTiles)
+						{
+							if (sDecalInfo.nTiledID == sTile.nTileID)
+							{
+								sDecalInfo.bHasCollision = true;
+								sDecalInfo.sCollisionTile = sTile;
+								test++;
+							}
+						}
 
 						sDecalInfo.vfSourcePos = { sourceX , sourceY };
 
@@ -538,6 +542,8 @@ namespace olc
 
 		}
 
+		//TODO: Add clean up
+
 
 		bisLevelLoaded = true;
 	}
@@ -546,6 +552,8 @@ namespace olc
 	{
 		delete Properties.renSpriteSheet.Decal();
 		delete Properties.renSpriteSheet.Sprite();
+
+		// TODO: Add code to clear all the structs and vectors!
 	}
 
 	void LevelManager::DisplayLevel(float fElapsedTime, olc::vi2d vTileTL, olc::vi2d vTileBR)
@@ -571,6 +579,8 @@ namespace olc
 		worldTile.pos.y = 0.0f;
 		worldTile.size = { 35.0f, 35.0f };
 
+		int test = 0; // TODO: Remove
+
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
@@ -585,29 +595,41 @@ namespace olc
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
+
+					if (decalInfo.bHasCollision)
+					{
+						// TODO... we need to do something here
+						Properties.tv->DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
+						test++;
+					}
+
 					switch (decalInfo.nLayerID)
 					{
 					case 1:
 					{
 						// This is our collision Layer, nothing to do just move on
+						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+							Properties.renSpriteSheet.Decal(),
+							decalInfo.vfSourcePos,
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 					case 2:
 					{
 						// this is our Ladder layer
-						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 					case 3:
 					{
 						// this is our drawing layer
-						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
+							decalInfo.vfSoureSizePos);*/
 						break;
 					}
 					default:
