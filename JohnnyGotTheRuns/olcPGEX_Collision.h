@@ -126,7 +126,7 @@ namespace olc
 				case PlayerObject::OBJECT_TYPE::GAME_CHAR:
 				{
 					UpdateCollisions(&playerObject->Properties.vfPosition, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
-					
+
 					break;
 				}
 				case PlayerObject::OBJECT_TYPE::NONE:
@@ -185,10 +185,8 @@ namespace olc
 		using namespace olc::utils::geom2d;
 
 		olc::vf2d vfDirection = { 0.0f, 0.0f };
-		float fClosestX = 0.0f;
-		float fClosestY = 0.0f;
-		float fDistanceX = 0.0f;
-		float fDistanceY = 0.0f;
+		olc::vf2d vfClosest = { 0.0f, 0.0f };
+		olc::vf2d vfDistance = { 0.0f, 0.0f };
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
 		//olc::vf2d worldTile = { 0.0f, 0.0f };
@@ -197,6 +195,8 @@ namespace olc
 		worldTile.pos.x = 0.0f;
 		worldTile.pos.y = 0.0f;
 		worldTile.size = { 35.0f, 35.0f };
+
+		bool bOverLaps = false; // Is set when a circle overlaps a Rect/Triangle
 
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
@@ -208,7 +208,8 @@ namespace olc
 				*/
 				for (auto& layer : *Properties.ptrmapLayerInfo)
 				{
-					decalInfo = layer.second[idx];
+					bOverLaps = false;	// Reset our overlap
+					decalInfo = layer.second[idx];	// We only care about the data (layer.data)
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
@@ -219,6 +220,8 @@ namespace olc
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
 
+
+
 						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
 						{
 							switch (tileObject.eCollision)
@@ -228,7 +231,14 @@ namespace olc
 							{
 								worldTile.pos += tileObject.vfPosition;
 								worldTile.size = tileObject.vfSize;
-								
+								bOverLaps = overlaps(circle<float>{vfCenterPos, fRadius}, worldTile);
+								if (bOverLaps)
+								{
+									// Get the closest point between a circle and a rectangle
+									vfClosest = closest(worldTile, circle<float>{vfCenterPos, fRadius});
+								}
+
+								break;
 							}
 							case LevelManager::Collision::ELLIPSE:
 							{
@@ -236,6 +246,8 @@ namespace olc
 							}
 							case LevelManager::Collision::POLYGON:
 							{
+								// need to loop through the triangles to see if any overlaps
+								// once we have an overlap we get the shortest and take it from there.
 								break;
 							}
 							case LevelManager::Collision::POINT:
@@ -249,30 +261,27 @@ namespace olc
 						}
 
 
-						bool bResult = overlaps(
-							circle<float>{vfCenterPos, fRadius},
-							worldTile);
 
-						if (bResult)
+						// Lets update our position if we are over lapping
+						if (bOverLaps)
 						{
-							fClosestX = std::clamp(vfCenterPos.x, worldTile.pos.x, worldTile.pos.x + worldTile.size.x);
-							fClosestY = std::clamp(vfCenterPos.y, worldTile.pos.y, worldTile.pos.y + worldTile.size.y);
+							// TODO: Updated to support triangles (polygons)
+							
 
-							fDistanceX = vfCenterPos.x - fClosestX;
-							fDistanceY = vfCenterPos.y - fClosestY;
+							vfDistance = vfCenterPos - vfClosest;
 
-							fDistance = std::sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY);
+							fDistance = std::sqrt(vfDistance.x * vfDistance.x + vfDistance.y * vfDistance.y);
 							fOverlap = fRadius - fDistance;
 
-							if (fDistance != 0) {
-								vfCenterPos.x += (fDistanceX / fDistance) * fOverlap;
-								vfCenterPos.y += (fDistanceY / fDistance) * fOverlap;
-								vfDirection.x += (fDistanceX / fDistance) * fOverlap;
-								vfDirection.y += (fDistanceY / fDistance) * fOverlap;
+							if (fDistance != 0)
+							{
+								vfCenterPos += (vfDistance / fDistance) * fOverlap;
+								vfDirection += (vfDistance / fDistance) * fOverlap;
 							}
-							else {
+							else
+							{
 								// Handle the case where the circle's center is exactly on the rectangle's edge
-								if (fDistanceX == 0) {
+								if (vfDistance.x == 0) {
 									vfCenterPos.y += (vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
 									vfDirection.y += (vfCenterPos.y > worldTile.pos.y + worldTile.size.y / 2) ? fOverlap : -fOverlap;
 								}
@@ -283,27 +292,13 @@ namespace olc
 							}
 
 							/*
-							* Note we add a* to declare we want to update the value
+							* Note we add *a to declare we want to update the value
 							* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
 							*/
-
 
 							*vfPositionPos += vfDirection * fElapsedTime;
 						}
 
-					}
-
-
-					switch (decalInfo.nLayerID)
-					{
-					case 1:
-					{
-						// This is our collision layer
-						
-						break;
-					}
-					default:
-						break;
 					}
 
 					nLayer++;

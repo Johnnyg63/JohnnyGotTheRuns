@@ -617,7 +617,7 @@ namespace olc
 								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
 								vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
 								Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
-								
+								break;
 							}
 							case Collision::ELLIPSE:
 							{
