@@ -215,12 +215,9 @@ namespace olc
 
 					if (decalInfo.bHasCollision)
 					{
-						Properties.ptrTileTransFormedView->DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
-
+						
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
-
-
 
 						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
 						{
@@ -229,6 +226,7 @@ namespace olc
 
 							case LevelManager::Collision::RECT:
 							{
+								//Properties.ptrTileTransFormedView->DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::RED);
 								worldTile.pos += tileObject.vfPosition;
 								worldTile.size = tileObject.vfSize;
 								bOverLaps = overlaps(circle<float>{vfCenterPos, fRadius}, worldTile);
@@ -248,6 +246,27 @@ namespace olc
 							{
 								// need to loop through the triangles to see if any overlaps
 								// once we have an overlap we get the shortest and take it from there.
+								
+								std::reverse(decalInfo.sCollisionTile.sCollisionType.vecPoints.begin(), 
+													decalInfo.sCollisionTile.sCollisionType.vecPoints.end());
+								auto test = decalInfo.sCollisionTile.sCollisionType.vecPoints;
+
+								int count = 0;
+								olc::vf2d vfPoints[3];
+
+								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
+								{
+									vfPoints[count] = Properties.ptrTileTransFormedView->ScaleToWorld(worldTile.pos + vfPoint);
+									count++;
+									if (count > 2)
+									{
+										count = 0;
+										Properties.ptrTileTransFormedView->FillTriangleDecal(vfPoints[0], vfPoints[1], vfPoints[2], olc::RED);
+
+									}
+								}
+								worldTile.pos += tileObject.vfPosition;
+								//Properties.ptrTileTransFormedView->DrawTriangle(worldTile.pos, tileObject.)
 								break;
 							}
 							case LevelManager::Collision::POINT:

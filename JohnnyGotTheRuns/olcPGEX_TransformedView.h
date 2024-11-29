@@ -188,6 +188,9 @@ namespace olc
 
 		// Draws a corner shaded rectangle as a decal
 		void GradientFillRectDecal(const olc::vf2d& pos, const olc::vf2d& size, const olc::Pixel colTL, const olc::Pixel colBL, const olc::Pixel colBR, const olc::Pixel colTR);
+		// Draws a single shaded filled triangle as a decal
+
+		void FillTriangleDecal(const olc::vf2d& p0, const olc::vf2d& p1, const olc::vf2d& p2, const olc::Pixel col = olc::WHITE);
 		// Draws an arbitrary convex textured polygon using GPU
 		void DrawPolygonDecal(olc::Decal* decal, const std::vector<olc::vf2d>& pos, const std::vector<olc::vf2d>& uv, const olc::Pixel tint = olc::WHITE);
 		void DrawLineDecal(const olc::vf2d& pos1, const olc::vf2d& pos2, Pixel p = olc::WHITE);
@@ -652,6 +655,11 @@ namespace olc
 	void TransformedView::GradientFillRectDecal(const olc::vf2d & pos, const olc::vf2d & size, const olc::Pixel colTL, const olc::Pixel colBL, const olc::Pixel colBR, const olc::Pixel colTR)
 	{
 		pge->GradientFillRectDecal(WorldToScreen(pos), size * m_vWorldScale, colTL, colBL, colBR, colTR);
+	}
+
+	void olc::TransformedView::FillTriangleDecal(const olc::vf2d& p0, const olc::vf2d& p1, const olc::vf2d& p2, const olc::Pixel col)
+	{
+		pge->FillTriangleDecal(WorldToScreen(p0), WorldToScreen(p1), WorldToScreen(p2), col);
 	}
 
 	void TransformedView::DrawPolygonDecal(olc::Decal* decal, const std::vector<olc::vf2d>& pos, const std::vector<olc::vf2d>& uv, const olc::Pixel tint)

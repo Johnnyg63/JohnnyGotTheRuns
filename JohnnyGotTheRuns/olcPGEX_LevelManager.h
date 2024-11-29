@@ -372,7 +372,10 @@ namespace olc
 			// Get the tile Data
 			for (auto& tileData : tileInfo.sTileData.data)
 			{
-				if (tileData.first == "id") sTile.nTileID = std::stoi(tileData.second);
+				// Right need to explain this, the TMX CSV data tile ID will always be + 1 greater than 
+				// The tileID held in the TSX data. There is a lot of reasons for this, but for our code to work correctly
+				// we need to ensure our sTile.ID matchs that of which is in the TMX file. 
+				if (tileData.first == "id") sTile.nTileID = (std::stoi(tileData.second) + 1);
 				if (tileData.first == "type") sTile.strClassType = tileData.second;
 			}
 
@@ -387,10 +390,13 @@ namespace olc
 			CollisionType sCollisionType;
 			sCollisionType.eCollision = Collision::RECT;
 
-			if (tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision == Collision::RECT;
-			if (tileInfo.sTypeData.tag == "point") sCollisionType.eCollision == Collision::POINT;
-			if (tileInfo.sTypeData.tag == "polygon") sCollisionType.eCollision == Collision::POLYGON;
-			if (tileInfo.sTypeData.tag == "ellipse") sCollisionType.eCollision == Collision::ELLIPSE;
+			if (tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision = Collision::RECT;
+			if (tileInfo.sTypeData.tag == "point") sCollisionType.eCollision = Collision::POINT;
+			if (tileInfo.sTypeData.tag == "polygon")
+			{
+				sCollisionType.eCollision = Collision::POLYGON;
+			}
+			if (tileInfo.sTypeData.tag == "ellipse") sCollisionType.eCollision = Collision::ELLIPSE;
 
 			for (auto& typeData : tileInfo.sTypeData.data)
 			{
@@ -475,28 +481,27 @@ namespace olc
 			auto rowYtiles = layer.tiles;
 			auto layerTags = layer.tag.data;
 
-			DecalInfo sDecalInfo;
-
-			// // id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
-			for (auto& tag : layerTags)
-			{
-				if (tag.first == "id") sDecalInfo.nLayerID = std::stoi(tag.second);
-				if (tag.first == "name") sDecalInfo.strName = tag.second;
-				if (tag.first == "class") sDecalInfo.strName = tag.second;
-				if (tag.first == "width") sDecalInfo.nWidth = std::stoi(tag.second);
-				if (tag.first == "height") sDecalInfo.nHeight = std::stoi(tag.second);
-				if (tag.first == "visable") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0)? true : false;
-				if (tag.first == "locked") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
-
-			}
-
-
-
 			for (auto& tiles : rowYtiles)
 			{
 				x = 0;
 				for (auto& tile : tiles)
 				{
+					DecalInfo sDecalInfo;
+
+					// // id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
+					for (auto& tag : layerTags)
+					{
+						if (tag.first == "id") sDecalInfo.nLayerID = std::stoi(tag.second);
+						if (tag.first == "name") sDecalInfo.strName = tag.second;
+						if (tag.first == "class") sDecalInfo.strName = tag.second;
+						if (tag.first == "width") sDecalInfo.nWidth = std::stoi(tag.second);
+						if (tag.first == "height") sDecalInfo.nHeight = std::stoi(tag.second);
+						if (tag.first == "visable") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
+						if (tag.first == "locked") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
+
+					}
+
+
 
 					int tileId = tile;
 
@@ -517,13 +522,15 @@ namespace olc
 						float sourceY = tileY * sTileSetInfo.vfTileSize.y; // sMapInfo.nTileHeight;
 
 						// Ok we need to check if this tile has collision?
+						
+
 						for (auto& sTile : vecTiles)
 						{
 							if (sDecalInfo.nTiledID == sTile.nTileID)
 							{
 								sDecalInfo.bHasCollision = true;
 								sDecalInfo.sCollisionTile = sTile;
-								test++;
+								//break;
 							}
 						}
 
@@ -625,6 +632,32 @@ namespace olc
 							}
 							case Collision::POLYGON:
 							{
+								//std::reverse(decalInfo.sCollisionTile.sCollisionType.vecPoints.begin(),
+									//decalInfo.sCollisionTile.sCollisionType.vecPoints.end());
+								auto test = decalInfo.sCollisionTile.sCollisionType.vecPoints;
+
+								int count = 0;
+								olc::vf2d vfPoints[3];
+
+								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
+								{
+									if (vfPoint == olc::vf2d{ 0.0f, 0.0f})
+									{
+										//vfPoint = tileObject.vfPosition;
+									}
+									vfPoints[count] = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
+									count++;
+									if (count > 2)
+									{
+										count = 0;
+										Properties.tv->FillTriangleDecal(vfPoints[0], vfPoints[1], vfPoints[2], olc::RED);
+
+									}
+								}
+
+								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
+								Properties.tv->DrawRectDecal({ float(vTile.x) , float(vTile.y) }, { 1.0f, 0.5f }, olc::RED);
+
 								break;
 							}
 							case Collision::POINT:
