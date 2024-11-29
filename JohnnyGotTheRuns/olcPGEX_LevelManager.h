@@ -160,10 +160,12 @@ namespace olc
 			std::string strClass = "";					// Layer Class name
 			int32_t nWidth = 0;							// Layer Width
 			int32_t nHeight = 0;						// Layer Height
-			int16_t nTiledID = 0;						// Tiled Map Editor ID 
+			int32_t nTiledID = 0;						// Tiled Map Editor ID 
 			olc::vf2d vfDrawLocation = { 0.0f, 0.0f };	// Locatoin of where to draw
 			olc::vf2d vfSourcePos = { 0.0f, 0.0f };		// Location on Sprite Sheet
 			olc::vf2d vfSoureSizePos = { 0.0f, 0.0f };	// Size of Partial Decal
+
+			int32_t nDecalID = 0;						// Holds the Tile ID to draw this decal
 
 			// Collision Info
 			bool bHasCollision = false;					// Has collision object 
@@ -474,6 +476,7 @@ namespace olc
 		int16_t nSpriteSheetTileCount = Properties.renSpriteSheet.Sprite()->width / sMapInfo.nTileWidth;
 
 		int test = 0; // TODO: Remove
+		int32_t nIDs = 0;
 
 		for (auto& layer : map.LayerData)
 		{
@@ -487,6 +490,12 @@ namespace olc
 				for (auto& tile : tiles)
 				{
 					DecalInfo sDecalInfo;
+					sDecalInfo.nDecalID = nIDs;
+
+					if (nIDs >= 1544)
+					{
+						int pause = 0;
+					}
 
 					// // id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
 					for (auto& tag : layerTags)
@@ -500,8 +509,6 @@ namespace olc
 						if (tag.first == "locked") sDecalInfo.bIsVisable = (std::stoi(tag.second) > 0) ? true : false;
 
 					}
-
-
 
 					int tileId = tile;
 
@@ -541,7 +548,9 @@ namespace olc
 					vecPartialDecalInfo.push_back(sDecalInfo);
 
 					x++;
+					nIDs++;
 				}
+
 
 				y++;
 			}
@@ -601,11 +610,14 @@ namespace olc
 			{
 				idx = vTile.y * Properties.viWorldSize.x + vTile.x;
 
-				//tv.DrawRectDecal({ (float)vTile.x, (float)vTile.y }, { 1.0f, 1.0f }, olc::BLACK);
-
 				for (auto& layer : Properties.mapLayerInfo)
 				{
 					decalInfo = layer.second[idx];
+
+					if (idx > 1540)
+					{
+						int pause = 0;
+					}
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
@@ -632,19 +644,16 @@ namespace olc
 							}
 							case Collision::POLYGON:
 							{
-								//std::reverse(decalInfo.sCollisionTile.sCollisionType.vecPoints.begin(),
-									//decalInfo.sCollisionTile.sCollisionType.vecPoints.end());
-								auto test = decalInfo.sCollisionTile.sCollisionType.vecPoints;
-
+								
 								int count = 0;
 								olc::vf2d vfPoints[3];
 
+								vfPoints[0] = { 0.0f, 0.0f };
+								vfPoints[1] = { 0.0f, 0.0f };
+								vfPoints[2] = { 0.0f, 0.0f };
+
 								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
 								{
-									if (vfPoint == olc::vf2d{ 0.0f, 0.0f})
-									{
-										//vfPoint = tileObject.vfPosition;
-									}
 									vfPoints[count] = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
 									count++;
 									if (count > 2)
@@ -655,8 +664,6 @@ namespace olc
 									}
 								}
 
-								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
-								Properties.tv->DrawRectDecal({ float(vTile.x) , float(vTile.y) }, { 1.0f, 0.5f }, olc::RED);
 
 								break;
 							}

@@ -3,15 +3,13 @@
  <image source="../images/levelSpriteSheet.png" width="980" height="560"/>
  <tile id="236">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0.239234" y="0.15949">
-    <polygon points="0,0 34.5295,-0.0797448 -0.239234,9.88836"/>
-   </object>
+   <object id="2" x="0" y="0" width="35" height="10"/>
   </objectgroup>
  </tile>
  <tile id="237">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="9.66667">
-    <polygon points="0,0 18.6667,-9.33333 34,0.333333"/>
+   <object id="3" x="0.15949" y="0.239234">
+    <polygon points="0,0 14.992,9.64912 34.8485,-0.239234"/>
    </object>
   </objectgroup>
  </tile>
