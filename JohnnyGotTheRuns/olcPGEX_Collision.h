@@ -189,12 +189,16 @@ namespace olc
 		olc::vf2d vfDistance = { 0.0f, 0.0f };
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
-		//olc::vf2d worldTile = { 0.0f, 0.0f };
-
+		
 		rect<float> worldTile;
 		worldTile.pos.x = 0.0f;
 		worldTile.pos.y = 0.0f;
 		worldTile.size = { 35.0f, 35.0f };
+
+		// Polygon stuff
+		olc::vf2d vfPoints[2];
+		olc::vf2d vfNewClosest = { 0.0f, 0.0f };
+		bool bIsFirstClosest = true;
 
 		bool bOverLaps = false; // Is set when a circle overlaps a Rect/Triangle
 
@@ -209,6 +213,7 @@ namespace olc
 				for (auto& layer : *Properties.ptrmapLayerInfo)
 				{
 					bOverLaps = false;	// Reset our overlap
+					bIsFirstClosest = true;
 					decalInfo = layer.second[idx];	// We only care about the data (layer.data)
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
@@ -243,29 +248,41 @@ namespace olc
 							}
 							case LevelManager::Collision::POLYGON:
 							{
-								// need to loop through the triangles to see if any overlaps
-								// once we have an overlap we get the shortest and take it from there.
-								int count = 0;
-								olc::vf2d vfPoints[3];
+								// Ok by right we should be looping through the trianges for our collision
+								// but in our case, the polygon points, angles etc have all been worked out by Tiled Map editor
+								// therefore we can just loop through the outer lines of out polygon and use these to manage collision
+								// It should have the excat same affect :)
+								//worldTile.pos += tileObject.vfPosition;
 
-								vfPoints[0] = { 0.0f, 0.0f };
-								vfPoints[1] = { 0.0f, 0.0f };
-								vfPoints[2] = { 0.0f, 0.0f };
 
-								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
+								auto& vPoints = decalInfo.sCollisionTile.sCollisionType.vecPoints;
+
+								for (int i = 1; i < vPoints.size(); i++)
 								{
-									vfPoints[count] = vTile + Properties.ptrTileTransFormedView->ScaleToWorld(vfPoint + tileObject.vfPosition);
-									count++;
-									if (count > 2)
+									vfPoints[0] = worldTile.pos + (vPoints[i - 1] + tileObject.vfPosition);
+									vfPoints[1] = worldTile.pos + (vPoints[i] + tileObject.vfPosition);
+									bOverLaps = overlaps(line<float>{vfPoints[0], vfPoints[1]}, circle<float>{ vfCenterPos, fRadius });
+
+									// If we over lap lets find the closet first and move back from there
+									if (bOverLaps)
 									{
-										count = 0;
-										// Handle collision
+										vfNewClosest = closest(line<float>{vfPoints[0], vfPoints[1]},
+											circle<float>{ vfCenterPos, fRadius });
+										
+										if (bIsFirstClosest)
+										{
+											vfClosest = vfNewClosest;
+											bIsFirstClosest = false;
+										}
+
+										if (vfClosest > vfNewClosest)
+										{
+											vfClosest = vfNewClosest;
+										}
 
 									}
+									
 								}
-
-
-								worldTile.pos += tileObject.vfPosition;
 								
 								break;
 							}
@@ -284,9 +301,6 @@ namespace olc
 						// Lets update our position if we are over lapping
 						if (bOverLaps)
 						{
-							// TODO: Updated to support triangles (polygons)
-							
-
 							vfDistance = vfCenterPos - vfClosest;
 
 							fDistance = std::sqrt(vfDistance.x * vfDistance.x + vfDistance.y * vfDistance.y);

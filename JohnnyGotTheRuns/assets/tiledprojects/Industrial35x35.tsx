@@ -3,14 +3,15 @@
  <image source="../images/levelSpriteSheet.png" width="980" height="560"/>
  <tile id="236">
   <objectgroup draworder="index" id="2">
-   <object id="5" name="Left_Rect" type="clsLeftRect" x="0.235383" y="0.470765" width="15.7706" height="10.1215"/>
-   <object id="6" name="Right_Rect" type="clsRightRect" x="16.4768" y="0.235383" width="18.3599" height="10.1215"/>
+   <object id="7" x="0.296487" y="0.197658">
+    <polygon points="0,0 16.8009,9.68523 34.5901,-0.0988289"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="237">
   <objectgroup draworder="index" id="2">
-   <object id="3" x="0.15949" y="0.239234">
-    <polygon points="0,0 14.992,9.64912 34.8485,-0.239234"/>
+   <object id="12" x="0.197658" y="9.68523">
+    <polygon points="0,0 9.68523,-9.68523 34.5901,-0.0988289"/>
    </object>
   </objectgroup>
  </tile>

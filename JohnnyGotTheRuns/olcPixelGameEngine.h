@@ -1124,6 +1124,8 @@ namespace olc
 		// Draws a triangle between points (x1,y1), (x2,y2) and (x3,y3)
 		void DrawTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, Pixel p = olc::WHITE);
 		void DrawTriangle(const olc::vi2d& pos1, const olc::vi2d& pos2, const olc::vi2d& pos3, Pixel p = olc::WHITE);
+
+		void DrawTriangleDecal(const olc::vf2d& pos1, const olc::vf2d& pos2, const olc::vf2d& pos3, Pixel p = olc::WHITE);
 		// Flat fills a triangle between points (x1,y1), (x2,y2) and (x3,y3)
 		void FillTriangle(int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t x3, int32_t y3, Pixel p = olc::WHITE);
 		void FillTriangle(const olc::vi2d& pos1, const olc::vi2d& pos2, const olc::vi2d& pos3, Pixel p = olc::WHITE);
@@ -2528,6 +2530,16 @@ namespace olc
 		DrawLine(x1, y1, x2, y2, p);
 		DrawLine(x2, y2, x3, y3, p);
 		DrawLine(x3, y3, x1, y1, p);
+	}
+
+	void PixelGameEngine::DrawTriangleDecal(const olc::vf2d& pos1, const olc::vf2d& pos2, const olc::vf2d& pos3, Pixel p)
+	{
+		DrawLineDecal(pos1, pos2, p);
+
+		DrawLineDecal(pos2, pos3, p);
+
+		DrawLineDecal(pos3, pos1, p);
+
 	}
 
 	void PixelGameEngine::FillTriangle(const olc::vi2d& pos1, const olc::vi2d& pos2, const olc::vi2d& pos3, Pixel p)

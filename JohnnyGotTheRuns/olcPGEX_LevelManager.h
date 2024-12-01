@@ -417,6 +417,21 @@ namespace olc
 
 			}
 
+			// Ok we need to check if we have a Triangle or Ploygon
+			if (sCollisionType.vecPoints.size() > 3)
+			{
+				// ok we have a polygon, and need to treat it a little different
+				// First we need to reverse the polygon
+				std::reverse(sCollisionType.vecPoints.begin(), sCollisionType.vecPoints.end());
+				olc::vf2d vfEndPoint = { 0.0f, 0.0f };
+
+				// Now we need to add the final point, which is the same as the first point {0.0}
+				// There will be a starting point offset that will be applied to this value
+				// Example: <object id="9" x="0.197658" y="9.78406"> the x/y here are the offset
+				// Example <polygon points = "0,0 10.2782,-9.78406 15.615,0.296487 25.5967,-9.78406 30.1428,0.0988289" / > we have more that 3 points we need to add the 0,0 at the end and reverse
+				sCollisionType.vecPoints.push_back(vfEndPoint);
+			}
+
 			sTile.eCollision = sCollisionType.eCollision;
 			sTile.sCollisionType = sCollisionType;
 
@@ -487,6 +502,7 @@ namespace olc
 			auto vecPartialDecalInfo = std::vector<DecalInfo>();
 			auto rowYtiles = layer.tiles;
 			auto layerTags = layer.tag.data;
+			nIDs = 0; // Reset the Tile ID per layer
 
 			for (auto& tiles : rowYtiles)
 			{
@@ -495,11 +511,6 @@ namespace olc
 				{
 					DecalInfo sDecalInfo;
 					sDecalInfo.nDecalID = nIDs;
-
-					if (nIDs >= 1544)
-					{
-						int pause = 0;
-					}
 
 					// // id="1" name="L0" class="collision" width="140" height="24" visable="0" locked="1"
 					for (auto& tag : layerTags)
@@ -532,16 +543,13 @@ namespace olc
 						float sourceX = tileX * sTileSetInfo.vfTileSize.x; // sMapInfo.nTileWidth;
 						float sourceY = tileY * sTileSetInfo.vfTileSize.y; // sMapInfo.nTileHeight;
 
-						// Ok we need to check if this tile has collision?
-						
-
 						for (auto& sTile : vecTiles)
 						{
 							if (sDecalInfo.nTiledID == sTile.nTileID)
 							{
 								sDecalInfo.bHasCollision = true;
 								sDecalInfo.sCollisionTile = sTile;
-								//break;
+								break;
 							}
 						}
 
@@ -600,6 +608,8 @@ namespace olc
 		olc::vf2d vfCollsionSize = { 0.0f, 0.0f };
 		olc::vf2d vfOffSet = { 0.0f, 0.0f };
 		
+		std::vector <olc::vf2d> vfPolyPoints;
+		std::vector <olc::vf2d> vfEmptyPoints;
 
 		rect<float> worldTile;
 		worldTile.pos.x = 0.0f;
@@ -648,26 +658,19 @@ namespace olc
 							}
 							case Collision::POLYGON:
 							{
-								
-								int count = 0;
-								olc::vf2d vfPoints[3];
-
-								vfPoints[0] = { 0.0f, 0.0f };
-								vfPoints[1] = { 0.0f, 0.0f };
-								vfPoints[2] = { 0.0f, 0.0f };
-
+							
 								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
 								{
-									vfPoints[count] = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
-									count++;
-									if (count > 2)
-									{
-										count = 0;
-										Properties.tv->FillTriangleDecal(vfPoints[0], vfPoints[1], vfPoints[2], olc::RED);
+									olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
+									vfPolyPoints.push_back(vfPointnew);
+									olc::vf2d vfColour = { 0.0f, 0.0f };
+									vfEmptyPoints.push_back(vfColour);
 
-									}
 								}
+								Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
 
+								vfPolyPoints.clear();
+								vfEmptyPoints.clear();
 
 								break;
 							}
