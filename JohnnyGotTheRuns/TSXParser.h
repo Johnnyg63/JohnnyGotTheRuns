@@ -82,6 +82,18 @@ public:
 		return parsedMapInfo;
 	}
 
+	/*
+	* Resets the parser Map Info class objects
+	*/
+	void ResetMapInfo()
+	{
+		parsedMapInfo.ImageData.data.clear();
+		parsedMapInfo.ImageData.tag = "";
+		parsedMapInfo.TilesetData.data.clear();
+		parsedMapInfo.ImageData.tag = "";
+		parsedMapInfo.vecTiles.clear();
+	}
+
 private:
 
 	Map_TSX parsedMapInfo;
@@ -257,9 +269,14 @@ private:
 		sTile.vecObjectData.clear();
 	}
 
+	
+
 public:
 	TSXParser(std::string file)
 	{
+		// Before we begin lets reset the class objects encase we are loading a new file
+		ResetMapInfo();
+
 		std::ifstream f(file, std::ios::in);
 
 		std::string accumulator = "";
@@ -322,5 +339,6 @@ public:
 	virtual ~TSXParser()
 	{
 		// TODO
+		
 	}
 };
