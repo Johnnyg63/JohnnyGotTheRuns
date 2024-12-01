@@ -130,6 +130,7 @@ namespace olc
 		struct TileObject
 		{
 			int32_t nTileObjectID = 0;				// Tile Object ID
+			std::string strName = "NOT_SET";		// Name if passed,default: "NOT_SET"
 			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
 			olc::vf2d vfPosition = { 0.0f, 0.0f };	// Object Start Poistion X,Y
 			olc::vf2d vfSize = { 0.0f, 0.0f };		// Object Size	Width, Height
@@ -424,21 +425,24 @@ namespace olc
 			// Get the Object Data
 			TileObject sTileObject;
 			sTileObject.eCollision = sTile.eCollision;
-			for (auto& objectData : tileInfo.sObjectData.data)
+			for (auto& sObjectData : tileInfo.vecObjectData)
 			{
-				
-				if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
-				if (objectData.first == "type") sTileObject.strClassType = objectData.second;
-				if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
-				if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
-				if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
-				if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
-				
+				for (auto& objectData : sObjectData.data)
+				{
+
+					if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
+					if (objectData.first == "name") sTileObject.strName = objectData.second;
+					if (objectData.first == "type") sTileObject.strClassType = objectData.second;
+					if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
+					if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
+					if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
+					if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
+
+				}
+
+				sTile.vecTileObjects.push_back(sTileObject);
 			}
 			
-			sTile.vecTileObjects.push_back(sTileObject);
-
-
 			vecTiles.push_back(sTile);
 
 

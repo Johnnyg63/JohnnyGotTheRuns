@@ -3,7 +3,8 @@
  <image source="../images/levelSpriteSheet.png" width="980" height="560"/>
  <tile id="236">
   <objectgroup draworder="index" id="2">
-   <object id="2" x="0" y="0" width="35" height="10"/>
+   <object id="5" name="Left_Rect" type="clsLeftRect" x="0.235383" y="0.470765" width="15.7706" height="10.1215"/>
+   <object id="6" name="Right_Rect" type="clsRightRect" x="16.4768" y="0.235383" width="18.3599" height="10.1215"/>
   </objectgroup>
  </tile>
  <tile id="237">

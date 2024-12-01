@@ -59,7 +59,7 @@ struct Tile
 {
 	XMLTag_TSX sTileData;
 	XMLTag_TSX sObjectGroupData;
-	XMLTag_TSX sObjectData;
+	std::vector<XMLTag_TSX> vecObjectData; //XMLTag_TSX sObjectData;
 	XMLTag_TSX sTypeData;
 };
 
@@ -170,7 +170,8 @@ private:
 		}
 		else if (newTag.tag == "object")
 		{
-			sTile.sObjectData = newTag;
+			//sTile.sObjectData = newTag;
+			sTile.vecObjectData.push_back(newTag);
 		}
 		else if (newTag.tag == "point")
 		{
@@ -228,11 +229,36 @@ private:
 			}
 		}
 		if(!bFound)	parsedMapInfo.vecTiles.push_back(tile);
+
+		// Must reset the sTile to ensure we always have fresh data
+		// Remove the below line to see the madness without it ;)
+		ResetsTile();
+	}
+
+	/*
+	* Resets the sTile to defaults
+	*/
+	void ResetsTile()
+	{
+		sTile.sObjectGroupData.data.clear();
+		sTile.sTileData.data.clear();
+		sTile.sTypeData.data.clear();
+
+		sTile.sObjectGroupData.tag = "";
+		sTile.sTileData.tag = "";
+		sTile.sTypeData.tag = "";
+
+		for (auto sObjectData : sTile.vecObjectData)
+		{
+			sObjectData.data.clear();
+			sObjectData.tag = "";
+		}
+
+		sTile.vecObjectData.clear();
 	}
 
 public:
 	TSXParser(std::string file)
-
 	{
 		std::ifstream f(file, std::ios::in);
 
