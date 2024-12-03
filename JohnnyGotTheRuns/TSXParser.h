@@ -54,13 +54,18 @@ struct XMLTag_TSX
 };
 
 
+struct ObjectDataInfo
+{
+	XMLTag_TSX sObjectData;
+	XMLTag_TSX sTypeData;
+};
 
 struct Tile
 {
 	XMLTag_TSX sTileData;
 	XMLTag_TSX sObjectGroupData;
-	std::vector<XMLTag_TSX> vecObjectData; //XMLTag_TSX sObjectData;
-	XMLTag_TSX sTypeData;
+	std::vector<ObjectDataInfo> vecObjectDataInfo; //XMLTag_TSX sObjectData;
+
 };
 
 
@@ -171,9 +176,6 @@ private:
 			if (!bIsFirstPass) UpdateVectorIfRequired();
 
 			bIsFirstPass = false;
-			// Set the default of rect for tiles that do not have a type (point, ellipse, polygon)
-			sTile.sTypeData.tag = "RECT";
-			sTile.sTypeData.data.clear();
 			sTile.sTileData = newTag;
 		}
 		else if (newTag.tag == "objectgroup")
@@ -183,25 +185,36 @@ private:
 		else if (newTag.tag == "object")
 		{
 			//sTile.sObjectData = newTag;
-			sTile.vecObjectData.push_back(newTag);
+			ObjectDataInfo sObjectDataInfo;
+			sObjectDataInfo.sObjectData = newTag;
+			sObjectDataInfo.sTypeData.tag = "rect";
+			sObjectDataInfo.sTypeData.data.clear();
+			sTile.vecObjectDataInfo.push_back(sObjectDataInfo);
 		}
 		else if (newTag.tag == "point")
 		{
-			sTile.sTypeData = newTag;
+			// The latest object data will always be the last in the list
+			auto& sObjectDataInfo = sTile.vecObjectDataInfo[sTile.vecObjectDataInfo.size() - 1];
+			sObjectDataInfo.sTypeData = newTag;
 		}
 		else if (newTag.tag == "ellipse")
 		{
-			sTile.sTypeData = newTag;
+			// The latest object data will always be the last in the list
+			auto& sObjectDataInfo = sTile.vecObjectDataInfo[sTile.vecObjectDataInfo.size() - 1];
+			sObjectDataInfo.sTypeData = newTag;
 
 		}
 		else if (newTag.tag == "polygon")
 		{
-			sTile.sTypeData = newTag;
+			// The latest object data will always be the last in the list
+			auto& sObjectDataInfo = sTile.vecObjectDataInfo[sTile.vecObjectDataInfo.size() - 1];
+			sObjectDataInfo.sTypeData = newTag;
+			
 
 		}
 		else if (newTag.tag == "/object")
 		{
-			UpdateVectorIfRequired();
+			//UpdateVectorIfRequired();
 
 		}
 		else if (newTag.tag == "/objectgroup")
@@ -253,20 +266,18 @@ private:
 	void ResetsTile()
 	{
 		sTile.sObjectGroupData.data.clear();
-		sTile.sTileData.data.clear();
-		sTile.sTypeData.data.clear();
-
 		sTile.sObjectGroupData.tag = "";
-		sTile.sTileData.tag = "";
-		sTile.sTypeData.tag = "";
 
-		for (auto sObjectData : sTile.vecObjectData)
+		for (auto sObjectDataInfo : sTile.vecObjectDataInfo)
 		{
-			sObjectData.data.clear();
-			sObjectData.tag = "";
+
+			sObjectDataInfo.sObjectData.data.clear();
+			sObjectDataInfo.sObjectData.tag = "";
+			sObjectDataInfo.sTypeData.data.clear();
+			sObjectDataInfo.sTypeData.tag = "";
 		}
 
-		sTile.vecObjectData.clear();
+		sTile.vecObjectDataInfo.clear();
 	}
 
 	

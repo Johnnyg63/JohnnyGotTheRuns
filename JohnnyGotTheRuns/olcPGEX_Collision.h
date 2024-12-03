@@ -174,9 +174,11 @@ namespace olc
 
 	void Collision::UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime)
 	{
+		// Restrict to only to the tiles on the screen
 		olc::vi2d vTileTL = Properties.ptrTileTransFormedView->GetTopLeftTile().max({ 0,0 });
 		olc::vi2d vTileBR = Properties.ptrTileTransFormedView->GetBottomRightTile().min(Properties.viWorldSize);
 
+		// DecalInfo studd
 		olc::LevelManager::DecalInfo decalInfo;
 		olc::vi2d vTile;
 		int32_t idx = 0;
@@ -184,12 +186,14 @@ namespace olc
 
 		using namespace olc::utils::geom2d;
 
+		// Collision stuff
 		olc::vf2d vfDirection = { 0.0f, 0.0f };
 		olc::vf2d vfClosest = { 0.0f, 0.0f };
 		olc::vf2d vfDistance = { 0.0f, 0.0f };
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
 		
+		// Rect collision stuff
 		rect<float> worldTile;
 		worldTile.pos.x = 0.0f;
 		worldTile.pos.y = 0.0f;
@@ -207,8 +211,8 @@ namespace olc
 			{
 				idx = vTile.y * Properties.viWorldSize.x + vTile.x;
 				/*
-				* Note we add a* to declare we want to access the value
-				* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
+				* Note we add *a to declare we want to access the value
+				* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs
 				*/
 				for (auto& layer : *Properties.ptrmapLayerInfo)
 				{
@@ -220,13 +224,12 @@ namespace olc
 
 					if (decalInfo.bHasCollision)
 					{
-						
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
 
 						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
 						{
-							switch (tileObject.eCollision)
+							switch (tileObject.sCollisionType.eCollision)
 							{
 
 							case LevelManager::Collision::RECT:
@@ -252,10 +255,8 @@ namespace olc
 								// but in our case, the polygon points, angles etc have all been worked out by Tiled Map editor
 								// therefore we can just loop through the outer lines of out polygon and use these to manage collision
 								// It should have the excat same affect :)
-								//worldTile.pos += tileObject.vfPosition;
-
-
-								auto& vPoints = decalInfo.sCollisionTile.sCollisionType.vecPoints;
+								
+								auto& vPoints = tileObject.sCollisionType.vecPoints;
 
 								for (int i = 1; i < vPoints.size(); i++)
 								{
@@ -263,22 +264,21 @@ namespace olc
 									vfPoints[1] = worldTile.pos + (vPoints[i] + tileObject.vfPosition);
 									bOverLaps = overlaps(line<float>{vfPoints[0], vfPoints[1]}, circle<float>{ vfCenterPos, fRadius });
 
-									// If we over lap lets find the closet first and move back from there
+									// If we over lap lets find the closest first and move back from there
 									if (bOverLaps)
 									{
 										vfNewClosest = closest(line<float>{vfPoints[0], vfPoints[1]},
-											circle<float>{ vfCenterPos, fRadius });
+																circle<float>{ vfCenterPos, fRadius });
 										
+										// use to ensure vfClosest is set the first overlap 
 										if (bIsFirstClosest)
 										{
 											vfClosest = vfNewClosest;
 											bIsFirstClosest = false;
 										}
 
-										if (vfClosest > vfNewClosest)
-										{
-											vfClosest = vfNewClosest;
-										}
+										// Find the closet distance
+										if (vfClosest > vfNewClosest) vfClosest = vfNewClosest;
 
 									}
 									
@@ -308,6 +308,7 @@ namespace olc
 
 							if (fDistance != 0)
 							{
+								// Move our player out of collision
 								vfCenterPos += (vfDistance / fDistance) * fOverlap;
 								vfDirection += (vfDistance / fDistance) * fOverlap;
 							}
@@ -343,11 +344,6 @@ namespace olc
 
 
 	}
-
-
-
-
-
 
 
 } // olc

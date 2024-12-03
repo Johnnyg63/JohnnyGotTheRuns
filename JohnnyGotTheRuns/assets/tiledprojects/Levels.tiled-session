@@ -1,5 +1,5 @@
 {
-    "activeFile": "Level1Output.tmx",
+    "activeFile": "Industrial35x35.tsx",
     "expandedProjectPaths": [
         "."
     ],
@@ -11,11 +11,11 @@
             "scaleInEditor": 1
         },
         "Level1Output.tmx": {
-            "scale": 1.1342,
+            "scale": 1.9561,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 187.35672720860515,
-                "y": 247.7517192734967
+                "x": 2450.028117171924,
+                "y": 419.96830427892235
             }
         }
     },
@@ -25,7 +25,7 @@
     ],
     "project": "Levels.tiled-project",
     "recentFiles": [
-        "Industrial35x35.tsx",
-        "Level1Output.tmx"
+        "Level1Output.tmx",
+        "Industrial35x35.tsx"
     ]
 }

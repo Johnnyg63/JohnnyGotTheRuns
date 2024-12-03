@@ -134,8 +134,8 @@ namespace olc
 			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
 			olc::vf2d vfPosition = { 0.0f, 0.0f };	// Object Start Poistion X,Y
 			olc::vf2d vfSize = { 0.0f, 0.0f };		// Object Size	Width, Height
-			Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
-
+			//Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
 		};
 
 		struct Tile
@@ -145,8 +145,8 @@ namespace olc
 			std::string strDrawOrder = "NOT_SET";	// Draw Order if passed, default: "NOT_SET"
 			int32_t nObjectGroupID = 0;				// Object Group ID
 			std::vector<TileObject> vecTileObjects;	// Vector of TileObject
-			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
-			Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+			//CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
+			//Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
 
 		};
 
@@ -360,12 +360,6 @@ namespace olc
 
 		}
 
-		/*
-		* XMLTag_TSX sTileData;
-		XMLTag_TSX sObjectGroupData;
-		XMLTag_TSX sObjectData;
-		XMLTag_TSX sTypeData;
-		*/
 
 		for (auto& tileInfo : map_TSX.vecTiles)
 		{
@@ -389,60 +383,59 @@ namespace olc
 				if (objectGroupData.first == "draworder") sTile.strDrawOrder = objectGroupData.second;
 			}
 
-			// Get the ObjectType
-			CollisionType sCollisionType;
-			sCollisionType.eCollision = Collision::RECT;
-
-			if (tileInfo.sTypeData.tag == "rect") sCollisionType.eCollision = Collision::RECT;
-			if (tileInfo.sTypeData.tag == "point") sCollisionType.eCollision = Collision::POINT;
-			if (tileInfo.sTypeData.tag == "polygon")
-			{
-				sCollisionType.eCollision = Collision::POLYGON;
-			}
-			if (tileInfo.sTypeData.tag == "ellipse") sCollisionType.eCollision = Collision::ELLIPSE;
-
-			for (auto& typeData : tileInfo.sTypeData.data)
-			{
-				/*
-				* Lets parse out our points to string --> olc::vf2d
-				* example: -0.666667,32.6667 (x, y)
-				* As we are dealing with data we use typeData.second as this is where the data is stored
-				*/
-				std::string strX = typeData.second.substr(0, typeData.second.find(","));
-				std::string strY = typeData.second.substr(typeData.second.find(",") + 1, std::string::npos);
-				olc::vf2d vfPoint = { 0.0f, 0.0f };
-				vfPoint.x = std::stof(strX);
-				vfPoint.y = std::stof(strY);
-				sCollisionType.vecPoints.push_back(vfPoint);
-
-			}
-
-			// Ok we need to check if we have a Triangle or Ploygon
-			if (sCollisionType.vecPoints.size() > 3)
-			{
-				// ok we have a polygon, and need to treat it a little different
-				// First we need to reverse the polygon
-				std::reverse(sCollisionType.vecPoints.begin(), sCollisionType.vecPoints.end());
-				olc::vf2d vfEndPoint = { 0.0f, 0.0f };
-
-				// Now we need to add the final point, which is the same as the first point {0.0}
-				// There will be a starting point offset that will be applied to this value
-				// Example: <object id="9" x="0.197658" y="9.78406"> the x/y here are the offset
-				// Example <polygon points = "0,0 10.2782,-9.78406 15.615,0.296487 25.5967,-9.78406 30.1428,0.0988289" / > we have more that 3 points we need to add the 0,0 at the end and reverse
-				sCollisionType.vecPoints.push_back(vfEndPoint);
-			}
-
-			sTile.eCollision = sCollisionType.eCollision;
-			sTile.sCollisionType = sCollisionType;
-
 			
 
-			// Get the Object Data
-			TileObject sTileObject;
-			sTileObject.eCollision = sTile.eCollision;
-			for (auto& sObjectData : tileInfo.vecObjectData)
+			// todo
+			for (auto& sObjectDataInfo : tileInfo.vecObjectDataInfo)
 			{
-				for (auto& objectData : sObjectData.data)
+				// Defaults
+				TileObject sTileObject;
+				sTileObject.sCollisionType.eCollision == Collision::RECT;
+
+				if (sObjectDataInfo.sTypeData.tag == "rect") 
+				{ 
+					sTileObject.sCollisionType.eCollision = Collision::RECT;
+				}
+				if (sObjectDataInfo.sTypeData.tag == "point") sTileObject.sCollisionType.eCollision = Collision::POINT;
+				if (sObjectDataInfo.sTypeData.tag == "polygon")
+				{ 
+					sTileObject.sCollisionType.eCollision = Collision::POLYGON;
+				}
+				if (sObjectDataInfo.sTypeData.tag == "ellipse") sTileObject.sCollisionType.eCollision = Collision::ELLIPSE;
+
+				for (auto& typeData : sObjectDataInfo.sTypeData.data)
+				{
+					/*
+					* Lets parse out our points to string --> olc::vf2d
+					* example: -0.666667,32.6667 (x, y)
+					* As we are dealing with data we use typeData.second as this is where the data is stored
+					*/
+					std::string strX = typeData.second.substr(0, typeData.second.find(","));
+					std::string strY = typeData.second.substr(typeData.second.find(",") + 1, std::string::npos);
+					olc::vf2d vfPoint = { 0.0f, 0.0f };
+					vfPoint.x = std::stof(strX);
+					vfPoint.y = std::stof(strY);
+					sTileObject.sCollisionType.vecPoints.push_back(vfPoint);
+
+				}
+
+
+				// Ok we need to check if we have a Triangle or Ploygon
+				if (sTileObject.sCollisionType.vecPoints.size() > 3)
+				{
+					// ok we have a polygon, and need to treat it a little different
+					// First we need to reverse the polygon
+					std::reverse(sTileObject.sCollisionType.vecPoints.begin(), sTileObject.sCollisionType.vecPoints.end());
+					olc::vf2d vfEndPoint = { 0.0f, 0.0f };
+
+					// Now we need to add the final point, which is the same as the first point {0.0}
+					// There will be a starting point offset that will be applied to this value
+					// Example: <object id="9" x="0.197658" y="9.78406"> the x/y here are the offset
+					// Example <polygon points = "0,0 10.2782,-9.78406 15.615,0.296487 25.5967,-9.78406 30.1428,0.0988289" / > we have more that 3 points we need to add the 0,0 at the end and reverse
+					sTileObject.sCollisionType.vecPoints.push_back(vfEndPoint);
+				}
+
+				for (auto& objectData : sObjectDataInfo.sObjectData.data)
 				{
 
 					if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
@@ -456,8 +449,11 @@ namespace olc
 				}
 
 				sTile.vecTileObjects.push_back(sTileObject);
-			}
-			
+				
+
+			} // END: for (auto& sObjectDataInfo : tileInfo.vecObjectDataInfo)
+
+
 			vecTiles.push_back(sTile);
 
 
@@ -642,7 +638,7 @@ namespace olc
 						
 						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
 						{
-							switch (tileObject.eCollision)
+							switch (tileObject.sCollisionType.eCollision)
 							{
 
 							case Collision::RECT:
@@ -659,7 +655,7 @@ namespace olc
 							case Collision::POLYGON:
 							{
 							
-								for (auto& vfPoint : decalInfo.sCollisionTile.sCollisionType.vecPoints)
+								for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
 								{
 									olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
 									vfPolyPoints.push_back(vfPointnew);
