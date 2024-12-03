@@ -367,6 +367,7 @@ namespace olc
 			Tile sTile;
 
 			// Get the tile Data
+			//  <tile id="236">
 			for (auto& tileData : tileInfo.sTileData.data)
 			{
 				// Right need to explain this, the TMX CSV data tile ID will always be + 1 greater than 
@@ -377,6 +378,7 @@ namespace olc
 			}
 
 			// Get the Object Group data
+			// <objectgroup draworder="index" id="2">
 			for (auto& objectGroupData : tileInfo.sObjectGroupData.data)
 			{
 				if (objectGroupData.first == "id") sTile.nObjectGroupID = std::stoi(objectGroupData.second);
@@ -385,13 +387,37 @@ namespace olc
 
 			
 
-			// todo
+			// Get the Object data:
+			/*
+			*   <object id="1" name="Left_Triangle" type="clsLeftTriangle" x="0.176258" y="9.51793">
+			*		<polygon points="0,0 4.51712,-9.51793 6.69781,0.352516"/>
+			*   </object>
+			*	<object id="2" name="Right_Triangle" type="clsRightTriangle" x="27.4963" y="9.87045">
+			*		<polygon points="0,0 4.44713,-9.69419 7.22658,-0.528774"/>
+			*   </object>
+			*   <object id="3" x="13.5719" y="0.705032" width="7.22658" height="7.93161"/>
+			*/
 			for (auto& sObjectDataInfo : tileInfo.vecObjectDataInfo)
 			{
 				// Defaults
 				TileObject sTileObject;
 				sTileObject.sCollisionType.eCollision == Collision::RECT;
 
+				// <object id="1" name="Left_Triangle" type="clsLeftTriangle" x="0.176258" y="9.51793">
+				for (auto& objectData : sObjectDataInfo.sObjectData.data)
+				{
+
+					if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
+					if (objectData.first == "name") sTileObject.strName = objectData.second;
+					if (objectData.first == "type") sTileObject.strClassType = objectData.second;
+					if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
+					if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
+					if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
+					if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
+
+				}
+
+				
 				if (sObjectDataInfo.sTypeData.tag == "rect") 
 				{ 
 					sTileObject.sCollisionType.eCollision = Collision::RECT;
@@ -403,6 +429,7 @@ namespace olc
 				}
 				if (sObjectDataInfo.sTypeData.tag == "ellipse") sTileObject.sCollisionType.eCollision = Collision::ELLIPSE;
 
+				// <polygon points = "0,0 4.51712,-9.51793 6.69781,0.352516" / >
 				for (auto& typeData : sObjectDataInfo.sTypeData.data)
 				{
 					/*
@@ -435,27 +462,13 @@ namespace olc
 					sTileObject.sCollisionType.vecPoints.push_back(vfEndPoint);
 				}
 
-				for (auto& objectData : sObjectDataInfo.sObjectData.data)
-				{
-
-					if (objectData.first == "id") sTileObject.nTileObjectID = std::stoi(objectData.second);
-					if (objectData.first == "name") sTileObject.strName = objectData.second;
-					if (objectData.first == "type") sTileObject.strClassType = objectData.second;
-					if (objectData.first == "x") sTileObject.vfPosition.x = std::stof(objectData.second);
-					if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
-					if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
-					if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
-
-				}
-
+				
 				sTile.vecTileObjects.push_back(sTileObject);
 				
 
 			} // END: for (auto& sObjectDataInfo : tileInfo.vecObjectDataInfo)
 
-
-			vecTiles.push_back(sTile);
-
+			vecTiles.push_back(sTile); // Push back the tile info for this decal
 
 		}
 
