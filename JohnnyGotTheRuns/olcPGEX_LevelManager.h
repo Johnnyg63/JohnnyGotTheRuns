@@ -134,7 +134,8 @@ namespace olc
 			std::string strClassType = "NOT_SET";	// Class type if passed, default: "NOT_SET"
 			olc::vf2d vfPosition = { 0.0f, 0.0f };	// Object Start Poistion X,Y
 			olc::vf2d vfSize = { 0.0f, 0.0f };		// Object Size	Width, Height
-			//Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+			float fRotationDeg = 0.0f;				// Object Rotation in Degrees
+			float fRotationRad = 0.0f;				// Object Rotation in Radians
 			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
 		};
 
@@ -145,8 +146,7 @@ namespace olc
 			std::string strDrawOrder = "NOT_SET";	// Draw Order if passed, default: "NOT_SET"
 			int32_t nObjectGroupID = 0;				// Object Group ID
 			std::vector<TileObject> vecTileObjects;	// Vector of TileObject
-			//CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
-			//Collision eCollision = Collision::RECT;	// Collision object type, Default RECT
+			
 
 		};
 
@@ -222,6 +222,9 @@ namespace olc
 
 	private:
 		bool bisLevelLoaded = false; // Use to stop execution until a level is loaded
+
+		// Rotates a point around the Center Position
+		olc::vf2d RotatePoint(olc::vf2d vfCenterPos, float fRadians, olc::vf2d vfPoint);
 
 	};
 
@@ -414,6 +417,13 @@ namespace olc
 					if (objectData.first == "y") sTileObject.vfPosition.y = std::stof(objectData.second);
 					if (objectData.first == "width") sTileObject.vfSize.x = std::stof(objectData.second);
 					if (objectData.first == "height") sTileObject.vfSize.y = std::stof(objectData.second);
+					if (objectData.first == "rotation")
+					{
+						sTileObject.fRotationDeg = std::stof(objectData.second);
+						// Get our radians // TODO we need to increase PI for more accurate results 
+						sTileObject.fRotationRad = sTileObject.fRotationDeg * 3.1415927f / 180.0f;
+
+					}
 
 				}
 
@@ -447,6 +457,8 @@ namespace olc
 				}
 
 
+
+
 				// Ok we need to check if we have a Triangle or Ploygon
 				if (sTileObject.sCollisionType.vecPoints.size() > 3)
 				{
@@ -462,6 +474,58 @@ namespace olc
 					sTileObject.sCollisionType.vecPoints.push_back(vfEndPoint);
 				}
 
+
+				// Now we need to check if the object is rotated
+				if (sTileObject.fRotationRad != 0.0f)
+				{
+					// Right the user has applied some rotation.
+					// We have a few cases to manager here.
+
+					switch (sTileObject.sCollisionType.eCollision)
+					{
+					case Collision::RECT:
+					{
+						// For a rect we need to convert to triangles (polgyon) as it makes out collision code easier to work with
+						// 1: Get the 4 points of the rect
+						olc::vf2d vfTopLeft = sTileObject.vfPosition;
+						olc::vf2d vfTopRight = sTileObject.vfPosition + olc::vf2d{ sTileObject.vfSize.x, 0.0f };
+						olc::vf2d vfBottomLeft = sTileObject.vfPosition + olc::vf2d{ 0.0f, sTileObject.vfSize.y };
+						olc::vf2d vfBottomRight = sTileObject.vfPosition + sTileObject.vfSize;
+
+						// 2: Get our center point : xCenter = (x1 + x2) / 2 , yCenter = (y1 + y2) / 2
+						olc::vf2d vfCenterPoint = sTileObject.vfPosition; //olc::vf2d{ (vfTopLeft.x + vfTopRight.x) / 2.0f, (vfTopLeft.y + vfBottomLeft.y) / 2.0f };
+
+						// 3: Rotate each point around the vfTopLeft position, TiledMap has already set this point, we do not need top calucate it
+						//vfTopLeft = RotatePoint(vfCenterPoint, sTileObject.fRotationRad, vfTopLeft);
+						vfTopRight = RotatePoint(vfCenterPoint, sTileObject.fRotationRad, vfTopRight);
+						vfBottomLeft = RotatePoint(vfCenterPoint, sTileObject.fRotationRad, vfBottomLeft);
+						vfBottomRight = RotatePoint(vfCenterPoint, sTileObject.fRotationRad, vfBottomRight);
+
+						sTileObject.vfPosition = vfTopLeft;
+
+						// 4: Now we need to convert into Polgon
+						// NOTE a RECT in Tiled map has no offset position unlike a "real" triangle/ploygon in tilemap
+						// For polygons we use the sTileObject.vfPosition as the offset point for the start point {0.0f,0.0f}
+						// Example: TODO add <polygon....
+						// Therefore we need to set sTileObject.vfPosition == {0.0f, 0.0f} so no offset is applied
+						sTileObject.vfPosition = { 0.0f, 0.0f };
+						sTileObject.sCollisionType.eCollision = Collision::POLYGON;
+
+						sTileObject.sCollisionType.vecPoints.push_back(vfTopLeft);
+						sTileObject.sCollisionType.vecPoints.push_back(vfTopRight);
+						sTileObject.sCollisionType.vecPoints.push_back(vfBottomRight);
+						sTileObject.sCollisionType.vecPoints.push_back(vfBottomLeft);
+						sTileObject.sCollisionType.vecPoints.push_back(vfTopLeft);
+
+
+						break;
+					}
+					default:
+						break;
+					}
+
+
+				}
 				
 				sTile.vecTileObjects.push_back(sTileObject);
 				
@@ -588,6 +652,15 @@ namespace olc
 		bisLevelLoaded = true;
 	}
 
+	olc::vf2d LevelManager::RotatePoint(olc::vf2d vfCenterPos, float fRadians, olc::vf2d vfPoint) 
+	{
+		float tempX = vfPoint.x - vfCenterPos.x;
+		float tempY = vfPoint.y - vfCenterPos.y;
+		vfPoint.x = vfCenterPos.x + (tempX * cos(fRadians) - tempY * sin(fRadians));
+		vfPoint.y = vfCenterPos.y + (tempX * sin(fRadians) + tempY * cos(fRadians));
+		return vfPoint;
+	}
+
 	void LevelManager::ClearLevel()
 	{
 		delete Properties.renSpriteSheet.Decal();
@@ -676,7 +749,21 @@ namespace olc
 									vfEmptyPoints.push_back(vfColour);
 
 								}
-								Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
+
+								for (int i = 0; i < vfPolyPoints.size(); i++)
+								{
+									if (i == vfPolyPoints.size() - 1)
+									{
+										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
+									}
+									else
+									{
+										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
+									}
+									
+								}
+
+								//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
 
 								vfPolyPoints.clear();
 								vfEmptyPoints.clear();

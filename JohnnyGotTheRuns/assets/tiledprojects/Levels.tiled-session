@@ -15,7 +15,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 2450.028117171924,
-                "y": 419.96830427892235
+                "y": 420.2239149327744
             }
         }
     },
@@ -24,6 +24,7 @@
         "Industrial35x35.tsx"
     ],
     "project": "Levels.tiled-project",
+    "property.type": "color",
     "recentFiles": [
         "Level1Output.tmx",
         "Industrial35x35.tsx"
