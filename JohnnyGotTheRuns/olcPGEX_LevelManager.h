@@ -722,63 +722,63 @@ namespace olc
 					{
 						// NOTE: We are in world space so we need to get realworld....
 						
-						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
-						{
-							switch (tileObject.sCollisionType.eCollision)
-							{
+						//for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
+						//{
+						//	switch (tileObject.sCollisionType.eCollision)
+						//	{
 
-							case Collision::RECT:
-							{
-								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
-								vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
-								Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
-								break;
-							}
-							case Collision::ELLIPSE:
-							{
-								break;
-							}
-							case Collision::POLYGON:
-							{
-							
-								for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
-								{
-									olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
-									vfPolyPoints.push_back(vfPointnew);
-									olc::vf2d vfColour = { 0.0f, 0.0f };
-									vfEmptyPoints.push_back(vfColour);
+						//	case Collision::RECT:
+						//	{
+						//		vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
+						//		vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
+						//		Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
+						//		break;
+						//	}
+						//	case Collision::ELLIPSE:
+						//	{
+						//		break;
+						//	}
+						//	case Collision::POLYGON:
+						//	{
+						//	
+						//		for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
+						//		{
+						//			olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
+						//			vfPolyPoints.push_back(vfPointnew);
+						//			olc::vf2d vfColour = { 0.0f, 0.0f };
+						//			vfEmptyPoints.push_back(vfColour);
 
-								}
+						//		}
 
-								for (int i = 0; i < vfPolyPoints.size(); i++)
-								{
-									if (i == vfPolyPoints.size() - 1)
-									{
-										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
-									}
-									else
-									{
-										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
-									}
-									
-								}
+						//		for (int i = 0; i < vfPolyPoints.size(); i++)
+						//		{
+						//			if (i == vfPolyPoints.size() - 1)
+						//			{
+						//				Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
+						//			}
+						//			else
+						//			{
+						//				Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
+						//			}
+						//			
+						//		}
 
-								//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
+						//		//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
 
-								vfPolyPoints.clear();
-								vfEmptyPoints.clear();
+						//		vfPolyPoints.clear();
+						//		vfEmptyPoints.clear();
 
-								break;
-							}
-							case Collision::POINT:
-							{
-								break;
-							}
+						//		break;
+						//	}
+						//	case Collision::POINT:
+						//	{
+						//		break;
+						//	}
 
-							default:
-								break;
-							}
-						}
+						//	default:
+						//		break;
+						//	}
+						//}
 
 					}
 
@@ -796,19 +796,19 @@ namespace olc
 					case 2:
 					{
 						// this is our Ladder layer
-						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
+							decalInfo.vfSoureSizePos);
 						break;
 					}
 					case 3:
 					{
 						// this is our drawing layer
-						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
+						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
 							Properties.renSpriteSheet.Decal(),
 							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
+							decalInfo.vfSoureSizePos);
 						break;
 					}
 					default:
