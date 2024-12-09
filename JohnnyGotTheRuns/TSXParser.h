@@ -63,6 +63,7 @@ struct ObjectDataInfo
 struct Tile
 {
 	XMLTag_TSX sTileData;
+	std::vector<XMLTag_TSX> vecProperties; // Stores any custom properties
 	XMLTag_TSX sObjectGroupData;
 	std::vector<ObjectDataInfo> vecObjectDataInfo; //XMLTag_TSX sObjectData;
 
@@ -177,6 +178,14 @@ private:
 
 			bIsFirstPass = false;
 			sTile.sTileData = newTag;
+		}
+		else if (newTag.tag == "properties")
+		{
+			//sTile.sPropertyData = newTag;
+		}
+		else if (newTag.tag == "property")
+		{
+			sTile.vecProperties.push_back(newTag);
 		}
 		else if (newTag.tag == "objectgroup")
 		{

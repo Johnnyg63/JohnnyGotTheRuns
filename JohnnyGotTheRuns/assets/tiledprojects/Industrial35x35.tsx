@@ -631,39 +631,42 @@
   </objectgroup>
  </tile>
  <tile id="120">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+   <property name="colour" type="color" value="#ffaa557f"/>
+   <property name="file" type="file" value="../images/toilet.png"/>
+   <property name="file2" type="file" value="../images/levelSpriteSheet.png"/>
+   <property name="float" type="float" value="1.2"/>
+   <property name="int" type="int" value="5"/>
+   <property name="object" type="object" value="0"/>
+   <property name="string" value="testname"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="9.96804" width="35" height="14.8329"/>
-   <object id="2" x="0" y="24.948" width="9.82098" height="10.052"/>
-   <object id="3" x="-0.212481" y="9.77413">
-    <polygon points="0,0 0.212481,-2.76225 5.20579,-7.22436 10.0929,-2.54977 10.0929,-0.106241"/>
-   </object>
+   <object id="1" x="0" y="2" width="35" height="33"/>
   </objectgroup>
  </tile>
  <tile id="121">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="9.8618" width="35" height="15.1516"/>
-   <object id="2" x="24.3291" y="25.1604" width="10.6709" height="9.83956"/>
-   <object id="3" x="24.9665" y="9.45541">
-    <polygon points="0,0 0,-2.65601 4.99331,-7.22436 9.56165,-2.44353 9.77413,0.318722"/>
-   </object>
+   <object id="1" x="0" y="2" width="35" height="33"/>
   </objectgroup>
  </tile>
  <tile id="122">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="2" x="10.1062" y="9.96804" width="24.8938" height="15.4703"/>
-   <object id="4" x="10.1991" y="10.0929">
-    <polygon points="0,0 -0.212481,-3.3997 4.56834,-7.64932 9.56165,-3.29346 9.66789,-0.212481"/>
-   </object>
-   <object id="5" x="10" y="25.4792" width="9.91384" height="9.52083"/>
+   <object id="1" x="10" y="2" width="25" height="33"/>
   </objectgroup>
  </tile>
  <tile id="123">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="3" x="14.8737" y="25.1604" width="10.1263" height="9.83956"/>
-   <object id="4" x="0" y="9.8618" width="25" height="15.3641"/>
-   <object id="5" x="14.9799" y="9.77413">
-    <polygon points="0,0 -0.106241,-2.8685 4.88707,-7.3306 9.77413,-2.97474 9.98661,0"/>
-   </object>
+   <object id="1" x="0" y="2" width="25" height="33"/>
   </objectgroup>
  </tile>
  <tile id="124">
@@ -819,27 +822,55 @@
   </objectgroup>
  </tile>
  <tile id="148">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="10.0335" height="35"/>
-   <object id="2" x="10.1991" y="9.88037" width="24.8009" height="15.2393"/>
+   <object id="1" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="149">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="9.88037" width="26.9257" height="15.2393"/>
-   <object id="2" x="24.9665" y="0" width="10.0335" height="35"/>
+   <object id="1" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="150">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="10" y="0" width="9.8076" height="35"/>
-   <object id="2" x="17.8618" y="9.98661" width="17.1382" height="15.133"/>
+   <object id="1" x="10" y="0" width="25" height="35"/>
   </objectgroup>
  </tile>
  <tile id="151">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="9.88037" width="17.1382" height="15.0268"/>
-   <object id="2" x="14.9799" y="0" width="10.0201" height="35"/>
+   <object id="1" x="0" y="0" width="25" height="35"/>
+  </objectgroup>
+ </tile>
+ <tile id="176">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="35" height="35"/>
+  </objectgroup>
+ </tile>
+ <tile id="177">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="35" height="35"/>
+  </objectgroup>
+ </tile>
+ <tile id="178">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="10" y="0" width="25" height="35"/>
+  </objectgroup>
+ </tile>
+ <tile id="179">
+  <objectgroup draworder="index" id="2">
+   <object id="1" x="0" y="0" width="25" height="35"/>
   </objectgroup>
  </tile>
  <tile id="180">
@@ -901,27 +932,35 @@
   </objectgroup>
  </tile>
  <tile id="204">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="9.90909" height="35"/>
-   <object id="2" x="0" y="10" width="35" height="15"/>
+   <object id="1" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="205">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="25.0909" y="0" width="9.90909" height="35"/>
-   <object id="2" x="0" y="10.1818" width="35" height="15.1818"/>
+   <object id="2" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="206">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="10" y="0" width="9.72727" height="35"/>
-   <object id="2" x="10" y="9.63636" width="25" height="15.5455"/>
+   <object id="1" x="10" y="0" width="25" height="35"/>
   </objectgroup>
  </tile>
  <tile id="207">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="10.1818" width="17.1818" height="14.6364"/>
-   <object id="2" x="0" y="0" width="25" height="35"/>
+   <object id="1" x="0" y="0" width="25" height="35"/>
   </objectgroup>
  </tile>
  <tile id="215">

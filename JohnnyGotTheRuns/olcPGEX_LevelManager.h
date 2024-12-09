@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <any>
 
 
 #ifdef OLC_PGEX_LEVEL_MANAGER
@@ -127,6 +128,59 @@ namespace olc
 			std::vector<olc::vf2d> vecPoints;
 		};
 
+		struct TypeBool
+		{
+			std::string name = "";
+			bool value = false;
+		};
+
+		struct TypeColor
+		{
+			std::string name = "";
+			olc::Pixel value = olc::BLANK;  //BLANK(0, 0, 0, 0)
+		};
+
+		struct TypeFloat
+		{
+			std::string name = "";
+			float value = 0.0f;
+		};
+
+		struct TypeInt
+		{
+			std::string name = "";
+			int value = 0;
+		};
+
+		struct TypeString
+		{
+			std::string name = "";
+			std::string value = "";
+		};
+
+		struct TypeObject
+		{
+			std::string name = "";
+			std::any value;
+		};
+
+		struct TypeFile
+		{
+			std::string name = "";
+			std::string value = "";
+		};
+
+		struct TileProperites
+		{
+			std::vector<TypeBool> vecBools;
+			std::vector<TypeColor> vecColors;
+			std::vector<TypeFloat> vecFloats;
+			std::vector<TypeFile> vecFiles;
+			std::vector<TypeInt> vecInts;
+			std::vector<TypeString> vecStrings;
+			std::vector<TypeObject> vecObjects;
+		};
+
 		struct TileObject
 		{
 			int32_t nTileObjectID = 0;				// Tile Object ID
@@ -137,6 +191,7 @@ namespace olc
 			float fRotationDeg = 0.0f;				// Object Rotation in Degrees
 			float fRotationRad = 0.0f;				// Object Rotation in Radians
 			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
+			
 		};
 
 		struct Tile
@@ -146,6 +201,7 @@ namespace olc
 			std::string strDrawOrder = "NOT_SET";	// Draw Order if passed, default: "NOT_SET"
 			int32_t nObjectGroupID = 0;				// Object Group ID
 			std::vector<TileObject> vecTileObjects;	// Vector of TileObject
+			TileProperites Properites;				// Stores vectors of custom properties
 			
 
 		};
@@ -388,6 +444,86 @@ namespace olc
 				if (objectGroupData.first == "draworder") sTile.strDrawOrder = objectGroupData.second;
 			}
 
+			/*
+			* <properties>
+			*	<property name="IsLadder" type="bool" value="true"/>
+			* </properties>
+			*/
+			for (auto& property : tileInfo.vecProperties)
+			{
+				std::string sName = "";
+				std::string sType = "";
+				std::string sValue = "";
+				for (auto& data : property.data)
+				{
+					if (data.first == "name") sName = data.second;
+					if (data.first == "type") sType = data.second;
+					if (data.first == "value") sValue = data.second;
+				}
+
+				// Ok Create the Property
+				if (sType == "bool")
+				{
+					TypeBool sTypeBool;
+					sTypeBool.name = sName;
+					sTypeBool.value = (sValue == "true") ? true : false;
+					sTile.Properites.vecBools.push_back(sTypeBool);
+					continue;
+				}
+
+				if (sType == "color")
+				{
+					TypeColor sTypeColor;
+					sTypeColor.name = sName;
+					//sColourType.value = (olc::Pixel)sValue;
+					sTile.Properites.vecColors.push_back(sTypeColor);
+					continue;
+				}
+
+				if (sType == "file")
+				{
+					TypeFile sTypeFile;
+					sTypeFile.name = sName;
+					sTypeFile.value = sValue;
+					sTile.Properites.vecFiles.push_back(sTypeFile);
+					continue;
+				}
+
+				if (sType == "float")
+				{
+					TypeFloat sTypeFloat;
+					sTypeFloat.name = sName;
+					sTypeFloat.value = std::stof(sValue);
+					sTile.Properites.vecFloats.push_back(sTypeFloat);
+					continue;
+				}
+
+				if (sType == "int")
+				{
+					TypeInt sTypeInt;
+					sTypeInt.name = sName;
+					sTypeInt.value = std::stoi(sValue);
+					sTile.Properites.vecInts.push_back(sTypeInt);
+					continue;
+				}
+
+				if (sType == "object")
+				{
+					TypeObject sTypeObject;
+					sTypeObject.name = sName;
+					sTypeObject.value = sValue;
+					sTile.Properites.vecObjects.push_back(sTypeObject);
+					continue;
+				}
+
+				// If it is not any of the above it is a string or unknown type we just record it as a string
+				// and let the developer decide what to do with it
+				TypeString sTypeString;
+				sTypeString.name = sName;
+				sTypeString.value = sValue;
+				sTile.Properites.vecStrings.push_back(sTypeString);
+
+			}
 			
 
 			// Get the Object data:

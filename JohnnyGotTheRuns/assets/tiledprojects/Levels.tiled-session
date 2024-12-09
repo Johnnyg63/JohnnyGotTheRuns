@@ -11,11 +11,11 @@
             "scaleInEditor": 1
         },
         "Level1Output.tmx": {
-            "scale": 1.9561,
-            "selectedLayer": 0,
+            "scale": 0.6123,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 2450.028117171924,
-                "y": 420.2239149327744
+                "x": 526.7025967662911,
+                "y": 143.72039849746852
             }
         }
     },
@@ -24,7 +24,7 @@
         "Industrial35x35.tsx"
     ],
     "project": "Levels.tiled-project",
-    "property.type": "color",
+    "property.type": "file",
     "recentFiles": [
         "Level1Output.tmx",
         "Industrial35x35.tsx"
