@@ -287,6 +287,7 @@ private:
 		}
 
 		sTile.vecObjectDataInfo.clear();
+		sTile.vecProperties.clear();
 	}
 
 	

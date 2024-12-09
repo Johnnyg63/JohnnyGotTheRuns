@@ -854,21 +854,33 @@
   </objectgroup>
  </tile>
  <tile id="176">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="177">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="35" height="35"/>
   </objectgroup>
  </tile>
  <tile id="178">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="10" y="0" width="25" height="35"/>
   </objectgroup>
  </tile>
  <tile id="179">
+  <properties>
+   <property name="IsLadder" type="bool" value="true"/>
+  </properties>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="25" height="35"/>
   </objectgroup>

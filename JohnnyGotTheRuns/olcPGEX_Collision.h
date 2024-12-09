@@ -113,7 +113,7 @@ namespace olc
 		if (Properties.bIsEnabled)
 		{
 			// We manage collisions before we draw
-
+			// TODO: Add threading
 			for (auto& playerObject : *Properties.vecPlayerObjects)
 			{
 				switch (playerObject->Properties.eObjectType)
@@ -220,10 +220,15 @@ namespace olc
 					bIsFirstClosest = true;
 					decalInfo = layer.second[idx];	// We only care about the data (layer.data)
 
-					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
+					if (decalInfo.nTiledID == 0) continue;					  // If the tile does nothing just move on
+					if (decalInfo.sCollisionTile.bIsLadder == true)
+					{
+						continue; // If it is a ladder move on, we work with IsLadders later
+					}
 
 					if (decalInfo.bHasCollision)
 					{
+						
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
 
@@ -295,8 +300,6 @@ namespace olc
 								break;
 							}
 						}
-
-
 
 						// Lets update our position if we are over lapping
 						if (bOverLaps)

@@ -191,7 +191,7 @@ namespace olc
 			float fRotationDeg = 0.0f;				// Object Rotation in Degrees
 			float fRotationRad = 0.0f;				// Object Rotation in Radians
 			CollisionType sCollisionType;			// Stores tthe Collision Type data, RECT, POINT, ELLIPSE, POLYGON
-			
+
 		};
 
 		struct Tile
@@ -202,7 +202,8 @@ namespace olc
 			int32_t nObjectGroupID = 0;				// Object Group ID
 			std::vector<TileObject> vecTileObjects;	// Vector of TileObject
 			TileProperites Properites;				// Stores vectors of custom properties
-			
+			bool bIsLadder = false;					// Set if ladder decal
+
 
 		};
 
@@ -408,8 +409,6 @@ namespace olc
 
 		}
 
-
-
 		// Get the Sprite image used for the tile set
 		for (auto& imageInfo : map_TSX.ImageData.data)
 		{
@@ -419,7 +418,7 @@ namespace olc
 
 		}
 
-
+		// TODO: Add threading
 		for (auto& tileInfo : map_TSX.vecTiles)
 		{
 			// 1: Create a new struct
@@ -461,6 +460,14 @@ namespace olc
 					if (data.first == "value") sValue = data.second;
 				}
 
+				// For my game I want to know if the tile is a ladder or not
+				// Therefore I just set a bool in the Tile Struct to manage it
+				// You do not have to do the same, I just needed access to IsLadder
+				if ((sType == "bool") && (sName == "IsLadder"))
+				{
+					sTile.bIsLadder = (sValue == "true") ? true : false;
+				}
+
 				// Ok Create the Property
 				if (sType == "bool")
 				{
@@ -475,6 +482,7 @@ namespace olc
 				{
 					TypeColor sTypeColor;
 					sTypeColor.name = sName;
+					// sTypeColor.value = olc::Pixel(std::stoi(sValue));
 					//sColourType.value = (olc::Pixel)sValue;
 					sTile.Properites.vecColors.push_back(sTypeColor);
 					continue;
@@ -524,7 +532,7 @@ namespace olc
 				sTile.Properites.vecStrings.push_back(sTypeString);
 
 			}
-			
+
 
 			// Get the Object data:
 			/*
@@ -563,14 +571,14 @@ namespace olc
 
 				}
 
-				
-				if (sObjectDataInfo.sTypeData.tag == "rect") 
-				{ 
+
+				if (sObjectDataInfo.sTypeData.tag == "rect")
+				{
 					sTileObject.sCollisionType.eCollision = Collision::RECT;
 				}
 				if (sObjectDataInfo.sTypeData.tag == "point") sTileObject.sCollisionType.eCollision = Collision::POINT;
 				if (sObjectDataInfo.sTypeData.tag == "polygon")
-				{ 
+				{
 					sTileObject.sCollisionType.eCollision = Collision::POLYGON;
 				}
 				if (sObjectDataInfo.sTypeData.tag == "ellipse") sTileObject.sCollisionType.eCollision = Collision::ELLIPSE;
@@ -591,8 +599,6 @@ namespace olc
 					sTileObject.sCollisionType.vecPoints.push_back(vfPoint);
 
 				}
-
-
 
 
 				// Ok we need to check if we have a Triangle or Ploygon
@@ -662,9 +668,9 @@ namespace olc
 
 
 				}
-				
+
 				sTile.vecTileObjects.push_back(sTileObject);
-				
+
 
 			} // END: for (auto& sObjectDataInfo : tileInfo.vecObjectDataInfo)
 
@@ -788,7 +794,7 @@ namespace olc
 		bisLevelLoaded = true;
 	}
 
-	olc::vf2d LevelManager::RotatePoint(olc::vf2d vfCenterPos, float fRadians, olc::vf2d vfPoint) 
+	olc::vf2d LevelManager::RotatePoint(olc::vf2d vfCenterPos, float fRadians, olc::vf2d vfPoint)
 	{
 		float tempX = vfPoint.x - vfCenterPos.x;
 		float tempY = vfPoint.y - vfCenterPos.y;
@@ -821,11 +827,11 @@ namespace olc
 		float fDistanceY = 0.0f;
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
-		
+
 		// Collision resizing
 		olc::vf2d vfCollsionSize = { 0.0f, 0.0f };
 		olc::vf2d vfOffSet = { 0.0f, 0.0f };
-		
+
 		std::vector <olc::vf2d> vfPolyPoints;
 		std::vector <olc::vf2d> vfEmptyPoints;
 
@@ -844,77 +850,80 @@ namespace olc
 
 				for (auto& layer : Properties.mapLayerInfo)
 				{
-					decalInfo = layer.second[idx];
 
-					if (idx > 1540)
-					{
-						int pause = 0;
-					}
+					decalInfo = layer.second[idx];
 
 					if (decalInfo.nTiledID == 0) continue; // If the tile does nothing just move on
 
 
 					if (decalInfo.bHasCollision)
 					{
-						// NOTE: We are in world space so we need to get realworld....
-						
-						//for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
-						//{
-						//	switch (tileObject.sCollisionType.eCollision)
-						//	{
+						if (decalInfo.strName == "L2")
+						{
+							int pause = 0;
 
-						//	case Collision::RECT:
-						//	{
-						//		vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
-						//		vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
-						//		Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
-						//		break;
-						//	}
-						//	case Collision::ELLIPSE:
-						//	{
-						//		break;
-						//	}
-						//	case Collision::POLYGON:
-						//	{
-						//	
-						//		for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
-						//		{
-						//			olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
-						//			vfPolyPoints.push_back(vfPointnew);
-						//			olc::vf2d vfColour = { 0.0f, 0.0f };
-						//			vfEmptyPoints.push_back(vfColour);
 
-						//		}
+							// NOTE: We are in world space so we need to get realworld....
 
-						//		for (int i = 0; i < vfPolyPoints.size(); i++)
-						//		{
-						//			if (i == vfPolyPoints.size() - 1)
-						//			{
-						//				Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
-						//			}
-						//			else
-						//			{
-						//				Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
-						//			}
-						//			
-						//		}
+							for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
+							{
+								switch (tileObject.sCollisionType.eCollision)
+								{
 
-						//		//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
+								case Collision::RECT:
+								{
+									vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
+									vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
+									Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
+									break;
+								}
+								case Collision::ELLIPSE:
+								{
+									break;
+								}
+								case Collision::POLYGON:
+								{
 
-						//		vfPolyPoints.clear();
-						//		vfEmptyPoints.clear();
+									for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
+									{
+										olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
+										vfPolyPoints.push_back(vfPointnew);
+										olc::vf2d vfColour = { 0.0f, 0.0f };
+										vfEmptyPoints.push_back(vfColour);
 
-						//		break;
-						//	}
-						//	case Collision::POINT:
-						//	{
-						//		break;
-						//	}
+									}
 
-						//	default:
-						//		break;
-						//	}
-						//}
+									for (int i = 0; i < vfPolyPoints.size(); i++)
+									{
+										if (i == vfPolyPoints.size() - 1)
+										{
+											Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
+										}
+										else
+										{
+											Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
+										}
+
+									}
+
+									//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
+
+									vfPolyPoints.clear();
+									vfEmptyPoints.clear();
+
+									break;
+								}
+								case Collision::POINT:
+								{
+									break;
+								}
+
+								default:
+									break;
+								}
+							}
+
+						}
 
 					}
 
