@@ -482,8 +482,15 @@ namespace olc
 				{
 					TypeColor sTypeColor;
 					sTypeColor.name = sName;
-					// sTypeColor.value = olc::Pixel(std::stoi(sValue));
-					//sColourType.value = (olc::Pixel)sValue;
+
+					char firstChar = sValue.at(0);
+					if (firstChar == '#')
+					{
+						// remove the leading # if it exist
+						sValue.erase(0, 1);
+					}
+
+					sTypeColor.value = olc::Pixel(std::stoul(sValue, nullptr, 16));
 					sTile.Properites.vecColors.push_back(sTypeColor);
 					continue;
 				}
