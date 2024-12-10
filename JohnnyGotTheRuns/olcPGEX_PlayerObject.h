@@ -136,7 +136,7 @@ namespace olc
 
 			olc::vf2d vfVelocity = { 0.0f, 0.0f };  // Velocity, vfsd {x, y}, Default: {0.0f, 0.0f}
 
-			olc::vi2d vfStartPosition = { 0,0 };	// Start Position {x,y} (Int32_t), Default {0,0}
+			olc::vf2d vfStartPosition = { 0,0 };	// Start Position {x,y} (Int32_t), Default {0,0}
 
 			olc::vf2d vfPosition = { 0.0f,0.0f };	// Player current POS {x,y} (float), Default {0.0f,0.0f}, recommended for decals
 

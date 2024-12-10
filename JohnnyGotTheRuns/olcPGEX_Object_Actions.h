@@ -259,8 +259,8 @@ namespace olc
 		}
 		if (Properties.ptrvTrackedPoint->x > Properties.viWorldSize.x)
 		{
-			Properties.ptrvTrackedPoint->x = Properties.viWorldSize.x;
-			pPlayerObject->Properties.vfPosition.x = Properties.viWorldSize.x;
+			Properties.ptrvTrackedPoint->x = float(Properties.viWorldSize.x);
+			pPlayerObject->Properties.vfPosition.x = float(Properties.viWorldSize.x);
 		}
 
 		if (Properties.ptrvTrackedPoint->y < 0.01f)
@@ -271,8 +271,8 @@ namespace olc
 
 		if (Properties.ptrvTrackedPoint->y > Properties.viWorldSize.y)
 		{
-			Properties.ptrvTrackedPoint->y = Properties.viWorldSize.y;
-			pPlayerObject->Properties.vfPosition.y = Properties.viWorldSize.y;
+			Properties.ptrvTrackedPoint->y = float(Properties.viWorldSize.y);
+			pPlayerObject->Properties.vfPosition.y = float(Properties.viWorldSize.y);
 		}
 
 		olc::vf2d newPos = *Properties.ptrvTrackedPoint - olc::vf2d(1.5f, 1.5f);

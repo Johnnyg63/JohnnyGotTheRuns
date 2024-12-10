@@ -212,8 +212,8 @@ namespace olc
 
 		// Gets load our renender
 		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
-		Properties.sprImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
-		Properties.sprImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
+		Properties.sprImageInfo.vSize.x = float(Properties.renSpriteSheet.Sprite()->width);
+		Properties.sprImageInfo.vSize.y = float(Properties.renSpriteSheet.Sprite()->height);
 
 		renToilet.Load(strToiletPath);
 
@@ -313,9 +313,9 @@ namespace olc
 
 		// We need to work out how much we want to scale in the x so the banner fills 80% of the screen
 		// We know the width of the image therefore
-		float newWidth = (pge->GetScreenSize().x / 100) * 80;	// New Width Size
-		float percentDiff = (264.0f / newWidth) * 100;			// Gives us the %differance between the widths	
-		float newScaleX = (100 / percentDiff);						// Tells us by what amount to scale x
+		float newWidth = (pge->GetScreenSize().x / 100.0f) * 80.0f;	// New Width Size
+		float percentDiff = (264.0f / newWidth) * 100.0f;			// Gives us the %differance between the widths	
+		float newScaleX = (100.0f / percentDiff);						// Tells us by what amount to scale x
 
 
 		pge->DrawPartialDecal(
@@ -362,12 +362,12 @@ namespace olc
 
 		//4: Ok now we need our start pos for our banner
 		olc::vf2d vfStartPos;
-		vfStartPos.x = vfCenTopRight.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		vfStartPos.x = vfCenTopRight.x - ((264.0f * vfScaler.x) / 2.0f);  // we know our base height is width="264" from the xml
 		vfStartPos.y = vfCenTopRight.y;
 
-		float newHeight = (pge->GetScreenSize().y / 100) * 33;	// New Height Size
-		float percentDiff = (59.0f / newHeight) * 100;			// Gives us the %differance between the widths	
-		float newScaleY = (100 / percentDiff);					// Tells us by what amount to scale x
+		float newHeight = float((pge->GetScreenSize().y / 100.0f) * 33.0f);	// New Height Size
+		float percentDiff = float((59.0f / newHeight) * 100.0f);			// Gives us the %differance between the widths	
+		float newScaleY = (100.0f / percentDiff);					// Tells us by what amount to scale x
 
 		//5: done
 		pge->DrawPartialDecal(
@@ -382,20 +382,20 @@ namespace olc
 			decSettingMessage = font.RenderStringToDecal(U" Settings ", olc::BLACK);
 		}
 
-		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decSettingMessage, vfScaler);
+		pge->DrawDecal({ vfStartPos.x + 10.0f, vfStartPos.y + 40.0f }, decSettingMessage, vfScaler);
 		
 		// Set our Top Right position for QuickGUI
-		Properties.vfSettingRect = { vfStartPos.x + 10, vfStartPos.y + 60 };
+		Properties.vfSettingRect = { vfStartPos.x + 10.0f, vfStartPos.y + 60.0f };
 
 		vfCenTopRight.x = (vfScreenSize.x / 100.0f) * 20.0f;
 		vfCenTopRight.y = (vfScreenSize.y / 100.0f) * 15.0f;
 
-		vfStartPos.x = vfCenTopRight.x - ((264 * vfScaler.x) / 2);  // we know our base height is width="264" from the xml
+		vfStartPos.x = vfCenTopRight.x - ((264.0f * vfScaler.x) / 2.0f);  // we know our base height is width="264" from the xml
 		vfStartPos.y = vfCenTopRight.y;
 
-		newHeight = (pge->GetScreenSize().y / 100) * 33;	// New Height Size
-		percentDiff = (59.0f / newHeight) * 100;			// Gives us the %differance between the widths	
-		newScaleY = (100 / percentDiff);						// Tells us by what amount to scale x
+		newHeight = float((pge->GetScreenSize().y / 100.0f) * 33.0f);	// New Height Size
+		percentDiff = (59.0f / newHeight) * 100.0f;			// Gives us the %differance between the widths	
+		newScaleY = (100.0f / percentDiff);						// Tells us by what amount to scale x
 
 		//5: done
 		pge->DrawPartialDecal(
@@ -410,24 +410,24 @@ namespace olc
 			decButtonsMessage = font.RenderStringToDecal(U" Lets Go! ", olc::BLACK);
 		}
 
-		pge->DrawDecal({ vfStartPos.x + 10, vfStartPos.y + 40 }, decButtonsMessage, vfScaler);
+		pge->DrawDecal({ vfStartPos.x + 10.0f, vfStartPos.y + 40.0f }, decButtonsMessage, vfScaler);
 
-		Properties.vfButtonRect = { vfStartPos.x + 10, vfStartPos.y + 60 };
+		Properties.vfButtonRect = { vfStartPos.x + 10.0f, vfStartPos.y + 60.0f };
 	}
 
 	void MainMenu::DrawToilet()
 	{
 		// Get the current vScale of our screen
-		olc::vf2d vfBaseScale = { 1280, 720 };
+		olc::vf2d vfBaseScale = { 1280.0f, 720.0f };
 		olc::vf2d vfScaler = { 1.0f, 1.0f };
-		olc::vf2d vfScreenSize = pge->GetScreenSize();
+		olc::vf2d vfScreenSize = olc::vf2d(pge->GetScreenSize());
 		vfScaler.x = vfScreenSize.x / vfBaseScale.x;
 		vfScaler.y = vfScreenSize.y / vfBaseScale.y;
 
 		//3: Get the current center pos and 20% from top
 		olc::vf2d vfCenTopPos;
-		vfCenTopPos.x = (vfScreenSize.x / 100) * 80;
-		vfCenTopPos.y = (vfScreenSize.y / 100) * 80;
+		vfCenTopPos.x = (vfScreenSize.x / 100.0f) * 80.0f;
+		vfCenTopPos.y = (vfScreenSize.y / 100.0f) * 80.0f;
 
 		//4: Ok now we need our start pos for our banner
 		olc::vf2d vfStartPos;

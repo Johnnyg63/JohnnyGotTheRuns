@@ -555,7 +555,7 @@ namespace olc
 			{
 				// Defaults
 				TileObject sTileObject;
-				sTileObject.sCollisionType.eCollision == Collision::RECT;
+				sTileObject.sCollisionType.eCollision = Collision::RECT;
 
 				// <object id="1" name="Left_Triangle" type="clsLeftTriangle" x="0.176258" y="9.51793">
 				for (auto& objectData : sObjectDataInfo.sObjectData.data)
@@ -749,8 +749,8 @@ namespace olc
 
 					int tileId = tile;
 
-					float spriteX = x * sMapInfo.nTileWidth;
-					float spriteY = y * sMapInfo.nTileHeight;
+					float spriteX = float(x * sMapInfo.nTileWidth);
+					float spriteY = float(y * sMapInfo.nTileHeight);
 
 					sDecalInfo.nTiledID = tileId;
 					sDecalInfo.vfDrawLocation = { spriteX , spriteY };

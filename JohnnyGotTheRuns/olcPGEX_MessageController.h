@@ -142,8 +142,8 @@ namespace olc
 
 		// Load up our image
 		Properties.renSpriteSheet.Load(Properties.strSpriteSheetPath);
-		Properties.sImageInfo.vSize.x = Properties.renSpriteSheet.Sprite()->width;
-		Properties.sImageInfo.vSize.y = Properties.renSpriteSheet.Sprite()->height;
+		Properties.sImageInfo.vSize.x = float(Properties.renSpriteSheet.Sprite()->width);
+		Properties.sImageInfo.vSize.y = float(Properties.renSpriteSheet.Sprite()->height);
 
 		LoadFonts();
 

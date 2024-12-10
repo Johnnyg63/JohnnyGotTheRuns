@@ -376,8 +376,8 @@ namespace olc {
         void DrawBitmap(int x, int y, FT_Bitmap bmp, olc::Pixel color) {
             switch (bmp.pixel_mode) {
             case FT_PIXEL_MODE_MONO:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         int byteOffset = bx / 8;
                         char byte = bmp.buffer[by * bmp.pitch + byteOffset];
                         bool val = (byte >> (7 - bx % 8)) & 1;
@@ -388,8 +388,8 @@ namespace olc {
                 }
                 break;
             case FT_PIXEL_MODE_GRAY:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         uint8_t byte = bmp.buffer[by * bmp.pitch + bx];
                         if (byte == 0) {
                             continue;
@@ -404,8 +404,8 @@ namespace olc {
             case FT_PIXEL_MODE_LCD: break;
             case FT_PIXEL_MODE_LCD_V: break;
             case FT_PIXEL_MODE_BGRA:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         olc::Pixel pixel{
                                 bmp.buffer[by * bmp.pitch + bx * 4 + 2],
                                 bmp.buffer[by * bmp.pitch + bx * 4 + 1],
@@ -422,8 +422,8 @@ namespace olc {
                           olc::Sprite *sprite) {
             switch (bmp.pixel_mode) {
             case FT_PIXEL_MODE_MONO:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         int byteOffset = bx / 8;
                         char byte = bmp.buffer[by * bmp.pitch + byteOffset];
                         bool val = (byte >> (7 - bx % 8)) & 1;
@@ -434,8 +434,8 @@ namespace olc {
                 }
                 break;
             case FT_PIXEL_MODE_GRAY:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         uint8_t byte = bmp.buffer[by * bmp.pitch + bx];
                         if (byte == 0) {
                             continue;
@@ -450,8 +450,8 @@ namespace olc {
             case FT_PIXEL_MODE_LCD: break;
             case FT_PIXEL_MODE_LCD_V: break;
             case FT_PIXEL_MODE_BGRA:
-                for (size_t bx = 0; bx < bmp.width; bx++) {
-                    for (size_t by = 0; by < bmp.rows; by++) {
+                for (uint32_t bx = 0; bx < bmp.width; bx++) {
+                    for (uint32_t by = 0; by < bmp.rows; by++) {
                         olc::Pixel pixel{
                                 bmp.buffer[by * bmp.pitch + bx * 4 + 2],
                                 bmp.buffer[by * bmp.pitch + bx * 4 + 1],

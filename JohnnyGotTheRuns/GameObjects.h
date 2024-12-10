@@ -304,10 +304,9 @@ namespace olc
 			PlayerObject::OBJECT_TYPE::PLAYER,
 			"Johnny", 0, 3, { 100.0f, 100.0f });
 
-		pPlayer->Properties.vfStartPosition.x = 10.0f; //(GetScreenSize().x / 100.0f) * 74.0f;
-		pPlayer->Properties.vfStartPosition.y = 10.0f;//(GetScreenSize().y / 100.0f) * 75.0f;
+		pPlayer->Properties.vfStartPosition = olc::vf2d{ 10.0f, 10.0f }; //(GetScreenSize().x / 100.0f) * 74.0f;
 		pPlayer->Properties.vfPosition = pPlayer->Properties.vfStartPosition;
-		pPlayer->Properties.vfMasterScaler = { 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
+		pPlayer->Properties.vfMasterScaler = olc::vf2d{ 0.50f, 0.50f }; // Our player is HD and Big, bring him down a little
 
 		// Create Chars
 

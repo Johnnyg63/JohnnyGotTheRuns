@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include <omp.h>
 
 
 
@@ -205,7 +206,7 @@ namespace olc
 		bool bIsFirstClosest = true;
 
 		bool bOverLaps = false; // Is set when a circle overlaps a Rect/Triangle
-
+//#pragma omp parallel for
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{

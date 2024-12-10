@@ -144,8 +144,8 @@ namespace olc
 		
 		// Load up our image
 		Properties.renImage.Load(Properties.strImagePath);
-		Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
-		Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+		Properties.sImageInfo.vSize.x = float(Properties.renImage.Sprite()->width);
+		Properties.sImageInfo.vSize.y = float(Properties.renImage.Sprite()->height);
 
 	}
 
@@ -161,8 +161,8 @@ namespace olc
 		if (bChangeGround)
 		{
 			Properties.renImage.Load(Properties.strImagePath);
-			Properties.sImageInfo.vSize.x = Properties.renImage.Sprite()->width;
-			Properties.sImageInfo.vSize.y = Properties.renImage.Sprite()->height;
+			Properties.sImageInfo.vSize.x = float(Properties.renImage.Sprite()->width);
+			Properties.sImageInfo.vSize.y = float(Properties.renImage.Sprite()->height);
 			bChangeGround = false; 
 		};
 		
