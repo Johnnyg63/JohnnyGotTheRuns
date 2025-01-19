@@ -1,6 +1,7 @@
 
 #include "pch.h"
 #include <strstream>
+#include <execution>
 
 using namespace olc;
 
@@ -250,10 +251,28 @@ private:
 	*/
 	void UpdateVectorIfRequired()
 	{
-		bool bFound = false;
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\TSXParser.h(257) : info C5012: loop not parallelized due to reason '500'
+		*/
+
+		Tile newTile = { sTile }; // Copy off our tile
+
+		auto it = std::find_if(
+			std::execution::par,
+			parsedMapInfo.vecTiles.begin(),
+			parsedMapInfo.vecTiles.end(),
+			[newTile](Tile tile) {return tile.sTileData.data == newTile.sTileData.data;});
+
+		if (it == parsedMapInfo.vecTiles.end())
+		{
+			parsedMapInfo.vecTiles.push_back(newTile);
+		}
+
+		/*bool bFound = false;
 
 		Tile tile = { sTile }; // Copy off our tile
-
 		for (auto& tile : parsedMapInfo.vecTiles)
 		{
 			if (tile.sTileData.data == sTile.sTileData.data)
@@ -262,7 +281,7 @@ private:
 				break;
 			}
 		}
-		if(!bFound)	parsedMapInfo.vecTiles.push_back(tile);
+		if(!bFound)	parsedMapInfo.vecTiles.push_back(tile);*/
 
 		// Must reset the sTile to ensure we always have fresh data
 		// Remove the below line to see the madness without it ;)
