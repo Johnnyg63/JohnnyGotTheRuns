@@ -421,10 +421,17 @@ namespace olc::QuickGUI
 
 	Manager::~Manager()
 	{
-		if (m_bEraseControlsOnDestroy)
-			for (auto& p : m_vControls)
-				delete p;
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\olcPGEX_QuickGUI.h(425) : info C5012: loop not parallelized due to reason '1007'
+		*/
 
+		if (m_bEraseControlsOnDestroy)
+		{
+			std::for_each(m_vControls.begin(), m_vControls.end(),
+				[](olc::QuickGUI::BaseControl* bControl) { delete bControl; });
+		}
 		m_vControls.clear();
 	}
 
@@ -435,7 +442,16 @@ namespace olc::QuickGUI
 
 	void Manager::Update(olc::PixelGameEngine* pge)
 	{
-		for (auto& p : m_vControls) p->Update(pge);
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\olcPGEX_QuickGUI.h(438) : info C5012: loop not parallelized due to reason '1007'
+		*/
+
+		std::for_each(m_vControls.begin(), m_vControls.end(),
+			[pge](olc::QuickGUI::BaseControl* bControl) { bControl->Update(pge); });
+
+		//for (auto& p : m_vControls) p->Update(pge);
 	}
 
 	void Manager::Draw(olc::PixelGameEngine* pge)
@@ -445,7 +461,16 @@ namespace olc::QuickGUI
 
 	void Manager::DrawDecal(olc::PixelGameEngine* pge)
 	{
-		for (auto& p : m_vControls) p->DrawDecal(pge);
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\olcPGEX_QuickGUI.h(448) : info C5012: loop not parallelized due to reason '1007'
+		*/
+
+		std::for_each(m_vControls.begin(), m_vControls.end(), 
+			[pge](olc::QuickGUI::BaseControl* bControl) { bControl->DrawDecal(pge); });
+
+		//for (auto& p : m_vControls) p->DrawDecal(pge);
 	}
 
 	void Manager::CopyThemeFrom(const Manager& manager)
