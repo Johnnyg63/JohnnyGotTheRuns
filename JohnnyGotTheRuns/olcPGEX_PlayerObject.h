@@ -335,43 +335,64 @@ namespace olc
 
 	void PlayerObject::UpdateAction(ACTION action)
 	{
-		for (auto& actionFrame : vecActionFrames)
+
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\olcPGEX_PlayerObject.h(339) : info C5002: loop not vectorized due to reason '1301'
+		*/
+
+		std::for_each(vecActionFrames.begin(), vecActionFrames.end(), [](ActionFrame& frame) { frame.bActive = false; });
+
+		auto item = action;
+		auto it = std::find_if(vecActionFrames.begin(), vecActionFrames.end(), [item](ActionFrame frame) 
+								{ return frame.nActionID == item; });
+		if (it != vecActionFrames.end()) { it->bActive = true; }
+
+		
+		/*for (auto& actionFrame : vecActionFrames)
 		{
 			actionFrame.bActive = false;
 			if (actionFrame.nActionID == action)
 			{
 				actionFrame.bActive = true;
 			}
-		}
+		}*/
 	}
 
 	void PlayerObject::Update(float fElapsedTime)
 	{
-		for (auto& actionFrame : vecActionFrames)
+		/*
+		* John Galvin: Optimizaton:
+		* Report:JohnnyGotTheRuns_optimisation_parallel
+		* C:\Users\jgalv\source\repos\JohnnyGotTheRuns\JohnnyGotTheRuns\olcPGEX_PlayerObject.h(371) : info C5012: loop not parallelized due to reason '500'
+		*/
+		auto actionFrame = std::find_if(vecActionFrames.begin(), vecActionFrames.end(), [](const ActionFrame& frame) 
+			{return frame.bActive == true; });
+
+		if (actionFrame != vecActionFrames.end())
 		{
-			if (actionFrame.bActive)
+			// 1: Is the vector empty
+			if (!actionFrame->vecPartialImages.empty())
 			{
-				// 1: Is the vector empty
-				if (actionFrame.vecPartialImages.empty()) { break; }
-
 				// 2:
-				actionFrame.fFrameChangeRate = 1.0f / actionFrame.fFramesPerSecound;
-				actionFrame.fFrameElapsedTime += fElapsedTime;
+				actionFrame->fFrameChangeRate = 1.0f / actionFrame->fFramesPerSecound;
+				actionFrame->fFrameElapsedTime += fElapsedTime;
 
-				if (actionFrame.fFrameElapsedTime > actionFrame.fFrameChangeRate)
+				if (actionFrame->fFrameElapsedTime > actionFrame->fFrameChangeRate)
 				{
-					actionFrame.fFrameElapsedTime = 0.0f;
-					actionFrame.nCurrentFrame++;
+					actionFrame->fFrameElapsedTime = 0.0f;
+					actionFrame->nCurrentFrame++;
 
 				}
-				if (actionFrame.nCurrentFrame >= actionFrame.vecPartialImages.size())
+				if (actionFrame->nCurrentFrame >= actionFrame->vecPartialImages.size())
 				{
-					actionFrame.nCurrentFrame = 0;
+					actionFrame->nCurrentFrame = 0;
 				}
 
-				Properties.sprImageInfo.vSource = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSource;
-				Properties.sprImageInfo.vSize = actionFrame.vecPartialImages[actionFrame.nCurrentFrame].vSize;
-				Properties.sprImageInfo.vScale = WarpFrame(actionFrame.nActionID);
+				Properties.sprImageInfo.vSource = actionFrame->vecPartialImages[actionFrame->nCurrentFrame].vSource;
+				Properties.sprImageInfo.vSize = actionFrame->vecPartialImages[actionFrame->nCurrentFrame].vSize;
+				Properties.sprImageInfo.vScale = WarpFrame(actionFrame->nActionID);
 				Properties.sprImageInfo.vScaleSize = Properties.sprImageInfo.vSize * Properties.sprImageInfo.vScale;
 				Properties.sprImageInfo.vScale *= vfDirection;
 
@@ -383,50 +404,50 @@ namespace olc
 
 				switch (Properties.eObjectType)
 				{
-					case PlayerObject::OBJECT_TYPE::ENEMY:
+				case PlayerObject::OBJECT_TYPE::ENEMY:
+				{
+					// TODO: 
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::GAME_CHAR:
+				{
+					// TODO:
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::NONE:
+				{
+					// TODO:
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::OTHER_PLAYER:
+				{
+					// For the player we update the vTrackpoint as this controlls the player position
+					// TODO
+					break;
+				}
+				case PlayerObject::OBJECT_TYPE::PLAYER:
+				{
+					if (pge->GetKey(olc::Key::RIGHT).bPressed)
 					{
-						// TODO: 
-						break;
+
+						bisFlipped = false;
+						vfDirection = vfRight;
 					}
-					case PlayerObject::OBJECT_TYPE::GAME_CHAR:
+
+					if (pge->GetKey(olc::Key::LEFT).bPressed)
 					{
-						// TODO:
-						break;
+						bisFlipped = true;
+
+						vfDirection = vfLeft;
 					}
-					case PlayerObject::OBJECT_TYPE::NONE:
+
+					if (bisFlipped)
 					{
-						// TODO:
-						break;
+						vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
 					}
-					case PlayerObject::OBJECT_TYPE::OTHER_PLAYER:
-					{
-						// For the player we update the vTrackpoint as this controlls the player position
-						// TODO
-						break;
-					}
-					case PlayerObject::OBJECT_TYPE::PLAYER:
-					{
-						if (pge->GetKey(olc::Key::RIGHT).bPressed)
-						{
 
-							bisFlipped = false;
-							vfDirection = vfRight;
-						}
-
-						if (pge->GetKey(olc::Key::LEFT).bPressed)
-						{
-							bisFlipped = true;
-
-							vfDirection = vfLeft;
-						}
-
-						if (bisFlipped)
-						{
-							vfDecolPos.x += Properties.sprImageInfo.vScaleSize.x;
-						}
-
-						break;
-					}
+					break;
+				}
 
 				default:
 					break;
@@ -458,6 +479,7 @@ namespace olc
 
 			}
 		}
+
 
 		// Now that we have our Player position we need to setup our collision circle
 		// NOTE: The Decal World and Sprite World do not aline, you made need to play with the values to get it perfect
