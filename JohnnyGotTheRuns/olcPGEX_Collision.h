@@ -224,6 +224,8 @@ namespace olc
 					if (decalInfo.nTiledID == 0) continue;					  // If the tile does nothing just move on
 					if (decalInfo.sCollisionTile.bIsLadder == true)
 					{
+						// we need to turn off gravity
+
 						continue; // If it is a ladder move on, we work with IsLadders later
 					}
 

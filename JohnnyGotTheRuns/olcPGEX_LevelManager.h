@@ -861,7 +861,7 @@ namespace olc
 		worldTile.pos.y = 0.0f;
 		worldTile.size = { 35.0f, 35.0f };
 
-		int test = 0; // TODO: Remove
+		int32_t nLayerCount = 0; 
 
 		// Then looping through them and drawing them
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
@@ -869,6 +869,7 @@ namespace olc
 			{
 				idx = vTile.y * Properties.viWorldSize.x + vTile.x;
 
+				nLayerCount = 0;
 				for (auto& layer : Properties.mapLayerInfo)
 				{
 
@@ -879,95 +880,82 @@ namespace olc
 
 					if (decalInfo.bHasCollision)
 					{
-						if (decalInfo.strName == "L2")
+						// NOTE: We are in world space so we need to get realworld....
+						for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
 						{
-							int pause = 0;
-
-
-							// NOTE: We are in world space so we need to get realworld....
-
-							for (auto& tileObject : decalInfo.sCollisionTile.vecTileObjects)
+							switch (tileObject.sCollisionType.eCollision)
 							{
-								switch (tileObject.sCollisionType.eCollision)
-								{
 
-								case Collision::RECT:
-								{
-									vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
-									vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
-									Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
-									break;
-								}
-								case Collision::ELLIPSE:
-								{
-									break;
-								}
-								case Collision::POLYGON:
-								{
+							case Collision::RECT:
+							{
+								vfOffSet = Properties.tv->ScaleToWorld(tileObject.vfPosition);
+								vfCollsionSize = Properties.tv->ScaleToWorld(tileObject.vfSize);
+								Properties.tv->DrawRectDecal({ float(vTile.x + vfOffSet.x) , float(vTile.y + vfOffSet.y) }, vfCollsionSize, olc::RED);
+								break;
+							}
+							case Collision::ELLIPSE:
+							{
+								break;
+							}
+							case Collision::POLYGON:
+							{
 
-									for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
+								for (auto& vfPoint : tileObject.sCollisionType.vecPoints)
+								{
+									olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
+									vfPolyPoints.push_back(vfPointnew);
+									olc::vf2d vfColour = { 0.0f, 0.0f };
+									vfEmptyPoints.push_back(vfColour);
+
+								}
+
+								for (int i = 0; i < vfPolyPoints.size(); i++)
+								{
+									if (i == vfPolyPoints.size() - 1)
 									{
-										olc::vf2d vfPointnew = vTile + Properties.tv->ScaleToWorld(vfPoint + tileObject.vfPosition);
-										vfPolyPoints.push_back(vfPointnew);
-										olc::vf2d vfColour = { 0.0f, 0.0f };
-										vfEmptyPoints.push_back(vfColour);
-
+										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
+									}
+									else
+									{
+										Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
 									}
 
-									for (int i = 0; i < vfPolyPoints.size(); i++)
-									{
-										if (i == vfPolyPoints.size() - 1)
-										{
-											Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[0], olc::RED);
-										}
-										else
-										{
-											Properties.tv->DrawLineDecal(vfPolyPoints[i], vfPolyPoints[i + 1], olc::RED);
-										}
-
-									}
-
-									//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
-
-									vfPolyPoints.clear();
-									vfEmptyPoints.clear();
-
-									break;
-								}
-								case Collision::POINT:
-								{
-									break;
 								}
 
-								default:
-									break;
-								}
+								//Properties.tv->DrawPolygonDecal(nullptr, vfPolyPoints, vfEmptyPoints, olc::BLUE);
+
+								vfPolyPoints.clear();
+								vfEmptyPoints.clear();
+
+								break;
+							}
+							case Collision::POINT:
+							{
+								break;
 							}
 
+							default:
+								break;
+							}
 						}
 
 					}
 
+					// The ladder is a speical case and we need to manage it differently
+					if (decalInfo.sCollisionTile.bIsLadder == true)
+					{
+						// if it is a ladder we need to set all preivous layer tiles to ladder too
+						for (size_t i = 0; i <= nLayerCount; i++)
+						{
+							auto& oldLayer = Properties.mapLayerInfo[i][idx];
+							oldLayer.sCollisionTile.bIsLadder = true;
+						}
+						
+					}
+
 					switch (decalInfo.nLayerID)
 					{
-					case 1:
-					{
-						// This is our collision Layer, nothing to do just move on
-						/*Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							Properties.renSpriteSheet.Decal(),
-							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);*/
-						break;
-					}
 					case 2:
-					{
-						// this is our Ladder layer
-						Properties.tv->DrawPartialDecal({ (float)vTile.x, (float)vTile.y },
-							Properties.renSpriteSheet.Decal(),
-							decalInfo.vfSourcePos,
-							decalInfo.vfSoureSizePos);
-						break;
-					}
 					case 3:
 					{
 						// this is our drawing layer
@@ -981,11 +969,15 @@ namespace olc
 						break;
 					}
 
+					nLayerCount++;
+
 				}
 
+				
 
 			} // End for Loop vtiles
 
+			
 	}
 
 
