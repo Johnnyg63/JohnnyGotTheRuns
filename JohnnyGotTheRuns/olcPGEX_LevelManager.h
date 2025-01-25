@@ -391,6 +391,20 @@ namespace olc
 			// Load the tsx file for collections etc
 			if (sTileSetLocation.strScource != "")
 			{
+				// We need to check if the file exist
+				std::filesystem::path filePath(sTileSetLocation.strScource);
+
+				if (!std::filesystem::exists(filePath)) {
+					std::filesystem::path fileName = filePath.filename();
+					std::filesystem::path TMXFilePath(Properties.strTiledMapTMXPath);
+					std::filesystem::path strvTMXFilePath = TMXFilePath.replace_filename(fileName);
+
+					if (std::filesystem::exists(strvTMXFilePath))
+						sTileSetLocation.strScource = strvTMXFilePath.string();
+
+				}
+				
+
 				TSXParser tsxParser = TSXParser(sTileSetLocation.strScource);
 				map_TSX = tsxParser.GetData();
 			}
