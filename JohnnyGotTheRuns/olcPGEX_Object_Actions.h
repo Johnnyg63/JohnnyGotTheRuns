@@ -179,11 +179,28 @@ namespace olc
 
 	void ObjectActions::ManageKeyInputs(std::shared_ptr<olc::PlayerObject> pPlayerObject, float fElapsedTime)
 	{
-		olc::vf2d vfDirection = { 0.0f, 0.5f };
+		olc::vf2d vfDirection = { 0.0f, 0.0f };
+		if (pPlayerObject->Properties.bIsGravityEnabled == true)
+		{
+			vfDirection = pPlayerObject->Properties.vfGravityDirection;
+		}
+		else
+		{
+			vfDirection = { 0.0f, 0.0f };
+		}
+		
 		pPlayerObject->Properties.vfVelocity = vfDirection;
-		pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+		if (pPlayerObject->Properties.bIsOnLadder == true)
+		{
+			pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::CLIMB_PAUSE);
+		}
+		else
+		{
+			pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::BEHIND_BACK);
+		}
+		
 
-		if (pge->GetKey(olc::Key::UP).bHeld)
+		if (pge->GetKey(olc::Key::UP).bHeld && pPlayerObject->Properties.bIsOnLadder == true)
 		{
 			pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
 			vfDirection = { 0, -1 }; //up
@@ -192,7 +209,16 @@ namespace olc
 
 		if (pge->GetKey(olc::Key::DOWN).bHeld)
 		{
-			pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::DUCK);
+
+			
+			if (pPlayerObject->Properties.bIsOnLadder == false)
+			{
+				pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::DUCK);
+			}
+			else
+			{
+				pPlayerObject->UpdateAction(olc::PlayerObject::ACTION::CLIMB);
+			}
 			vfDirection = { 0, +1. }; // down
 
 

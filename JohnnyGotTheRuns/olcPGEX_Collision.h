@@ -36,7 +36,8 @@ namespace olc
 		void DrawDecal();
 
 		// Add your own public methods here
-		void UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime);
+		void UpdateCollisions(olc::vf2d* pvfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime, 
+								bool* pbEnableGravity, bool* pbOnLadder);
 
 
 	public:
@@ -126,7 +127,9 @@ namespace olc
 				}
 				case PlayerObject::OBJECT_TYPE::GAME_CHAR:
 				{
-					UpdateCollisions(&playerObject->Properties.vfPosition, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
+					UpdateCollisions(&playerObject->Properties.vfPosition, 
+						playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, 
+							fElapsedTime, &playerObject->Properties.bIsGravityEnabled, &playerObject->Properties.bIsOnLadder);
 
 					break;
 				}
@@ -142,7 +145,9 @@ namespace olc
 				case PlayerObject::OBJECT_TYPE::PLAYER:
 				{
 					// For the player we update the vTrackpoint as this controlls the player position
-					UpdateCollisions(Properties.ptrvTrackedPoint, playerObject->collCircle.vfCenterPos, playerObject->collCircle.fRadius, fElapsedTime);
+					UpdateCollisions(Properties.ptrvTrackedPoint, playerObject->collCircle.vfCenterPos, 
+										playerObject->collCircle.fRadius, fElapsedTime, 
+											&playerObject->Properties.bIsGravityEnabled, &playerObject->Properties.bIsOnLadder);
 
 					break;
 				}
@@ -173,7 +178,9 @@ namespace olc
 
 	}
 
-	void Collision::UpdateCollisions(olc::vf2d* vfPositionPos, olc::vf2d vfCenterPos, float fRadius, float fElapsedTime)
+	void Collision::UpdateCollisions(olc::vf2d* pvfPositionPos, olc::vf2d vfCenterPos, 
+										float fRadius, float fElapsedTime, 
+											bool* pbEnableGravity, bool* pbOnLadder)
 	{
 		// Restrict to only to the tiles on the screen
 		olc::vi2d vTileTL = Properties.ptrTileTransFormedView->GetTopLeftTile().max({ 0,0 });
@@ -193,6 +200,18 @@ namespace olc
 		olc::vf2d vfDistance = { 0.0f, 0.0f };
 		float fDistance = 0.0f;
 		float fOverlap = 0.0f;
+
+		/*
+		* Note the pvfPositionPos and pbPlayerObjEnableGravity are passed by referance (&) 
+		* Therefore to update the object value itself we need to use *
+		* This can be confusing as you can playerObject->Properties.pbPlayerObjEnableGravity = true and it will work
+		* But here we are passing a referance directly to the pbPlayerObjEnableGravity object in memory and we must use * to update it
+		* I am trying to show you other ways of using pointers and the power they have
+		* In this method, it just updates collisions regardless of the object type as long as each object contains a 
+		* vfPositionPos, bEnableGravity, bOnLadder this method will work :)
+		*/
+		*pbEnableGravity = true;
+		*pbOnLadder = false;
 		
 		// Rect collision stuff
 		rect<float> worldTile;
@@ -206,7 +225,7 @@ namespace olc
 		bool bIsFirstClosest = true;
 
 		bool bOverLaps = false; // Is set when a circle overlaps a Rect/Triangle
-//#pragma omp parallel for
+
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{
@@ -222,16 +241,9 @@ namespace olc
 					decalInfo = layer.second[idx];	// We only care about the data (layer.data)
 
 					if (decalInfo.nTiledID == 0) continue;					  // If the tile does nothing just move on
-					if (decalInfo.sCollisionTile.bIsLadder == true)
-					{
-						// we need to turn off gravity
-
-						continue; // If it is a ladder move on, we work with IsLadders later
-					}
-
+					
 					if (decalInfo.bHasCollision)
 					{
-						
 						// Check for collision here
 						worldTile.pos = Properties.ptrTileTransFormedView->WorldToScreen(vTile);
 
@@ -307,6 +319,15 @@ namespace olc
 						// Lets update our position if we are over lapping
 						if (bOverLaps)
 						{
+							if (decalInfo.sCollisionTile.bIsLadder == true)
+							{
+								// we need to turn off gravity
+								*pbEnableGravity = false;
+								*pbOnLadder = true;
+								continue;
+
+							}
+
 							vfDistance = vfCenterPos - vfClosest;
 
 							fDistance = std::sqrt(vfDistance.x * vfDistance.x + vfDistance.y * vfDistance.y);
@@ -335,8 +356,9 @@ namespace olc
 							* Note we add *a to declare we want to update the value
 							* Javidx9 has a great video explaining pointers here : https://www.youtube.com/watch?v=iChalAKXffs)
 							*/
-
-							*vfPositionPos += vfDirection * fElapsedTime;
+							*pvfPositionPos += vfDirection * fElapsedTime;
+							
+							
 						}
 
 					}

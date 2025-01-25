@@ -33,6 +33,7 @@ namespace olc
 			DUCK,
 			HIT,
 			CLIMB,
+			CLIMB_PAUSE,
 			CHEER,
 			BACK,
 			SLIDE,
@@ -152,6 +153,12 @@ namespace olc
 			olc::Renderable renSpriteSheet;			// Keeps the sprSpriteSheet and decSpriteSheet in the one location
 
 			olc::vf2d vfMasterScaler;				// Master Scaler is used to scale the overall object, this is applied before AutoScaler
+
+
+			olc::vf2d vfGravityDirection = { 0.0f, 0.5f }; // Gravity speed and direction, default {0.0f, 0.0f}
+			bool bIsGravityEnabled = true;			// Enable/Disable gravity for this object
+
+			bool bIsOnLadder = false;				// Special Case for ladders, is set when the player object is on a ladder
 
 		};
 
@@ -590,6 +597,18 @@ namespace olc
 		actFrame_HIT.vecPartialImages.push_back(sImageInfo_HIT);
 		vecActionFrames.push_back(actFrame_HIT);
 
+		// CLIMB_PAUSE
+		ActionFrame actFrame_CLIMB_PAUSE;
+		ImageInfo sImageInfo_CLIMB_PAUSE;
+		actFrame_CLIMB_PAUSE.nActionID = ACTION::CLIMB_PAUSE;
+		actFrame_CLIMB_PAUSE.strActionName = "climb_pause";
+		actFrame_CLIMB_PAUSE.nMaxFrames = 1;
+
+		sImageInfo_CLIMB_PAUSE.vSource = { 960.0f, 0.0f };
+		sImageInfo_CLIMB_PAUSE.vSize = { 192.0f, 256.0f };
+		actFrame_CLIMB_PAUSE.vecPartialImages.push_back(sImageInfo_CLIMB_PAUSE);
+		vecActionFrames.push_back(actFrame_CLIMB_PAUSE);
+
 		// CLIMB
 		ActionFrame actFrame_CLIMB;
 		ImageInfo sImageInfo_CLIMB;
@@ -914,42 +933,42 @@ namespace olc
 		actFrame_WALK.nMaxFrames = 8;
 
 		// frame 0
-		sImageInfo_WALK.vSource = { 0.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 0.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 1
-		sImageInfo_WALK.vSource = { 192.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 192.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 2
-		sImageInfo_WALK.vSource = { 384.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 384.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 3
-		sImageInfo_WALK.vSource = { 576.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 576.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 4
-		sImageInfo_WALK.vSource = { 768.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 768.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 5
-		sImageInfo_WALK.vSource = { 960.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 960.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 6
-		sImageInfo_WALK.vSource = { 1152.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 1152.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 
 		// frame 7
-		sImageInfo_WALK.vSource = { 1344.0f, 1024.0f };
+		sImageInfo_WALK.vSource = { 1344.0f, 1025.0f };
 		sImageInfo_WALK.vSize = { 192.0f, 256.0f };
 		actFrame_WALK.vecPartialImages.push_back(sImageInfo_WALK);
 		vecActionFrames.push_back(actFrame_WALK);
